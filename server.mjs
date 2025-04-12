@@ -1,12 +1,10 @@
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-const next = require("next");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-
-// Import Message model
-const Message = require("./models/Message");
-const Session = require("./models/Session");
+import { createServer } from "http";
+import { Server } from "socket.io";
+import next from "next";
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import Message from "./src/models/Message.js";
+import Session from "./src/models/Session.js";
 
 dotenv.config();
 
@@ -35,7 +33,6 @@ app.prepare().then(() => {
       socket.join(sessionId);
       console.log(`Socket ${socket.id} joined room ${sessionId}`);
 
-      // Send existing messages when user joins
       try {
         const messages = await Message.find({ sessionId }).sort({ createdAt: 1 });
         socket.emit("chatHistory", messages);
@@ -45,7 +42,6 @@ app.prepare().then(() => {
     });
 
     socket.on("sendMessage", async ({ sessionId, message, sender }) => {
-      // Save message to DB
       try {
         const newMessage = new Message({ sessionId, message, sender });
         await newMessage.save();
@@ -53,7 +49,6 @@ app.prepare().then(() => {
         console.error("Error saving message:", err);
       }
 
-      // Broadcast to room
       io.to(sessionId).emit("receiveMessage", { message, sender });
     });
 
@@ -63,7 +58,7 @@ app.prepare().then(() => {
   });
 
   const port = process.env.PORT || 3000;
-  server.listen(port, () => {
+  server.listen(port, "0.0.0.0", () => {
     console.log(`> Ready on http://localhost:${port}`);
   });
 });

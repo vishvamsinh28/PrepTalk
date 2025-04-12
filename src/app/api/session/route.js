@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 
 export async function POST(req) {
   try {
-    const { title, description } = await req.json();
+    const { title, description, participants, evaluators } = await req.json();
 
     const token = req.cookies.get("prepTalkToken")?.value;
 
@@ -25,6 +25,8 @@ export async function POST(req) {
       title,
       description,
       createdBy: payload.email,
+      participants,
+      evaluators,
     });
 
     await newSession.save();

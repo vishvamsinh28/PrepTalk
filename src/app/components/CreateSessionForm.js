@@ -4,7 +4,12 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function CreateSessionForm() {
-  const [formData, setFormData] = useState({ title: "", description: "" });
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    participants: "",
+    evaluators: "",
+  });
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
@@ -16,9 +21,16 @@ export default function CreateSessionForm() {
     setMessage("");
 
     try {
-      const response = await axios.post("/api/session", formData);
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        participants: formData.participants.split(",").map((email) => email.trim()),
+        evaluators: formData.evaluators.split(",").map((email) => email.trim()),
+      };
+
+      const response = await axios.post("/api/session", payload);
       setMessage(response.data.message);
-      setFormData({ title: "", description: "" });
+      setFormData({ title: "", description: "", participants: "", evaluators: "" });
     } catch (error) {
       setMessage(error.response?.data?.message || "Session creation failed");
     }
@@ -45,6 +57,21 @@ export default function CreateSessionForm() {
         placeholder="Session Description"
         className="border w-full p-2 rounded"
       ></textarea>
+
+      <input
+        name="participants"
+        value={formData.participants}
+        onChange={handleChange}
+        placeholder="Participants Emails (comma separated)"
+        className="border w-full p-2 rounded"
+      />
+      <input
+        name="evaluators"
+        value={formData.evaluators}
+        onChange={handleChange}
+        placeholder="Evaluators Emails (comma separated)"
+        className="border w-full p-2 rounded"
+      />
 
       <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600 transition">
         Create Session
