@@ -4,8 +4,8 @@ import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import ChatRoom from "@/app/components/ChatRoom";
 
-export default async function SessionRoom({ params }) {
-  const { sessionId } = params;
+export default async function SessionRoom(props) {
+  const { sessionId } = await props.params;
 
   await connectDB();
 
@@ -19,16 +19,18 @@ export default async function SessionRoom({ params }) {
     );
   }
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("prepTalkToken")?.value;
 
   let userEmail = "Unknown";
+  let userRole = "Unknown";
 
   if (token) {
     try {
       const secret = new TextEncoder().encode(process.env.JWT_SECRET);
       const { payload } = await jwtVerify(token, secret);
       userEmail = payload.email;
+      userRole = payload.role;
     } catch (error) {
       console.error("Token error:", error);
     }
