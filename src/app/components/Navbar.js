@@ -48,12 +48,21 @@ export default function Navbar() {
         </button>
 
         {userRole === "Moderator" && (
-          <button
-            onClick={() => router.push("/moderator/analytics")}
-            className="text-gray-700 hover:text-blue-600 transition"
-          >
-            Analytics
-          </button>
+          <>
+            <button
+              onClick={() => router.push("/moderator/analytics")}
+              className="text-gray-700 hover:text-blue-600 transition"
+            >
+              Analytics
+            </button>
+
+            <button
+              onClick={() => router.push("/feedbacks")}
+              className="text-gray-700 hover:text-blue-600 transition"
+            >
+              Feedbacks
+            </button>
+          </>
         )}
 
         <button

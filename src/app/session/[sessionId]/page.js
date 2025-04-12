@@ -3,6 +3,7 @@ import Session from "@/models/Session";
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import ChatRoom from "@/app/components/ChatRoom";
+import FeedbackForm from "@/app/components/FeedbackForm";
 
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
@@ -43,6 +44,10 @@ export default async function SessionRoom(props) {
       <p className="text-sm text-gray-500">Created by: {session.createdBy}</p>
 
       <ChatRoom sessionId={sessionId} userEmail={userEmail} />
+      {userRole === "Evaluator" || userRole === "Moderator" ? (
+        <FeedbackForm sessionId={sessionId} userEmail={userEmail} role={userRole} />
+      ) : null}
+
     </div>
   );
 }
