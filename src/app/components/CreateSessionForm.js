@@ -9,6 +9,7 @@ export default function CreateSessionForm() {
     description: "",
     participants: "",
     evaluators: "",
+    topic: "",
   });
   const [message, setMessage] = useState("");
 
@@ -24,20 +25,35 @@ export default function CreateSessionForm() {
       const payload = {
         title: formData.title,
         description: formData.description,
-        participants: formData.participants.split(",").map((email) => email.trim()),
-        evaluators: formData.evaluators.split(",").map((email) => email.trim()),
+        topic: formData.topic,
+        participants: formData.participants
+          .split(",")
+          .map((email) => email.trim()),
+        evaluators: formData.evaluators
+          .split(",")
+          .map((email) => email.trim()),
       };
 
       const response = await axios.post("/api/session", payload);
       setMessage(response.data.message);
-      setFormData({ title: "", description: "", participants: "", evaluators: "" });
+
+      setFormData({
+        title: "",
+        description: "",
+        participants: "",
+        evaluators: "",
+        topic: "",
+      });
     } catch (error) {
       setMessage(error.response?.data?.message || "Session creation failed");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-white p-6 rounded shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 bg-white p-6 rounded shadow-md"
+    >
       <h2 className="text-xl font-bold mb-4">Create New Session</h2>
 
       {message && <p className="text-green-500">{message}</p>}
@@ -50,6 +66,7 @@ export default function CreateSessionForm() {
         className="border w-full p-2 rounded"
         required
       />
+
       <textarea
         name="description"
         value={formData.description}
@@ -58,6 +75,22 @@ export default function CreateSessionForm() {
         className="border w-full p-2 rounded"
       ></textarea>
 
+      <select
+        name="topic"
+        value={formData.topic}
+        onChange={handleChange}
+        className="border w-full p-2 rounded"
+        required
+      >
+        <option value="">-- Select a Topic --</option>
+        <option value="Artificial Intelligence">Artificial Intelligence</option>
+        <option value="Climate Change">Climate Change</option>
+        <option value="Future of Work">Future of Work</option>
+        <option value="Education System">Education System</option>
+        <option value="Mental Health Awareness">Mental Health Awareness</option>
+        <option value="Women Empowerment">Women Empowerment</option>
+      </select>
+
       <input
         name="participants"
         value={formData.participants}
@@ -65,6 +98,7 @@ export default function CreateSessionForm() {
         placeholder="Participants Emails (comma separated)"
         className="border w-full p-2 rounded"
       />
+
       <input
         name="evaluators"
         value={formData.evaluators}
@@ -73,7 +107,10 @@ export default function CreateSessionForm() {
         className="border w-full p-2 rounded"
       />
 
-      <button type="submit" className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600 transition">
+      <button
+        type="submit"
+        className="bg-blue-500 text-white w-full p-2 rounded hover:bg-blue-600 transition"
+      >
         Create Session
       </button>
     </form>
