@@ -58,7 +58,7 @@ export default function Navbar() {
           {/* Logo */}
           <div 
             className="flex items-center text-xl font-bold cursor-pointer"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/dashboard")}
           >
             <span className="bg-gradient-to-r from-sky-400 to-blue-500 text-transparent bg-clip-text">
               PrepTalk
