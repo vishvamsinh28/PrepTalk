@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser } from "react-icons/fa";
+import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser, FaRobot } from "react-icons/fa";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -24,7 +24,6 @@ export default function Navbar() {
 
     fetchUser();
 
-    // Add scroll listener to change navbar appearance
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
@@ -42,7 +41,6 @@ export default function Navbar() {
     }
   };
 
-  // Don't render navbar on landing page, login, or register
   if (["/login", "/register", "/"].includes(pathname)) return null;
 
   return (
@@ -66,8 +64,9 @@ export default function Navbar() {
             <span className="text-2xl ml-1">🎙️</span>
           </div>
 
-          {/* Desktop Navigation Menu */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
+            {/* Dashboard */}
             <NavItem 
               icon={<FaHome />}
               label="Dashboard"
@@ -83,6 +82,14 @@ export default function Navbar() {
                 pathname === "/participant" || 
                 pathname === "/evaluator"
               }
+            />
+
+            {/* New: AI Question Generator */}
+            <NavItem 
+              icon={<FaRobot />}
+              label="Practice AI Questions"
+              onClick={() => router.push("/practice-ai-questions")}
+              isActive={pathname === "/practice-ai-questions"}
             />
 
             {userRole === "Moderator" && (
@@ -114,7 +121,7 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Profile & Mobile Menu Button */}
+          {/* Mobile Menu Button */}
           <div className="flex items-center space-x-4 md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -137,6 +144,7 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden bg-gray-800 rounded-b-lg shadow-lg border border-gray-700 border-t-0">
             <div className="px-2 pt-2 pb-3 space-y-1">
+              {/* Dashboard */}
               <MobileNavItem 
                 icon={<FaHome />}
                 label="Dashboard"
@@ -155,6 +163,17 @@ export default function Navbar() {
                   pathname === "/participant" || 
                   pathname === "/evaluator"
                 }
+              />
+
+              {/* New: AI Question Generator */}
+              <MobileNavItem 
+                icon={<FaRobot />}
+                label="Practice AI Questions"
+                onClick={() => {
+                  router.push("/practice-ai-questions");
+                  setIsMenuOpen(false);
+                }}
+                isActive={pathname === "/practice-ai-questions"}
               />
 
               {userRole === "Moderator" && (
@@ -201,7 +220,6 @@ export default function Navbar() {
   );
 }
 
-// Desktop Navigation Item Component
 function NavItem({ icon, label, onClick, isActive }) {
   return (
     <button
@@ -218,7 +236,6 @@ function NavItem({ icon, label, onClick, isActive }) {
   );
 }
 
-// Mobile Navigation Item Component
 function MobileNavItem({ icon, label, onClick, isActive }) {
   return (
     <button
