@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import cleanMarkdown from "@/lib/cleanup";
 
 export default function MockInterview() {
   const [role, setRole] = useState("Software Engineer");
@@ -72,7 +73,7 @@ export default function MockInterview() {
         answers,
         role,
       });
-      setSummary(response.data.summary);
+      setSummary(cleanMarkdown(response.data.summary));
     } catch (error) {
       console.error("Error generating summary:", error);
     } finally {

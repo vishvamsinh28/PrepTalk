@@ -45,11 +45,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-gray-900 border-b border-gray-800 shadow-lg"
-          : "bg-gray-900/80 backdrop-blur-sm"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+        ? "bg-gray-900 border-b border-gray-800 shadow-lg"
+        : "bg-gray-900/80 backdrop-blur-sm"
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
@@ -75,8 +74,8 @@ export default function Navbar() {
                   userRole === "Moderator"
                     ? "/moderator"
                     : userRole === "Participant"
-                    ? "/participant"
-                    : "/evaluator"
+                      ? "/participant"
+                      : "/evaluator"
                 )
               }
               isActive={
@@ -92,6 +91,13 @@ export default function Navbar() {
               label="Practice AI Questions"
               onClick={() => router.push("/practice-ai-questions")}
               isActive={pathname === "/practice-ai-questions"}
+            />
+
+            <NavItem
+              icon={<FaUser />}
+              label="Resume Review"
+              onClick={() => router.push("/resume-review")}
+              isActive={pathname === "/resume-review"}
             />
 
             {/* Mock Interview */}
@@ -173,8 +179,8 @@ export default function Navbar() {
                     userRole === "Moderator"
                       ? "/moderator"
                       : userRole === "Participant"
-                      ? "/participant"
-                      : "/evaluator"
+                        ? "/participant"
+                        : "/evaluator"
                   );
                   setIsMenuOpen(false);
                 }}
@@ -194,6 +200,16 @@ export default function Navbar() {
                   setIsMenuOpen(false);
                 }}
                 isActive={pathname === "/practice-ai-questions"}
+              />
+
+              <MobileNavItem
+                icon={<FaUser />}
+                label="Resume Review"
+                onClick={() => {
+                  router.push("/resume-review");
+                  setIsMenuOpen(false);
+                }}
+                isActive={pathname === "/resume-review"}
               />
 
               {/* Mock Interview */}
@@ -266,11 +282,10 @@ function NavItem({ icon, label, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        isActive
-          ? "bg-sky-500/10 text-sky-400"
-          : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
-      }`}
+      className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+        ? "bg-sky-500/10 text-sky-400"
+        : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+        }`}
     >
       <span className="mr-1.5">{icon}</span>
       {label}
@@ -282,11 +297,10 @@ function MobileNavItem({ icon, label, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center w-full px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-        isActive
-          ? "bg-sky-500/10 text-sky-400"
-          : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
-      }`}
+      className={`flex items-center w-full px-3 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+        ? "bg-sky-500/10 text-sky-400"
+        : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
+        }`}
     >
       <span className="mr-2">{icon}</span>
       {label}

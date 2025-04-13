@@ -4,6 +4,7 @@ import { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { FaRobot, FaCopy } from "react-icons/fa";
+import cleanMarkdown from "@/lib/cleanup";
 
 export default function QuestionGenerator() {
     const [category, setCategory] = useState("Technical");
@@ -32,7 +33,7 @@ export default function QuestionGenerator() {
                 question: generatedQuestion,
             });
 
-            setQuestion(generatedQuestion);
+            setQuestion(cleanMarkdown(generatedQuestion));
             setHistory((prevHistory) => [generatedQuestion, ...prevHistory]);
         } catch (error) {
             console.error("Error generating question:", error);

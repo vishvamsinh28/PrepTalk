@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaCopy } from "react-icons/fa";
+import cleanMarkdown from "@/lib/cleanup";
 
 export default function QuestionHistory() {
   const [history, setHistory] = useState([]);
@@ -12,7 +13,7 @@ export default function QuestionHistory() {
     const fetchHistory = async () => {
       try {
         const response = await axios.get("/api/get-questions");
-        setHistory(response.data.questions);
+        setHistory(cleanMarkdown(response.data.questions));
       } catch (error) {
         console.error("Error fetching history:", error);
       } finally {
