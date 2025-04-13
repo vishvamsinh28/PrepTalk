@@ -25,14 +25,19 @@ app.prepare().then(() => {
     handle(req, res);
   });
 
-  const io = new Server(server);
+  const io = new Server(server, {
+    cors: {
+      origin: ["https://preptalk.onrender.com/"],
+      methods: ["GET", "POST"]
+    }
+  });
 
   io.on("connection", (socket) => {
     console.log("🟢 New client connected:", socket.id);
 
     socket.on("joinRoom", async (sessionId, userEmail) => {
       socket.join(sessionId);
-      console.log(`Socket ${socket.id} (${userEmail}) joined room ${sessionId}`);
+      console.log(`💬 ${userEmail} joined chat room: ${sessionId}`);
 
       if (!activeUsers[sessionId]) activeUsers[sessionId] = [];
       activeUsers[sessionId].push({ socketId: socket.id, userEmail });
@@ -58,42 +63,29 @@ app.prepare().then(() => {
       io.to(sessionId).emit("receiveMessage", { message, sender });
     });
 
+    socket.on("joinVideoRoom", (sessionId, userEmail) => {
+      socket.join(sessionId);
+      console.log(`🎥 ${userEmail} joined video room: ${sessionId}`);
+
+      socket.to(sessionId).emit("userJoinedVideoRoom", { socketId: socket.id, userEmail });
+    });
+
+    socket.on("sendingSignal", ({ userToSignal, callerId, signal }) => {
+      io.to(userToSignal).emit("userIncomingSignal", { signal, callerId });
+    });
+
+    socket.on("returningSignal", ({ callerId, signal }) => {
+      io.to(callerId).emit("receivingReturnedSignal", { signal, id: socket.id });
+    });
+
     socket.on("disconnect", () => {
       console.log("🔴 Client disconnected:", socket.id);
-
-      // === Video Room Events ===
-      socket.on("joinVideoRoom", (sessionId, userEmail) => {
-        socket.join(sessionId);
-        console.log(`🎥 ${userEmail} joined video room: ${sessionId}`);
-
-        // Notify other users in the room
-        socket.to(sessionId).emit("userJoinedVideoRoom", { socketId: socket.id, userEmail });
-      });
-
-      socket.on("sendingSignal", ({ userToSignal, callerId, signal }) => {
-        io.to(userToSignal).emit("userIncomingSignal", { signal, callerId });
-      });
-
-      socket.on("returningSignal", ({ callerId, signal }) => {
-        io.to(callerId).emit("receivingReturnedSignal", { signal, id: socket.id });
-      });
-
-      socket.on("disconnect", () => {
-        console.log("🔴 Client disconnected:", socket.id);
-
-        for (const sessionId in activeUsers) {
-          activeUsers[sessionId] = activeUsers[sessionId].filter(user => user.socketId !== socket.id);
-          io.to(sessionId).emit("activeUsers", activeUsers[sessionId].map((u) => u.userEmail));
-
-          // Notify video room about disconnection
-          io.to(sessionId).emit("userLeftVideoRoom", { socketId: socket.id });
-        }
-      });
-
 
       for (const sessionId in activeUsers) {
         activeUsers[sessionId] = activeUsers[sessionId].filter(user => user.socketId !== socket.id);
         io.to(sessionId).emit("activeUsers", activeUsers[sessionId].map((u) => u.userEmail));
+
+        io.to(sessionId).emit("userLeftVideoRoom", { socketId: socket.id });
       }
     });
   });
