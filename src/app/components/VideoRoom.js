@@ -3,10 +3,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
+import { useRouter } from "next/navigation";
 
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
+const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+  transports: ["websocket"],
+});
 
 export default function VideoRoom({ sessionId, userEmail }) {
+  const router = useRouter();
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -15,31 +19,34 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
   const userVideo = useRef();
   const peersRef = useRef([]);
+  const streamsRef = useRef({});
 
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then(currentStream => {
         setStream(currentStream);
-
         if (userVideo.current) {
           userVideo.current.srcObject = currentStream;
         }
 
         socket.emit("joinVideoRoom", sessionId, userEmail);
 
-        // Listen for new participants
         socket.on("userJoinedVideoRoom", ({ socketId, userEmail }) => {
+          if (peersRef.current.find(p => p.peerId === socketId)) return;
+
           const peer = createPeer(socketId, socket.id, currentStream);
           peersRef.current.push({ peerId: socketId, peer, userEmail });
-          setPeers(users => [...users, peer]);
+          setPeers(existing => [...existing, peer]);
           setParticipants(p => [...p, { socketId, userEmail }]);
         });
 
         socket.on("userIncomingSignal", ({ callerId, signal }) => {
+          if (peersRef.current.find(p => p.peerId === callerId)) return;
+
           const peer = addPeer(signal, callerId, currentStream);
           peersRef.current.push({ peerId: callerId, peer });
-          setPeers(users => [...users, peer]);
+          setPeers(existing => [...existing, peer]);
         });
 
         socket.on("receivingReturnedSignal", ({ id, signal }) => {
@@ -57,6 +64,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
           peersRef.current = peersRef.current.filter(p => p.peerId !== socketId);
           setPeers(peers => peers.filter(p => p.peerId !== socketId));
           setParticipants(p => p.filter(user => user.socketId !== socketId));
+          delete streamsRef.current[socketId];
         });
       });
 
@@ -79,6 +87,10 @@ export default function VideoRoom({ sessionId, userEmail }) {
       socket.emit("sendingSignal", { userToSignal, callerId, signal });
     });
 
+    peer.on("stream", remoteStream => {
+      streamsRef.current[userToSignal] = remoteStream;
+    });
+
     return peer;
   }
 
@@ -91,6 +103,10 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
     peer.on("signal", signal => {
       socket.emit("returningSignal", { callerId, signal });
+    });
+
+    peer.on("stream", remoteStream => {
+      streamsRef.current[callerId] = remoteStream;
     });
 
     peer.signal(incomingSignal);
@@ -117,41 +133,32 @@ export default function VideoRoom({ sessionId, userEmail }) {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
     }
-    window.location.reload();
+    router.push("/dashboard");
   };
 
   return (
     <div className="flex flex-col items-center p-4 space-y-4">
-      {/* Participants Grid */}
+      {/* Video Grid */}
       <div className="flex flex-wrap gap-6 justify-center">
         {/* Self Video */}
-        <div className="flex flex-col items-center">
-          <video
-            className="w-64 rounded shadow mb-2"
-            ref={userVideo}
-            autoPlay
-            muted
-            playsInline
-          />
-          <span className="text-sm text-gray-600">{userEmail} (You)</span>
-        </div>
+        <VideoTile
+          videoRef={userVideo}
+          userEmail={userEmail}
+          isSelf={true}
+          streamReady={!!stream}
+        />
 
-        {/* Other Peers */}
+        {/* Peers Videos */}
         {peers.map((peer, index) => (
-          <Video
+          <PeerVideoTile
             key={index}
             peer={peer}
+            peerId={peersRef.current[index]?.peerId}
             userEmail={participants[index + 1]?.userEmail || "Participant"}
+            streamsRef={streamsRef}
           />
         ))}
       </div>
-
-      {/* Waiting Message */}
-      {participants.length <= 1 && (
-        <p className="text-gray-500 mt-4 animate-pulse">
-          Waiting for others to join the video room...
-        </p>
-      )}
 
       {/* Controls */}
       <div className="flex space-x-4 mt-4">
@@ -178,21 +185,43 @@ export default function VideoRoom({ sessionId, userEmail }) {
   );
 }
 
-function Video({ peer, userEmail }) {
+function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
+  return (
+    <div className="flex flex-col items-center">
+      <video
+        className="w-64 rounded shadow mb-2 bg-black"
+        ref={videoRef}
+        autoPlay
+        muted={isSelf}
+        playsInline
+      />
+      <span className="text-sm text-gray-600">
+        {userEmail} {isSelf && "(You)"}
+        {!streamReady && " (Connecting...)"} 
+      </span>
+    </div>
+  );
+}
+
+function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   const ref = useRef();
 
   useEffect(() => {
-    peer.on("stream", stream => {
+    peer.on("stream", remoteStream => {
       if (ref.current) {
-        ref.current.srcObject = stream;
+        ref.current.srcObject = remoteStream;
       }
     });
-  }, [peer]);
+
+    if (streamsRef.current[peerId] && ref.current) {
+      ref.current.srcObject = streamsRef.current[peerId];
+    }
+  }, [peer, peerId, streamsRef]);
 
   return (
     <div className="flex flex-col items-center">
       <video
-        className="w-64 rounded shadow mb-2"
+        className="w-64 rounded shadow mb-2 bg-black"
         ref={ref}
         autoPlay
         playsInline
