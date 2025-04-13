@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import DashboardClient from "../components/DashboardClient";
 
 export default async function DashboardPage() {
   const cookieStore = cookies();
@@ -12,23 +13,17 @@ export default async function DashboardPage() {
   } catch (error) {
     console.error("Token verification failed:", error);
     return (
-      <div className="flex min-h-screen justify-center items-center">
-        <h2 className="text-xl text-red-500">Invalid or expired token. Please login again.</h2>
+      <div className="flex min-h-screen justify-center items-center bg-gray-900 text-gray-100">
+        <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg max-w-md text-center">
+          <svg className="w-12 h-12 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <p className="text-lg font-medium">Invalid or expired token.</p>
+          <p className="mt-2 text-sm">Please login again to continue.</p>
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="flex min-h-screen justify-center items-center flex-col bg-gray-100">
-      <h1 className="text-3xl font-bold mb-4">Welcome to PrepTalk 🚀</h1>
-      <p className="text-xl">Hello, <strong>{userData?.email}</strong>!</p>
-      <p className="text-lg mt-2">Your role: <span className="font-semibold">{userData?.role}</span></p>
-
-      <div className="mt-6 space-x-4">
-        <a href="/moderator" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Moderator Panel</a>
-        <a href="/participant" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Participant Panel</a>
-        <a href="/evaluator" className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition">Evaluator Panel</a>
-      </div>
-    </div>
-  );
+  return <DashboardClient userData={userData} />;
 }
