@@ -4,6 +4,9 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function MockInterview() {
+  const [role, setRole] = useState("Software Engineer");
+  const roles = ["Software Engineer", "Data Analyst", "Product Manager", "UI/UX Designer", "Cybersecurity Specialist"];
+
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
@@ -13,15 +16,12 @@ export default function MockInterview() {
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [interviewCompleted, setInterviewCompleted] = useState(false);
   const [summary, setSummary] = useState("");
-  const [role, setRole] = useState("Software Engineer");
 
-  const roles = ["Software Engineer", "Data Analyst", "Product Manager", "UI/UX Designer", "Cybersecurity Specialist"];
-  
   const startInterview = async () => {
     setLoading(true);
     try {
       const response = await axios.post("/api/start-mock-interview", {
-        role: "Software Engineer",
+        role,
         category: "Technical",
         numberOfQuestions: 5,
       });
@@ -70,6 +70,7 @@ export default function MockInterview() {
       const response = await axios.post("/api/generate-summary", {
         questions,
         answers,
+        role,
       });
       setSummary(response.data.summary);
     } catch (error) {
@@ -81,13 +82,30 @@ export default function MockInterview() {
 
   if (!interviewStarted) {
     return (
-      <button
-        onClick={startInterview}
-        disabled={loading}
-        className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-md hover:shadow-sky-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {loading ? "Starting Interview..." : "Start AI Mock Interview"}
-      </button>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-400 mb-2">Select Role for Interview:</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          >
+            {roles.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          onClick={startInterview}
+          disabled={loading}
+          className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-all transform hover:scale-105 shadow-md hover:shadow-sky-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? "Starting Interview..." : "Start AI Mock Interview"}
+        </button>
+      </div>
     );
   }
 
@@ -99,6 +117,20 @@ export default function MockInterview() {
         <div className="bg-gray-700 border border-gray-600 p-4 rounded-lg text-gray-100">
           {summary}
         </div>
+        <button
+          onClick={() => {
+            setInterviewStarted(false);
+            setInterviewCompleted(false);
+            setQuestions([]);
+            setCurrentQuestionIndex(0);
+            setAnswers([]);
+            setFeedback([]);
+            setSummary("");
+          }}
+          className="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-sky-600 hover:to-blue-700 transition"
+        >
+          Retry Interview
+        </button>
       </div>
     );
   }

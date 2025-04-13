@@ -8,13 +8,16 @@ export async function POST(req) {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+    const randomSeed = Math.floor(Math.random() * 1000);
+
     const prompt = `
-      Generate ${numberOfQuestions} realistic and challenging interview questions for the role of ${role}, focusing on ${category} skills.
+      Generate ${numberOfQuestions} unique and varied interview questions for the role of ${role}, focusing on ${category} skills.
+      Avoid repetition from previous questions, make each question creative and diverse.
+      Random seed: ${randomSeed}
       Do not provide answers, just the questions.
-      Format the output as a plain numbered list, like:
+      Format as plain numbered list:
       1. Question one?
       2. Question two?
-      3. Question three?
       ...
     `;
 

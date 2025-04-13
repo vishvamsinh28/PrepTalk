@@ -15,8 +15,6 @@ export async function POST(req) {
       - If the answer is correct, partially correct, or incorrect
       - Any improvements or suggestions
 
-      Format your response as plain text, 2-3 lines.
-
       Question: ${question}
       Candidate's Answer: ${answer}
     `;

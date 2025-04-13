@@ -1,9 +1,13 @@
+import { connectDB } from "@/lib/db";
+import InterviewResult from "@/models/InterviewResult";
+import { cookies } from "next/headers";
+import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export async function POST(req) {
   try {
-    const { questions, answers } = await req.json();
+    const { questions, answers, role } = await req.json();
 
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -20,12 +24,8 @@ export async function POST(req) {
       - Strengths observed
       - Areas of improvement
 
-      Be specific and encouraging.
-
       Interview Transcript:
       ${qaPairs}
-
-      Provide your summary as plain text, around 4-5 lines.
     `;
 
     const result = await model.generateContent({
@@ -40,6 +40,28 @@ export async function POST(req) {
 
     const response = result.response;
     const summary = response.text().trim();
+
+    const cookieStore = cookies();
+    const token = cookieStore.get("prepTalkToken")?.value;
+
+    let userEmail = "Unknown";
+    if (token) {
+      try {
+        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+        const { payload } = await jwtVerify(token, secret);
+        userEmail = payload.email;
+      } catch (error) {
+        console.error("Token verification failed:", error);
+      }
+    }
+
+    await connectDB();
+    const interviewResult = new InterviewResult({
+      userEmail,
+      role,
+      summary,
+    });
+    await interviewResult.save();
 
     return NextResponse.json({ summary });
   } catch (error) {

@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser, FaRobot } from "react-icons/fa";
+import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser, FaRobot, FaMicrophone } from "react-icons/fa";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -44,17 +44,17 @@ export default function Navbar() {
   if (["/login", "/register", "/"].includes(pathname)) return null;
 
   return (
-    <nav 
+    <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-gray-900 border-b border-gray-800 shadow-lg" 
+        isScrolled
+          ? "bg-gray-900 border-b border-gray-800 shadow-lg"
           : "bg-gray-900/80 backdrop-blur-sm"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div 
+          <div
             className="flex items-center text-xl font-bold cursor-pointer"
             onClick={() => router.push("/dashboard")}
           >
@@ -67,49 +67,69 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             {/* Dashboard */}
-            <NavItem 
+            <NavItem
               icon={<FaHome />}
               label="Dashboard"
-              onClick={() => router.push(
-                userRole === "Moderator" 
-                  ? "/moderator" 
-                  : userRole === "Participant" 
-                    ? "/participant" 
+              onClick={() =>
+                router.push(
+                  userRole === "Moderator"
+                    ? "/moderator"
+                    : userRole === "Participant"
+                    ? "/participant"
                     : "/evaluator"
-              )}
+                )
+              }
               isActive={
-                pathname === "/moderator" || 
-                pathname === "/participant" || 
+                pathname === "/moderator" ||
+                pathname === "/participant" ||
                 pathname === "/evaluator"
               }
             />
 
-            {/* New: AI Question Generator */}
-            <NavItem 
+            {/* Practice AI Questions */}
+            <NavItem
               icon={<FaRobot />}
               label="Practice AI Questions"
               onClick={() => router.push("/practice-ai-questions")}
               isActive={pathname === "/practice-ai-questions"}
             />
 
+            {/* Mock Interview */}
+            <NavItem
+              icon={<FaMicrophone />}
+              label="Mock Interview"
+              onClick={() => router.push("/mock-interview")}
+              isActive={pathname === "/mock-interview"}
+            />
+
+            {/* Interview History */}
+            <NavItem
+              icon={<FaComments />}
+              label="Interview History"
+              onClick={() => router.push("/mock-interview/history")}
+              isActive={pathname === "/mock-interview/history"}
+            />
+
+            {/* Moderator-only items */}
             {userRole === "Moderator" && (
               <>
-                <NavItem 
+                <NavItem
                   icon={<FaChartBar />}
                   label="Analytics"
-                  onClick={() => router.push("/moderator/analytics")} 
+                  onClick={() => router.push("/moderator/analytics")}
                   isActive={pathname === "/moderator/analytics"}
                 />
 
-                <NavItem 
+                <NavItem
                   icon={<FaComments />}
                   label="Feedbacks"
-                  onClick={() => router.push("/feedbacks")} 
+                  onClick={() => router.push("/feedbacks")}
                   isActive={pathname === "/feedbacks"}
                 />
               </>
             )}
 
+            {/* Logout Button */}
             <div className="pl-4 ml-2 border-l border-gray-700">
               <button
                 onClick={handleLogout}
@@ -145,28 +165,28 @@ export default function Navbar() {
           <div className="md:hidden bg-gray-800 rounded-b-lg shadow-lg border border-gray-700 border-t-0">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {/* Dashboard */}
-              <MobileNavItem 
+              <MobileNavItem
                 icon={<FaHome />}
                 label="Dashboard"
                 onClick={() => {
                   router.push(
-                    userRole === "Moderator" 
-                      ? "/moderator" 
-                      : userRole === "Participant" 
-                        ? "/participant" 
-                        : "/evaluator"
+                    userRole === "Moderator"
+                      ? "/moderator"
+                      : userRole === "Participant"
+                      ? "/participant"
+                      : "/evaluator"
                   );
                   setIsMenuOpen(false);
                 }}
                 isActive={
-                  pathname === "/moderator" || 
-                  pathname === "/participant" || 
+                  pathname === "/moderator" ||
+                  pathname === "/participant" ||
                   pathname === "/evaluator"
                 }
               />
 
-              {/* New: AI Question Generator */}
-              <MobileNavItem 
+              {/* Practice AI Questions */}
+              <MobileNavItem
                 icon={<FaRobot />}
                 label="Practice AI Questions"
                 onClick={() => {
@@ -176,9 +196,31 @@ export default function Navbar() {
                 isActive={pathname === "/practice-ai-questions"}
               />
 
+              {/* Mock Interview */}
+              <MobileNavItem
+                icon={<FaMicrophone />}
+                label="Mock Interview"
+                onClick={() => {
+                  router.push("/mock-interview");
+                  setIsMenuOpen(false);
+                }}
+                isActive={pathname === "/mock-interview"}
+              />
+
+              {/* Interview History */}
+              <MobileNavItem
+                icon={<FaComments />}
+                label="Interview History"
+                onClick={() => {
+                  router.push("/mock-interview/history");
+                  setIsMenuOpen(false);
+                }}
+                isActive={pathname === "/mock-interview/history"}
+              />
+
               {userRole === "Moderator" && (
                 <>
-                  <MobileNavItem 
+                  <MobileNavItem
                     icon={<FaChartBar />}
                     label="Analytics"
                     onClick={() => {
@@ -188,7 +230,7 @@ export default function Navbar() {
                     isActive={pathname === "/moderator/analytics"}
                   />
 
-                  <MobileNavItem 
+                  <MobileNavItem
                     icon={<FaComments />}
                     label="Feedbacks"
                     onClick={() => {
@@ -225,8 +267,8 @@ function NavItem({ icon, label, onClick, isActive }) {
     <button
       onClick={onClick}
       className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        isActive 
-          ? "bg-sky-500/10 text-sky-400" 
+        isActive
+          ? "bg-sky-500/10 text-sky-400"
           : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
       }`}
     >
@@ -241,8 +283,8 @@ function MobileNavItem({ icon, label, onClick, isActive }) {
     <button
       onClick={onClick}
       className={`flex items-center w-full px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-        isActive 
-          ? "bg-sky-500/10 text-sky-400" 
+        isActive
+          ? "bg-sky-500/10 text-sky-400"
           : "text-gray-400 hover:text-gray-200 hover:bg-gray-800"
       }`}
     >
