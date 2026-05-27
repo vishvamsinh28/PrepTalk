@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaEye, FaEyeSlash, FaLock, FaRocket, FaUsersCog } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUsersCog } from "react-icons/fa";
+import PrepTalkLogo from "../components/PrepTalkLogo";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -56,9 +57,7 @@ export default function RegisterPage() {
       >
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
-              <FaRocket className="text-2xl text-slate-950" />
-            </div>
+            <PrepTalkLogo showWord={false} markClassName="h-16 w-16" />
           </div>
           <h2 className="text-4xl font-black tracking-tight gradient-text">Create account</h2>
           <p className="mt-3 text-slate-300">Join PrepTalk and elevate your skills today.</p>

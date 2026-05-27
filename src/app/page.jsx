@@ -11,6 +11,7 @@ import {
   FaRocket,
   FaUserGraduate,
 } from "react-icons/fa";
+import PrepTalkLogo from "./components/PrepTalkLogo";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 22 },
@@ -55,10 +56,7 @@ export default function HomePage() {
               className="flex items-center gap-3 text-left"
               aria-label="PrepTalk home"
             >
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 font-black text-slate-950 shadow-lg shadow-cyan-500/20">
-                PT
-              </span>
-              <span className="text-xl font-black tracking-tight">PrepTalk</span>
+              <PrepTalkLogo />
             </button>
 
             <div className="flex items-center gap-3">

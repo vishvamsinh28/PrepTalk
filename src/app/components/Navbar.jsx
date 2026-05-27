@@ -3,14 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaClipboardCheck, FaListAlt, FaPlus, FaSignOutAlt, FaUserFriends } from "react-icons/fa";
-
-function LogoMark() {
-  return (
-    <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 font-black text-slate-950 shadow-lg shadow-cyan-500/20">
-      P
-    </span>
-  );
-}
+import PrepTalkLogo from "./PrepTalkLogo";
 
 function getRoleHome(role) {
   if (role === "Interviewer") return "/interviewer";
@@ -82,7 +75,7 @@ export default function Navbar() {
       <div
         className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 ${
           isScrolled
-            ? "rounded-2xl border border-white/10 bg-slate-950/72 px-4 py-2 shadow-xl shadow-black/20"
+            ? "rounded-2xl bg-slate-950/72 px-4 py-2 shadow-xl shadow-black/20"
             : ""
         }`}
       >
@@ -91,8 +84,7 @@ export default function Navbar() {
             onClick={() => router.push(getRoleHome(userRole))}
             aria-label="PrepTalk home"
           >
-            <LogoMark />
-            <span className="text-xl font-black tracking-tight text-white">PrepTalk</span>
+            <PrepTalkLogo />
           </button>
 
           <div className="hidden items-center gap-3 md:flex">
