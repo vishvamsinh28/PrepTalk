@@ -78,7 +78,7 @@ export default function DashboardClient({ userData }) {
             <motion.a
               variants={itemVariants}
               href={action.href}
-              className={`mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-gradient-to-r ${action.className} px-6 py-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
+              className={`mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-linear-to-r ${action.className} px-6 py-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
             >
               {action.icon}
               {action.label}

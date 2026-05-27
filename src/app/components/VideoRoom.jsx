@@ -247,7 +247,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         </button>
         <button
           onClick={leaveRoom}
-          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-rose-500 to-red-400 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-rose-500 to-red-400 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
         >
           <FaPhoneSlash />
           Leave Room
@@ -268,7 +268,7 @@ function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
         muted={isSelf}
         playsInline
       />
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/80 to-transparent p-4">
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-linear-to-t from-black/80 to-transparent p-4">
         <div>
           <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
           <p className="text-xs text-slate-300">{isSelf ? "You" : "Participant"} {!streamReady && "· Connecting"}</p>
@@ -304,7 +304,7 @@ function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
         autoPlay
         playsInline
       />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-4">
         <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
         <p className="text-xs text-slate-300">Remote participant</p>
       </div>

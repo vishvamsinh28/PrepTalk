@@ -190,7 +190,7 @@ export default function InterviewScorecard({ sessionId, session }) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          className="rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
         >
           Save Report
         </button>

@@ -81,7 +81,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
               <FaLink />
               Copy public join link
             </button>
-            <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
+            <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
               <FaEnvelope />
               Draft email invite
             </a>
@@ -97,7 +97,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
           </div>
           {isInterviewer && (
             <div className="flex flex-wrap gap-2">
-              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
+              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
                 <FaMagic />
                 {loading === "questions" ? "Generating..." : "Generate questions"}
               </button>
@@ -109,7 +109,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
           )}
         </div>
 
-        <div className="max-h-[42rem] overflow-y-auto pr-1">
+        <div className="max-h-168 overflow-y-auto pr-1">
           {prepGuide && (
             <div className="mb-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
               <p className="mb-2 font-black text-cyan-100">Interviewee prep</p>

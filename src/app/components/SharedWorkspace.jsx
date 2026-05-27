@@ -45,7 +45,7 @@ export default function SharedWorkspace({ sessionId, inviteCode }) {
         </div>
         <button
           onClick={saveWorkspace}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950"
         >
           <FaSave />
           Save

@@ -132,7 +132,7 @@ export default function CreateSessionForm() {
           <h2 className="text-2xl font-black tracking-tight text-white">Create session</h2>
           <p className="mt-2 text-sm text-slate-300">Set up the interview, schedule, agenda, and invite package.</p>
         </div>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-linear-to-br from-cyan-300 via-emerald-300 to-blue-400">
           <FaRocket className="text-xl text-slate-950" />
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function CreateSessionForm() {
               <FaLink />
               Copy link
             </button>
-            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
+            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
               <FaEnvelope />
               Send email
             </a>
@@ -337,7 +337,7 @@ export default function CreateSessionForm() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
+          className="w-full rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
         >
           Create Session
         </button>

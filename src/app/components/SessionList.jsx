@@ -130,7 +130,7 @@ function SessionCard({ session, router, variants, compact }) {
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => router.push(`/session/${session._id}`)}
-          className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
+          className="flex items-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
         >
           <FaSignInAlt />
           Join Session

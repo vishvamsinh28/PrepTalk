@@ -50,7 +50,7 @@ export default function IntervieweeSessionList() {
             <p className="text-sm text-slate-300">Please check back later.</p>
           </motion.div>
         ) : (
-          <motion.div className="grid max-h-[42rem] gap-5 overflow-y-auto pr-1" variants={containerVariants}>
+          <motion.div className="grid max-h-168 gap-5 overflow-y-auto pr-1" variants={containerVariants}>
             <AnimatePresence>
               {sessions.map((session) => (
                 <motion.div
@@ -73,7 +73,7 @@ export default function IntervieweeSessionList() {
                   </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+                    className="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-300 via-cyan-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
                   >
                     <FaSignInAlt />
                     Join Session

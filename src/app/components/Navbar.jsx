@@ -105,7 +105,7 @@ export default function Navbar() {
             <div>
               <button
                 onClick={handleLogout}
-                className="flex items-center rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="flex items-center rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
               >
                 <FaSignOutAlt className="mr-1" />
                 Logout
@@ -148,7 +148,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
+                  className="flex w-full items-center justify-center rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
                 >
                   <FaSignOutAlt className="mr-2" />
                   Logout
