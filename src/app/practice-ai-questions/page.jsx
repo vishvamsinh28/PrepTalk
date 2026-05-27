@@ -1,7 +1,7 @@
 "use client";
 
 import QuestionGenerator from "../components/QuestionGenerator";
-import QuestionHistory from "../components/QuestionHistory.js";
+import QuestionHistory from "../components/QuestionHistory";
 import Quiz from "../components/Quiz";
 import QuizHistory from "../components/QuizHistory";
 
