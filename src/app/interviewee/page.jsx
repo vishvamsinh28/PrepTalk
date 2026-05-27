@@ -2,7 +2,6 @@ import { getCurrentUser } from "@/lib/serverAuth";
 import IntervieweeSessionList from "../components/IntervieweeSessionList";
 import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
-import { FaUserFriends } from "react-icons/fa";
 
 export default async function IntervieweePage() {
   const userData = await getCurrentUser();
@@ -22,9 +21,6 @@ export default async function IntervieweePage() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-300 via-cyan-300 to-blue-400 shadow-lg shadow-cyan-500/20">
-              <FaUserFriends className="text-xl text-slate-950" />
-            </div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewee workspace</p>
             <h1 className="text-5xl font-black tracking-tight gradient-text">Your practice room</h1>
             <p className="mt-3 max-w-2xl text-slate-300">Join assigned sessions, review prep guidance, and track your feedback history.</p>

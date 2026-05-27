@@ -50,7 +50,7 @@ export default function IntervieweeSessionList() {
             <p className="text-sm text-slate-300">Please check back later.</p>
           </motion.div>
         ) : (
-          <motion.div className="space-y-6" variants={containerVariants}>
+          <motion.div className="grid max-h-[42rem] gap-5 overflow-y-auto pr-1" variants={containerVariants}>
             <AnimatePresence>
               {sessions.map((session) => (
                 <motion.div

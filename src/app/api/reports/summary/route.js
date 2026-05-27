@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
 import InterviewReport from "@/models/InterviewReport";
 import Session from "@/models/Session";
+import { isValidObjectId } from "@/lib/sessionAccess";
 
 function summaryPrompt({ session, report }) {
   return `
@@ -33,6 +34,7 @@ export async function POST(req) {
 
     const { reportId } = await req.json();
     if (!reportId) return json({ message: "reportId is required" }, 400);
+    if (!isValidObjectId(reportId)) return json({ message: "Invalid reportId" }, 400);
 
     await connectDB();
     const report = await InterviewReport.findById(reportId);

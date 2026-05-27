@@ -109,39 +109,41 @@ export default function SessionTools({ sessionId, session, userRole }) {
           )}
         </div>
 
-        {prepGuide && (
-          <div className="mb-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
-            <p className="mb-2 font-black text-cyan-100">Interviewee prep</p>
-            <p className="whitespace-pre-wrap text-sm leading-6 text-slate-200">{prepGuide}</p>
-          </div>
-        )}
+        <div className="max-h-[42rem] overflow-y-auto pr-1">
+          {prepGuide && (
+            <div className="mb-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
+              <p className="mb-2 font-black text-cyan-100">Interviewee prep</p>
+              <p className="whitespace-pre-wrap text-sm leading-6 text-slate-200">{prepGuide}</p>
+            </div>
+          )}
 
-        {isInterviewer ? (
-          <div className="grid gap-3">
-            {questions.length > 0 ? questions.map((item, index) => (
-            <article key={`${item.question}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
-              <div className="mb-2 flex flex-wrap gap-2">
-                <span className="rounded-lg bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-100">{item.category}</span>
-                {item.skill && <span className="rounded-lg bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{item.skill}</span>}
-              </div>
-              <p className="font-bold text-white">{item.question}</p>
-              {item.followUps?.length > 0 && (
-                <ul className="mt-3 space-y-1 text-sm text-slate-300">
-                  {item.followUps.map((followUp) => <li key={followUp}>- {followUp}</li>)}
-                </ul>
+          {isInterviewer ? (
+            <div className="grid gap-3">
+              {questions.length > 0 ? questions.map((item, index) => (
+              <article key={`${item.question}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+                <div className="mb-2 flex flex-wrap gap-2">
+                  <span className="rounded-lg bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-100">{item.category}</span>
+                  {item.skill && <span className="rounded-lg bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{item.skill}</span>}
+                </div>
+                <p className="font-bold text-white">{item.question}</p>
+                {item.followUps?.length > 0 && (
+                  <ul className="mt-3 space-y-1 text-sm text-slate-300">
+                    {item.followUps.map((followUp) => <li key={followUp}>- {followUp}</li>)}
+                  </ul>
+                )}
+              </article>
+            )) : (
+              <p className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-300">
+                Generate an AI question bank for this role, level, and skill set.
+              </p>
               )}
-            </article>
-          )) : (
+            </div>
+          ) : (
             <p className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-300">
-              Generate an AI question bank for this role, level, and skill set.
+              Your interviewer controls the question bank. Use this area to review the prep guide and agenda before the call.
             </p>
-            )}
-          </div>
-        ) : (
-          <p className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-300">
-            Your interviewer controls the question bank. Use this area to review the prep guide and agenda before the call.
-          </p>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

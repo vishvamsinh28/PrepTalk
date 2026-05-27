@@ -2,16 +2,18 @@ import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { json } from "@/lib/api";
+import { normalizeEmailList, normalizeStringList, normalizeText } from "@/lib/validation";
 import crypto from "crypto";
 
 function parseAgenda(agenda) {
   if (Array.isArray(agenda)) {
     return agenda
       .map((item) => ({
-        title: String(item.title || "").trim(),
-        minutes: Number(item.minutes) || 10,
+        title: normalizeText(item.title, 120),
+        minutes: Math.min(Math.max(Number(item.minutes) || 10, 1), 240),
       }))
-      .filter((item) => item.title);
+      .filter((item) => item.title)
+      .slice(0, 20);
   }
 
   return String(agenda || "")
@@ -21,10 +23,11 @@ function parseAgenda(agenda) {
     .map((line) => {
       const match = line.match(/^(.+?)(?:\s*[-–]\s*(\d+)\s*min(?:utes?)?)?$/i);
       return {
-        title: match?.[1]?.trim() || line,
-        minutes: Number(match?.[2]) || 10,
+        title: normalizeText(match?.[1] || line, 120),
+        minutes: Math.min(Math.max(Number(match?.[2]) || 10, 1), 240),
       };
-    });
+    })
+    .slice(0, 20);
 }
 
 export async function POST(req) {
@@ -52,21 +55,23 @@ export async function POST(req) {
       return json({ message: "Only interviewers can create sessions" }, 403);
     }
 
-    if (!title || !role) {
+    const cleanTitle = normalizeText(title, 120);
+    const cleanRole = normalizeText(role, 120);
+    if (!cleanTitle || !cleanRole) {
       return json({ message: "Session title and target role are required" }, 400);
     }
 
     await connectDB();
 
     const newSession = new Session({
-      title,
-      description,
-      role,
+      title: cleanTitle,
+      description: normalizeText(description, 1200),
+      role: cleanRole,
       level,
       interviewType,
-      skills,
+      skills: normalizeStringList(skills, 20, 80),
       createdBy: payload.email,
-      interviewees,
+      interviewees: normalizeEmailList(interviewees, 25),
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
       durationMinutes: Number(durationMinutes) || 60,
       agenda: parseAgenda(agenda),

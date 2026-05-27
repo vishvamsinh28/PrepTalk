@@ -2,19 +2,8 @@ import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
-import Session from "@/models/Session";
-
-function normalizePrepGuide(value, fallback = "") {
-  if (Array.isArray(value)) {
-    return value.map((item) => `- ${String(item).trim()}`).join("\n");
-  }
-
-  if (typeof value === "string") {
-    return value;
-  }
-
-  return fallback;
-}
+import { normalizePrepGuide } from "@/lib/aiOutput";
+import { findOwnedSession } from "@/lib/sessionAccess";
 
 function prepPrompt(session) {
   return `
@@ -40,13 +29,13 @@ export async function POST(req, props) {
     if (user.role !== "Interviewer") return json({ message: "Only interviewers can generate prep guides" }, 403);
 
     await connectDB();
-    const session = await Session.findById(sessionId);
+    const session = await findOwnedSession(sessionId, user);
     if (!session) return json({ message: "Session not found" }, 404);
-    if (session.createdBy !== user.email) return json({ message: "Forbidden" }, 403);
 
     const result = await generateGeminiJson(prepPrompt(session));
     const prepGuide = normalizePrepGuide(result.prepGuide, session.prepGuide);
-    await Session.findByIdAndUpdate(sessionId, { $set: { prepGuide } }, { runValidators: false });
+    session.prepGuide = prepGuide;
+    await session.save();
 
     return json({ prepGuide });
   } catch (error) {

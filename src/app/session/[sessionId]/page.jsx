@@ -5,15 +5,29 @@ import ChatRoom from "@/app/components/ChatRoom";
 import VideoRoom from "@/app/components/VideoRoom";
 import InterviewScorecard from "@/app/components/InterviewScorecard";
 import AuthState from "@/app/components/AuthState";
-import { FaComments, FaExclamationTriangle, FaUserTie } from "react-icons/fa";
+import { FaExclamationTriangle, FaUserTie } from "react-icons/fa";
 import SessionTools from "@/app/components/SessionTools";
 import SharedWorkspace from "@/app/components/SharedWorkspace";
+import { isValidObjectId, userCanAccessSession } from "@/lib/sessionAccess";
 
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
   const searchParams = await props.searchParams;
 
   await connectDB();
+
+  if (!isValidObjectId(sessionId)) {
+    return (
+      <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
+        <div className="soft-grid absolute inset-0 opacity-60"></div>
+        <div className="glass-panel relative z-10 max-w-md rounded-2xl p-8 text-center">
+          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-amber-200" />
+          <p className="text-xl font-black text-white">Session not found</p>
+          <p className="mt-2 text-sm text-slate-300">Please check the session ID and try again.</p>
+        </div>
+      </div>
+    );
+  }
 
   const session = await Session.findById(sessionId);
 
@@ -38,6 +52,10 @@ export default async function SessionRoom(props) {
   const sessionData = JSON.parse(JSON.stringify(session));
   const inviteCode = typeof searchParams?.invite === "string" ? searchParams.invite : "";
 
+  if (!userCanAccessSession(session, user, inviteCode)) {
+    return <AuthState title="Access denied." message="You do not have access to this session." />;
+  }
+
   return (
     <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
       <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
@@ -46,9 +64,6 @@ export default async function SessionRoom(props) {
         <section className="glass-panel mb-5 rounded-xl p-5 sm:p-6">
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
             <div className="min-w-0">
-              <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
-                <FaComments className="text-xl text-slate-950" />
-              </div>
               <h1 className="text-4xl font-black leading-tight tracking-tight text-white">{session.title}</h1>
               <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{session.description}</p>
               <div className="mt-4 flex flex-wrap gap-2">
@@ -91,7 +106,7 @@ export default async function SessionRoom(props) {
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Conversation</p>
               <h2 className="text-2xl font-black text-white">Live Chat</h2>
             </div>
-            <ChatRoom sessionId={sessionId} userEmail={user.email} />
+            <ChatRoom sessionId={sessionId} userEmail={user.email} inviteCode={inviteCode} />
           </aside>
         </div>
 

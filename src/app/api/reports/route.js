@@ -3,6 +3,8 @@ import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import InterviewReport from "@/models/InterviewReport";
 import Session from "@/models/Session";
+import { isValidObjectId } from "@/lib/sessionAccess";
+import { normalizeEmail, normalizeText } from "@/lib/validation";
 
 export async function GET(req) {
   try {
@@ -33,6 +35,11 @@ export async function POST(req) {
 
     const body = await req.json();
     const { sessionId, intervieweeEmail, recommendation, scores, strengths, improvements, notes } = body;
+    const cleanIntervieweeEmail = normalizeEmail(intervieweeEmail);
+
+    if (!isValidObjectId(sessionId)) {
+      return json({ message: "Invalid sessionId" }, 400);
+    }
 
     await connectDB();
     const session = await Session.findById(sessionId);
@@ -41,21 +48,21 @@ export async function POST(req) {
       return json({ message: "Only the session interviewer can submit this report" }, 403);
     }
 
-    if (!session.interviewees.includes(intervieweeEmail)) {
+    if (!session.interviewees.includes(cleanIntervieweeEmail)) {
       return json({ message: "Interviewee is not assigned to this session" }, 400);
     }
 
     const report = await InterviewReport.findOneAndUpdate(
-      { sessionId, intervieweeEmail },
+      { sessionId, intervieweeEmail: cleanIntervieweeEmail },
       {
         sessionId,
-        intervieweeEmail,
+        intervieweeEmail: cleanIntervieweeEmail,
         interviewerEmail: user.email,
         recommendation,
         scores,
-        strengths,
-        improvements,
-        notes,
+        strengths: normalizeText(strengths, 2000),
+        improvements: normalizeText(improvements, 2000),
+        notes: normalizeText(notes, 3000),
       },
       { new: true, upsert: true, runValidators: true }
     );

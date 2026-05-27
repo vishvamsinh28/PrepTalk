@@ -3,16 +3,22 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { createAuthCookie, signAuthToken } from "@/lib/auth";
 import { json } from "@/lib/api";
+import { normalizeEmail } from "@/lib/validation";
 
 export async function POST(req) {
   try {
     const { email, password } = await req.json();
+    const cleanEmail = normalizeEmail(email);
+
+    if (!cleanEmail || !password) {
+      return json({ message: "Email and password are required" }, 400);
+    }
 
     await connectDB();
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: cleanEmail });
     if (!user) {
-      return json({ message: "User not found" }, 404);
+      return json({ message: "Invalid credentials" }, 401);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

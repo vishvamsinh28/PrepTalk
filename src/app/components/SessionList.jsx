@@ -69,7 +69,10 @@ export default function SessionList({ compact = false }) {
         )}
 
         {!loading && sessions.length > 0 && (
-          <motion.div className={compact ? "grid gap-4" : "grid gap-5 lg:grid-cols-2"} variants={containerVariants}>
+          <motion.div
+            className={compact ? "grid max-h-[34rem] gap-4 overflow-y-auto pr-1" : "grid max-h-[46rem] gap-5 overflow-y-auto pr-1 lg:grid-cols-2"}
+            variants={containerVariants}
+          >
             <AnimatePresence>
               {sessions.map((session) => (
                 <SessionCard key={session._id} session={session} router={router} variants={itemVariants} compact={compact} />

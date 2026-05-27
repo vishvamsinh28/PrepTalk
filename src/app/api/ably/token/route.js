@@ -12,6 +12,10 @@ export async function GET(req) {
     const ably = getAblyRestClient();
     const tokenRequest = await ably.auth.createTokenRequest({
       clientId: user.email,
+      capability: JSON.stringify({
+        "chat:*": ["publish", "subscribe", "presence"],
+        "video:*": ["publish", "subscribe", "presence"],
+      }),
     });
 
     return json(tokenRequest);

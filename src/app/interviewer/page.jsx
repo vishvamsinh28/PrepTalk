@@ -3,7 +3,6 @@ import CreateSessionForm from "../components/CreateSessionForm";
 import SessionList from "../components/SessionList";
 import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
-import { FaMicrophoneAlt } from "react-icons/fa";
 
 export default async function InterviewerPage() {
   const userData = await getCurrentUser();
@@ -23,9 +22,6 @@ export default async function InterviewerPage() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-8">
           <div>
-            <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
-              <FaMicrophoneAlt className="text-xl text-slate-950" />
-            </div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewer workspace</p>
             <h1 className="text-4xl font-black tracking-tight gradient-text sm:text-5xl">Run better interviews</h1>
             <p className="mt-3 max-w-2xl text-slate-300">Create sessions, send invites, generate AI questions, and review reports from one focused workspace.</p>
