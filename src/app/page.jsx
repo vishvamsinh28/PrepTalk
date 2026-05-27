@@ -95,7 +95,7 @@ export default function HomePage() {
           <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
             variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             {[
-              { icon: <FaUserGraduate />, title: "Role-Based Experience", desc: "Moderator, Participant, or Evaluator with tailored interfaces for you." },
+              { icon: <FaUserGraduate />, title: "Role-Based Experience", desc: "Interviewer and interviewee workflows with tailored interfaces." },
               { icon: <FaComments />, title: "Real-Time Collaboration", desc: "Dynamic discussions with instant messaging & audio features." },
               { icon: <FaClipboardCheck />, title: "Comprehensive Feedback", desc: "Get actionable insights to boost your performance fast." },
               { icon: <FaRocket />, title: "AI-Powered Insights", desc: "Personalized recommendations to play on your strengths." },

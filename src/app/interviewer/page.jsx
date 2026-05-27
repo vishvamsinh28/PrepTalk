@@ -4,15 +4,15 @@ import SessionList from "../components/SessionList";
 import AuthState from "../components/AuthState";
 import { FaMicrophoneAlt } from "react-icons/fa";
 
-export default async function ModeratorPage() {
+export default async function InterviewerPage() {
   const userData = await getCurrentUser();
 
   if (!userData) {
     return <AuthState title="Invalid token." message="Please login again to continue." />;
   }
 
-  if (userData.role !== "Moderator") {
-    return <AuthState title="Access denied." message="This page is restricted to Moderators only." />;
+  if (userData.role !== "Interviewer") {
+    return <AuthState title="Access denied." message="This page is restricted to Interviewers only." />;
   }
 
   return (
@@ -27,9 +27,9 @@ export default async function ModeratorPage() {
           <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
             <FaMicrophoneAlt className="text-3xl text-sky-300" />
           </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-2">Moderator Panel 🎤</h1>
+          <h1 className="text-4xl font-bold text-sky-300 mb-2">Interviewer Panel</h1>
           <p className="text-gray-400 text-sm mb-4">Welcome, {userData.email}!</p>
-          <p className="text-gray-500 text-xs">Your role: <strong className="text-sky-300">{userData.role}</strong></p>
+          <p className="text-gray-500 text-xs">Your role: <strong className="text-sky-300">Interviewer</strong></p>
         </div>
 
         <div className="mb-16">

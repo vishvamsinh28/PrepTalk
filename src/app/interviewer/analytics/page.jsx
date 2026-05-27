@@ -153,11 +153,11 @@ export default function AnalyticsPage() {
           className="text-center mt-8"
         >
           <button
-            onClick={() => window.location.href = "/moderator"}
+            onClick={() => window.location.href = "/interviewer"}
             className="flex items-center justify-center mx-auto bg-gray-800 hover:bg-gray-700 text-sky-400 px-6 py-3 rounded-lg border border-sky-500/30 hover:border-sky-500/50 transition-all group"
           >
             <FaArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" />
-            Back to Moderator Panel
+            Back to Interviewer Panel
           </button>
         </motion.div>
       </div>

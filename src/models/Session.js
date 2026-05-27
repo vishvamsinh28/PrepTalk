@@ -6,8 +6,7 @@ const SessionSchema = new mongoose.Schema(
     description: { type: String },
     topic: { type: String },
     createdBy: { type: String, required: true },
-    participants: [{ type: String }],
-    evaluators: [{ type: String }],
+    interviewees: [{ type: String }],
   },
   { timestamps: true }
 );

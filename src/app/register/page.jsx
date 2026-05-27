@@ -13,7 +13,7 @@ export default function RegisterPage() {
     username: "",
     email: "",
     password: "",
-    role: "Participant",
+    role: "Interviewee",
   });
 
   const [error, setError] = useState("");
@@ -131,9 +131,8 @@ export default function RegisterPage() {
               onChange={handleChange} 
               className="bg-gray-700 border border-gray-600 w-full p-3 pl-10 rounded-lg focus:outline-none focus:border-sky-500 transition-colors appearance-none"
             >
-              <option value="Participant">Participant</option>
-              <option value="Moderator">Moderator</option>
-              <option value="Evaluator">Evaluator</option>
+              <option value="Interviewee">Interviewee</option>
+              <option value="Interviewer">Interviewer</option>
             </select>
           </div>
 

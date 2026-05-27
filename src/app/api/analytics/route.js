@@ -12,8 +12,8 @@ export async function GET(req) {
       return json({ message: "Unauthorized" }, 401);
     }
 
-    if (payload.role !== "Moderator") {
-      return json({ message: "Only moderators can view analytics" }, 403);
+    if (payload.role !== "Interviewer") {
+      return json({ message: "Only interviewers can view analytics" }, 403);
     }
 
     await connectDB();

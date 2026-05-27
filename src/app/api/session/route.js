@@ -5,15 +5,15 @@ import { json } from "@/lib/api";
 
 export async function POST(req) {
   try {
-    const { title, description, topic, participants, evaluators } = await req.json();
+    const { title, description, topic, interviewees } = await req.json();
 
     const payload = await getAuthPayloadFromRequest(req);
     if (!payload) {
       return json({ message: "Unauthorized" }, 401);
     }
 
-    if (payload.role !== "Moderator") {
-      return json({ message: "Only moderators can create sessions" }, 403);
+    if (payload.role !== "Interviewer") {
+      return json({ message: "Only interviewers can create sessions" }, 403);
     }
 
     await connectDB();
@@ -23,8 +23,7 @@ export async function POST(req) {
       description,
       topic,
       createdBy: payload.email,
-      participants,
-      evaluators,
+      interviewees,
     });
 
     await newSession.save();

@@ -9,8 +9,7 @@ export default function CreateSessionForm() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    participants: "",
-    evaluators: "",
+    interviewees: "",
     topic: "",
   });
   const [message, setMessage] = useState("");
@@ -30,11 +29,7 @@ export default function CreateSessionForm() {
         title: formData.title,
         description: formData.description,
         topic: formData.topic,
-        participants: formData.participants
-          .split(",")
-          .map((email) => email.trim())
-          .filter(Boolean),
-        evaluators: formData.evaluators
+        interviewees: formData.interviewees
           .split(",")
           .map((email) => email.trim())
           .filter(Boolean),
@@ -47,8 +42,7 @@ export default function CreateSessionForm() {
       setFormData({
         title: "",
         description: "",
-        participants: "",
-        evaluators: "",
+        interviewees: "",
         topic: "",
       });
     } catch (error) {
@@ -68,8 +62,8 @@ export default function CreateSessionForm() {
         <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-3">
           <FaRocket className="text-3xl text-sky-300" />
         </div>
-        <h2 className="text-3xl font-bold text-sky-300 mb-1">Create New Session 🚀</h2>
-        <p className="text-gray-400 text-sm">Launch your next discussion effortlessly.</p>
+        <h2 className="text-3xl font-bold text-sky-300 mb-1">Create New Session</h2>
+        <p className="text-gray-400 text-sm">Invite interviewees and start a practice session.</p>
       </div>
 
       {message && (
@@ -124,18 +118,10 @@ export default function CreateSessionForm() {
         </select>
 
         <input
-          name="participants"
-          value={formData.participants}
+          name="interviewees"
+          value={formData.interviewees}
           onChange={handleChange}
-          placeholder="Participants Emails (comma separated)"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
-        />
-
-        <input
-          name="evaluators"
-          value={formData.evaluators}
-          onChange={handleChange}
-          placeholder="Evaluators Emails (comma separated)"
+          placeholder="Interviewee emails (comma separated)"
           className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
         />
 

@@ -33,7 +33,7 @@ export default function FeedbackClient({ feedbacks, sessions }) {
       >
         <motion.div variants={itemVariants} className="mb-8">
           <button
-            onClick={() => window.location.href = "/moderator"}
+            onClick={() => window.location.href = "/interviewer"}
             className="flex items-center bg-gray-800 hover:bg-gray-700 text-sky-400 px-4 py-2 rounded-lg border border-sky-500/30 hover:border-sky-500/50 transition-all group"
           >
             <FaArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" />
@@ -46,7 +46,7 @@ export default function FeedbackClient({ feedbacks, sessions }) {
             <FaRegCommentDots className="text-3xl text-sky-300" />
           </div>
           <h1 className="text-4xl font-bold text-sky-300 mb-3">All Feedbacks</h1>
-          <p className="text-gray-400">See what participants are saying about your sessions.</p>
+          <p className="text-gray-400">Review feedback submitted by interviewers.</p>
         </motion.div>
 
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
@@ -71,7 +71,7 @@ export default function FeedbackClient({ feedbacks, sessions }) {
           <motion.div variants={itemVariants} className="text-center text-gray-400 bg-gray-800 p-8 rounded-xl border border-gray-700">
             <FaComments className="text-5xl text-sky-500 mb-4 mx-auto" />
             <p className="text-lg">No feedback submitted yet.</p>
-            <p className="text-sm text-gray-500">Encourage participants to share their thoughts!</p>
+            <p className="text-sm text-gray-500">Feedback will appear here after an interviewer submits it.</p>
           </motion.div>
         ) : (
           <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={containerVariants}>

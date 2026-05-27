@@ -5,9 +5,8 @@ import { useEffect, useState } from "react";
 import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser, FaRobot, FaMicrophone } from "react-icons/fa";
 
 function getRoleHome(role) {
-  if (role === "Moderator") return "/moderator";
-  if (role === "Participant") return "/participant";
-  if (role === "Evaluator") return "/evaluator";
+  if (role === "Interviewer") return "/interviewer";
+  if (role === "Interviewee") return "/interviewee";
   return "/dashboard";
 }
 
@@ -57,7 +56,7 @@ export default function Navbar() {
       icon: <FaHome />,
       label: "Dashboard",
       path: getRoleHome(userRole),
-      isActive: ["/moderator", "/participant", "/evaluator", "/dashboard"].includes(pathname),
+    isActive: ["/interviewer", "/interviewee", "/dashboard"].includes(pathname),
     },
     {
       icon: <FaRobot />,
@@ -83,13 +82,13 @@ export default function Navbar() {
       path: "/mock-interview/history",
       isActive: pathname === "/mock-interview/history",
     },
-    ...(userRole === "Moderator"
+    ...(userRole === "Interviewer"
       ? [
           {
             icon: <FaChartBar />,
             label: "Analytics",
-            path: "/moderator/analytics",
-            isActive: pathname === "/moderator/analytics",
+            path: "/interviewer/analytics",
+            isActive: pathname === "/interviewer/analytics",
           },
           {
             icon: <FaComments />,

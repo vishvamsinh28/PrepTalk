@@ -66,7 +66,7 @@ export default async function SessionRoom(props) {
           </div>
         </div>
 
-        {(user.role === "Evaluator" || user.role === "Moderator") && (
+        {user.role === "Interviewer" && (
           <div className="mt-16 bg-gray-800 p-6 rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold text-sky-300 mb-6">Submit Feedback 📝</h2>
             <FeedbackForm sessionId={sessionId} userEmail={user.email} role={user.role} />

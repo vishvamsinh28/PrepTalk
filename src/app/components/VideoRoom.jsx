@@ -154,7 +154,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
             key={index}
             peer={peer}
             peerId={peersRef.current[index]?.peerId}
-            userEmail={participants[index + 1]?.userEmail || "Participant"}
+            userEmail={participants[index + 1]?.userEmail || "Interviewee"}
             streamsRef={streamsRef}
           />
         ))}

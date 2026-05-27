@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChalkboardTeacher, FaSignInAlt } from "react-icons/fa";
 
-export default function ParticipantSessionList({ userEmail }) {
+export default function IntervieweeSessionList({ userEmail }) {
   const [sessions, setSessions] = useState([]);
   const router = useRouter();
 
@@ -14,8 +14,8 @@ export default function ParticipantSessionList({ userEmail }) {
     const fetchSessions = async () => {
       try {
         const response = await getJson("/api/session/list");
-        const filtered = response.sessions.filter(session =>
-          session.participants.includes(userEmail)
+        const filtered = response.sessions.filter((session) =>
+          session.interviewees.includes(userEmail)
         );
         setSessions(filtered);
       } catch (error) {
@@ -59,7 +59,7 @@ export default function ParticipantSessionList({ userEmail }) {
 
         {sessions.length === 0 ? (
           <motion.div variants={itemVariants} className="text-center bg-gray-800 p-6 rounded-xl border border-gray-700">
-            <p className="text-lg text-sky-400">😔 No sessions assigned yet.</p>
+            <p className="text-lg text-sky-400">No sessions assigned yet.</p>
             <p className="text-gray-400 text-sm">Please check back later.</p>
           </motion.div>
         ) : (

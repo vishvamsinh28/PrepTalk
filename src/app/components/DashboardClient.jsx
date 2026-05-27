@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaUserShield, FaUserFriends, FaUserCheck } from "react-icons/fa";
+import { FaUserShield, FaUserFriends } from "react-icons/fa";
 
 export default function DashboardClient({ userData }) {
   const containerVariants = {
@@ -18,28 +18,21 @@ export default function DashboardClient({ userData }) {
   };
 
   const roleDescriptions = {
-    Moderator: "As a Moderator, you can create sessions, manage participants, and guide discussions.",
-    Participant: "As a Participant, you can join discussions, share ideas, and improve your speaking skills.",
-    Evaluator: "As an Evaluator, you can provide feedback, rate participants, and help them grow."
+    Interviewer: "As an Interviewer, you can create sessions, run interviews, and provide feedback.",
+    Interviewee: "As an Interviewee, you can join sessions, practice interviews, and improve your answers."
   };
   const roleActions = {
-    Moderator: {
-      href: "/moderator",
+    Interviewer: {
+      href: "/interviewer",
       icon: <FaUserShield />,
-      label: "Open Moderator Panel",
+      label: "Open Interviewer Panel",
       className: "from-blue-500 to-sky-500",
     },
-    Participant: {
-      href: "/participant",
+    Interviewee: {
+      href: "/interviewee",
       icon: <FaUserFriends />,
-      label: "Open Participant Panel",
+      label: "Open Interviewee Panel",
       className: "from-green-500 to-emerald-500",
-    },
-    Evaluator: {
-      href: "/evaluator",
-      icon: <FaUserCheck />,
-      label: "Open Evaluator Panel",
-      className: "from-yellow-500 to-amber-400",
     },
   };
   const action = roleActions[userData?.role];
