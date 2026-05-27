@@ -1,38 +1,61 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import io from "socket.io-client";
+import * as Ably from "ably";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPaperPlane, FaUsers } from "react-icons/fa";
+import { getJson, postJson } from "@/lib/clientApi";
 
-let socket;
+function uniqueUsers(members) {
+  return [...new Set(members.map((member) => member.data?.userEmail).filter(Boolean))];
+}
 
 export default function ChatRoom({ sessionId, userEmail }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
+  const channelRef = useRef(null);
+  const ablyRef = useRef(null);
 
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    socket = io();
+    let isMounted = true;
+    const ably = new Ably.Realtime({ authUrl: "/api/ably/token" });
+    const channel = ably.channels.get(`chat:${sessionId}`);
+    ablyRef.current = ably;
+    channelRef.current = channel;
 
-    socket.emit("joinRoom", sessionId, userEmail);
+    getJson(`/api/messages?sessionId=${encodeURIComponent(sessionId)}`)
+      .then((data) => {
+        if (isMounted) setMessages(data.messages);
+      })
+      .catch((error) => console.error("Error fetching messages:", error));
 
-    socket.on("chatHistory", (history) => {
-      setMessages(history);
-    });
+    const handleMessage = (event) => {
+      setMessages((prev) => {
+        if (prev.some((msg) => msg._id === event.data._id)) return prev;
+        return [...prev, event.data];
+      });
+    };
 
-    socket.on("receiveMessage", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
+    const updatePresence = async () => {
+      const members = await channel.presence.get();
+      if (isMounted) setActiveUsers(uniqueUsers(members));
+    };
 
-    socket.on("activeUsers", (users) => {
-      setActiveUsers(users);
+    channel.subscribe("message", handleMessage);
+    channel.presence.subscribe(updatePresence);
+    channel.presence.enter({ userEmail }).then(updatePresence).catch((error) => {
+      console.error("Error entering chat presence:", error);
     });
 
     return () => {
-      socket.disconnect();
+      isMounted = false;
+      channel.presence.leave().catch(() => {});
+      channel.unsubscribe("message", handleMessage);
+      channel.presence.unsubscribe(updatePresence);
+      ably.close();
     };
   }, [sessionId, userEmail]);
 
@@ -40,12 +63,18 @@ export default function ChatRoom({ sessionId, userEmail }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() === "") return;
 
-    socket.emit("sendMessage", { sessionId, message, sender: userEmail });
-    setMessages((prev) => [...prev, { message, sender: "You" }]);
+    const text = message.trim();
     setMessage("");
+
+    try {
+      const saved = await postJson("/api/messages", { sessionId, message: text });
+      await channelRef.current?.publish("message", saved.message);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
 
   return (
@@ -77,18 +106,18 @@ export default function ChatRoom({ sessionId, userEmail }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className={`flex ${
-                msg.sender === "You" ? "justify-end" : "justify-start"
+                msg.sender === userEmail ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`px-3 py-2 rounded-lg text-sm ${
-                  msg.sender === "You"
+                  msg.sender === userEmail
                     ? "bg-sky-500 text-white rounded-br-none"
                     : "bg-gray-600 text-gray-200 rounded-bl-none"
                 }`}
               >
                 <strong className="block text-xs opacity-70 mb-1">
-                  {msg.sender}
+                  {msg.sender === userEmail ? "You" : msg.sender}
                 </strong>
                 {msg.message}
               </div>

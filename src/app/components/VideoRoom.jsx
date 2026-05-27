@@ -1,13 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
+import * as Ably from "ably";
 import Peer from "simple-peer";
 import { useRouter } from "next/navigation";
-
-const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-  transports: ["websocket"],
-});
 
 export default function VideoRoom({ sessionId, userEmail }) {
   const router = useRouter();
@@ -20,63 +16,116 @@ export default function VideoRoom({ sessionId, userEmail }) {
   const userVideo = useRef();
   const peersRef = useRef([]);
   const streamsRef = useRef({});
+  const ablyRef = useRef(null);
+  const channelRef = useRef(null);
+  const connectionIdRef = useRef("");
+  const streamRef = useRef(null);
 
   useEffect(() => {
+    let isMounted = true;
+    const ably = new Ably.Realtime({ authUrl: "/api/ably/token" });
+    const channel = ably.channels.get(`video:${sessionId}`);
+    ablyRef.current = ably;
+    channelRef.current = channel;
+
+    const removePeer = (connectionId) => {
+      const peerObj = peersRef.current.find(p => p.peerId === connectionId);
+      if (peerObj) {
+        peerObj.peer.destroy();
+      }
+      peersRef.current = peersRef.current.filter(p => p.peerId !== connectionId);
+      setPeers(peers => peers.filter(p => p.peerId !== connectionId));
+      setParticipants(p => p.filter(user => user.socketId !== connectionId));
+      delete streamsRef.current[connectionId];
+    };
+
+    const syncPresence = async () => {
+      const members = await channel.presence.get();
+      const selfId = connectionIdRef.current;
+      const remoteMembers = members.filter((member) => member.connectionId !== selfId);
+
+      setParticipants([
+        { socketId: "self", userEmail },
+        ...remoteMembers.map((member) => ({
+          socketId: member.connectionId,
+          userEmail: member.data?.userEmail || "Interviewee",
+        })),
+      ]);
+
+      remoteMembers.forEach((member) => {
+        if (streamRef.current && !peersRef.current.find((p) => p.peerId === member.connectionId)) {
+          const peer = createPeer(member.connectionId, streamRef.current);
+          peersRef.current.push({ peerId: member.connectionId, peer, userEmail: member.data?.userEmail });
+          setPeers(existing => [...existing, peer]);
+        }
+      });
+    };
+
+    const handleSignal = (event) => {
+      const data = event.data;
+      const selfId = connectionIdRef.current;
+      if (!selfId || data.to !== selfId || data.from === selfId || !streamRef.current) return;
+
+      if (event.name === "signal-offer") {
+        if (peersRef.current.find(p => p.peerId === data.from)) return;
+
+        const peer = addPeer(data.signal, data.from, streamRef.current);
+        peersRef.current.push({ peerId: data.from, peer, userEmail: data.userEmail });
+        setPeers(existing => [...existing, peer]);
+        setParticipants(p => (
+          p.some((user) => user.socketId === data.from)
+            ? p
+            : [...p, { socketId: data.from, userEmail: data.userEmail || "Interviewee" }]
+        ));
+      }
+
+      if (event.name === "signal-answer") {
+        const item = peersRef.current.find(p => p.peerId === data.from);
+        if (item) item.peer.signal(data.signal);
+      }
+    };
+
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then(currentStream => {
+        if (!isMounted) {
+          currentStream.getTracks().forEach(track => track.stop());
+          return;
+        }
+
+        streamRef.current = currentStream;
         setStream(currentStream);
         if (userVideo.current) {
           userVideo.current.srcObject = currentStream;
         }
 
-        socket.emit("joinVideoRoom", sessionId, userEmail);
-
-        socket.on("userJoinedVideoRoom", ({ socketId, userEmail }) => {
-          if (peersRef.current.find(p => p.peerId === socketId)) return;
-
-          const peer = createPeer(socketId, socket.id, currentStream);
-          peersRef.current.push({ peerId: socketId, peer, userEmail });
-          setPeers(existing => [...existing, peer]);
-          setParticipants(p => [...p, { socketId, userEmail }]);
+        ably.connection.once("connected", async () => {
+          connectionIdRef.current = ably.connection.id;
+          await channel.attach();
+          await channel.subscribe("signal-offer", handleSignal);
+          await channel.subscribe("signal-answer", handleSignal);
+          await channel.presence.subscribe("enter", syncPresence);
+          await channel.presence.subscribe("leave", (event) => removePeer(event.connectionId));
+          await channel.presence.enter({ userEmail });
+          await syncPresence();
         });
-
-        socket.on("userIncomingSignal", ({ callerId, signal }) => {
-          if (peersRef.current.find(p => p.peerId === callerId)) return;
-
-          const peer = addPeer(signal, callerId, currentStream);
-          peersRef.current.push({ peerId: callerId, peer });
-          setPeers(existing => [...existing, peer]);
-        });
-
-        socket.on("receivingReturnedSignal", ({ id, signal }) => {
-          const item = peersRef.current.find(p => p.peerId === id);
-          if (item) {
-            item.peer.signal(signal);
-          }
-        });
-
-        socket.on("userLeftVideoRoom", ({ socketId }) => {
-          const peerObj = peersRef.current.find(p => p.peerId === socketId);
-          if (peerObj) {
-            peerObj.peer.destroy();
-          }
-          peersRef.current = peersRef.current.filter(p => p.peerId !== socketId);
-          setPeers(peers => peers.filter(p => p.peerId !== socketId));
-          setParticipants(p => p.filter(user => user.socketId !== socketId));
-          delete streamsRef.current[socketId];
-        });
-      });
+      })
+      .catch((error) => console.error("Unable to start video stream:", error));
 
     return () => {
-      socket.disconnect();
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+      isMounted = false;
+      channel.unsubscribe("signal-offer", handleSignal);
+      channel.unsubscribe("signal-answer", handleSignal);
+      channel.presence.unsubscribe();
+      channel.presence.leave().catch(() => {});
+      peersRef.current.forEach(({ peer }) => peer.destroy());
+      peersRef.current = [];
+      streamRef.current?.getTracks().forEach(track => track.stop());
+      ably.close();
     };
-  }, []);
+  }, [sessionId, userEmail]);
 
-  function createPeer(userToSignal, callerId, stream) {
+  function createPeer(userToSignal, stream) {
     const peer = new Peer({
       initiator: true,
       trickle: false,
@@ -84,7 +133,12 @@ export default function VideoRoom({ sessionId, userEmail }) {
     });
 
     peer.on("signal", signal => {
-      socket.emit("sendingSignal", { userToSignal, callerId, signal });
+      channelRef.current?.publish("signal-offer", {
+        to: userToSignal,
+        from: connectionIdRef.current,
+        userEmail,
+        signal,
+      });
     });
 
     peer.on("stream", remoteStream => {
@@ -102,7 +156,12 @@ export default function VideoRoom({ sessionId, userEmail }) {
     });
 
     peer.on("signal", signal => {
-      socket.emit("returningSignal", { callerId, signal });
+      channelRef.current?.publish("signal-answer", {
+        to: callerId,
+        from: connectionIdRef.current,
+        userEmail,
+        signal,
+      });
     });
 
     peer.on("stream", remoteStream => {
@@ -129,10 +188,9 @@ export default function VideoRoom({ sessionId, userEmail }) {
   };
 
   const leaveRoom = () => {
-    socket.disconnect();
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
+    channelRef.current?.presence.leave().catch(() => {});
+    ablyRef.current?.close();
+    streamRef.current?.getTracks().forEach(track => track.stop());
     router.push("/dashboard");
   };
 
