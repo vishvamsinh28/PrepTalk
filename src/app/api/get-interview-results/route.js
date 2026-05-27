@@ -1,28 +1,18 @@
 import { connectDB } from "@/lib/db";
 import InterviewResult from "@/models/InterviewResult";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { getCurrentUser } from "@/lib/serverAuth";
 
 export async function GET() {
   try {
     await connectDB();
 
-    const cookieStore = cookies();
-    const token = cookieStore.get("prepTalkToken")?.value;
-
-    let userEmail = "Unknown";
-    if (token) {
-      try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        userEmail = payload.email;
-      } catch (error) {
-        console.error("Token verification failed:", error);
-      }
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const results = await InterviewResult.find({ userEmail }).sort({ date: -1 });
+    const results = await InterviewResult.find({ userEmail: user.email }).sort({ date: -1 });
 
     return NextResponse.json({ results });
   } catch (error) {

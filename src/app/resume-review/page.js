@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 import cleanMarkdown from "@/lib/cleanup";
 
 export default function ResumeReviewPage() {
@@ -28,8 +28,8 @@ export default function ResumeReviewPage() {
     setFeedback("");
 
     try {
-      const response = await axios.post("/api/resume-review", formData);
-      setFeedback(cleanMarkdown(response.data.feedback));
+      const response = await postJson("/api/resume-review", formData);
+      setFeedback(cleanMarkdown(response.feedback));
     } catch (error) {
       console.error("Error analyzing resume:", error);
       setFeedback("There was an error analyzing your resume. Please try again later.");

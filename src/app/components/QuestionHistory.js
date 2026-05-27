@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 import { FaCopy } from "react-icons/fa";
 import cleanMarkdown from "@/lib/cleanup";
 
@@ -12,8 +12,8 @@ export default function QuestionHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get("/api/get-questions");
-        setHistory(cleanMarkdown(response.data.questions));
+        const response = await getJson("/api/get-questions");
+        setHistory(response.questions.map((q) => ({ ...q, question: cleanMarkdown(q.question) })));
       } catch (error) {
         console.error("Error fetching history:", error);
       } finally {

@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateGeminiContent } from "@/lib/gemini";
 
 export async function POST(req) {
   try {
     const { question, answer } = await req.json();
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
       You are an expert interviewer.
@@ -19,18 +16,15 @@ export async function POST(req) {
       Candidate's Answer: ${answer}
     `;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
+    const feedback = await generateGeminiContent(
+      { contents: [{ role: "user", parts: [{ text: prompt }] }] },
+      {
         temperature: 0.7,
         topK: 40,
         topP: 0.9,
         maxOutputTokens: 512,
-      },
-    });
-
-    const response = result.response;
-    const feedback = response.text().trim();
+      }
+    );
 
     return NextResponse.json({ feedback });
   } catch (error) {

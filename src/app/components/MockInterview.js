@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 import cleanMarkdown from "@/lib/cleanup";
 
 export default function MockInterview() {
@@ -21,12 +21,12 @@ export default function MockInterview() {
   const startInterview = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/start-mock-interview", {
+      const response = await postJson("/api/start-mock-interview", {
         role,
         category: "Technical",
         numberOfQuestions: 5,
       });
-      setQuestions(response.data.questions);
+      setQuestions(response.questions);
       setInterviewStarted(true);
     } catch (error) {
       console.error("Error starting interview:", error);
@@ -43,37 +43,38 @@ export default function MockInterview() {
     }
 
     const currentQuestion = questions[currentQuestionIndex];
+    const nextAnswers = [...answers, userInput];
 
     try {
-      const response = await axios.post("/api/evaluate-answer", {
+      const response = await postJson("/api/evaluate-answer", {
         question: currentQuestion,
         answer: userInput,
       });
 
-      setFeedback((prev) => [...prev, response.data.feedback]);
+      setFeedback((prev) => [...prev, response.feedback]);
     } catch (error) {
       console.error("Error evaluating answer:", error);
       setFeedback((prev) => [...prev, "No feedback available."]);
     }
 
-    setAnswers((prev) => [...prev, userInput]);
+    setAnswers(nextAnswers);
     setUserInput("");
 
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      generateSummary();
+      generateSummary(nextAnswers);
     }
   };
 
-  const generateSummary = async () => {
+  const generateSummary = async (completedAnswers) => {
     try {
-      const response = await axios.post("/api/generate-summary", {
+      const response = await postJson("/api/generate-summary", {
         questions,
-        answers,
+        answers: completedAnswers,
         role,
       });
-      setSummary(cleanMarkdown(response.data.summary));
+      setSummary(cleanMarkdown(response.summary));
     } catch (error) {
       console.error("Error generating summary:", error);
     } finally {

@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateGeminiContent } from "@/lib/gemini";
 
 export async function POST(req) {
   const { category, role } = await req.json();
-
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const prompt = `
   Generate one challenging interview question for the role of ${role}, focusing on ${category} skills.
@@ -15,9 +12,7 @@ export async function POST(req) {
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = result.response;
-    const text = response.text().trim();
+    const text = await generateGeminiContent(prompt);
 
     return NextResponse.json({ question: text });
   } catch (error) {

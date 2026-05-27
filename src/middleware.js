@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { jwtVerify } from "jose";
+import { verifyAuthToken } from "@/lib/token";
 
 export async function middleware(request) {
   const token = request.cookies.get("prepTalkToken")?.value;
@@ -9,8 +9,7 @@ export async function middleware(request) {
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    await jwtVerify(token, secret);
+    await verifyAuthToken(token);
     return NextResponse.next();
   } catch (err) {
     console.error("JWT verification failed:", err);

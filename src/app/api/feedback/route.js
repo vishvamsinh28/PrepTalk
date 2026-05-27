@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db";
 import Feedback from "@/models/Feedback";
+import { json } from "@/lib/api";
 
 export async function POST(req) {
   try {
@@ -9,15 +10,9 @@ export async function POST(req) {
     const feedback = new Feedback(body);
     await feedback.save();
 
-    return new Response(JSON.stringify({ message: "Feedback submitted successfully!" }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ message: "Feedback submitted successfully!" });
   } catch (error) {
     console.error("Feedback error:", error);
-    return new Response(JSON.stringify({ error: "Failed to submit feedback." }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return json({ error: "Failed to submit feedback." }, 500);
   }
 }

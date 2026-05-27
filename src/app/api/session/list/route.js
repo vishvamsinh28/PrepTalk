@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
+import { json } from "@/lib/api";
 
 export async function GET() {
   try {
@@ -7,9 +8,9 @@ export async function GET() {
 
     const sessions = await Session.find().sort({ createdAt: -1 });
 
-    return new Response(JSON.stringify({ sessions }), { status: 200 });
+    return json({ sessions });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: "Failed to fetch sessions", error: error.message }), { status: 500 });
+    return json({ message: "Failed to fetch sessions", error: error.message }, 500);
   }
 }

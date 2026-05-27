@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChalkboardTeacher, FaSpinner, FaExclamationCircle, FaSignInAlt } from "react-icons/fa";
@@ -14,8 +14,8 @@ export default function SessionList() {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get("/api/session/list");
-        setSessions(response.data.sessions);
+        const response = await getJson("/api/session/list");
+        setSessions(response.sessions);
       } catch (error) {
         console.error("Error fetching sessions:", error);
       } finally {

@@ -2,21 +2,18 @@ import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import Message from "@/models/Message";
 import Feedback from "@/models/Feedback";
-import { jwtVerify } from "jose";
+import { getAuthPayloadFromRequest } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export async function GET(req) {
   try {
-    const token = req.cookies.get("prepTalkToken")?.value;
-
-    if (!token) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
+    const payload = await getAuthPayloadFromRequest(req);
+    if (!payload) {
+      return json({ message: "Unauthorized" }, 401);
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-
     if (payload.role !== "Moderator") {
-      return new Response(JSON.stringify({ message: "Only moderators can view analytics" }), { status: 403 });
+      return json({ message: "Only moderators can view analytics" }, 403);
     }
 
     await connectDB();
@@ -29,17 +26,14 @@ export async function GET(req) {
     const averageRating =
       feedbacks.reduce((acc, feedback) => acc + feedback.rating, 0) / (feedbacks.length || 1);
 
-    return new Response(
-      JSON.stringify({
-        sessionCount,
-        messageCount,
-        feedbackCount,
-        averageRating: averageRating.toFixed(2),
-      }),
-      { status: 200 }
-    );
+    return json({
+      sessionCount,
+      messageCount,
+      feedbackCount,
+      averageRating: averageRating.toFixed(2),
+    });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: "Analytics fetch failed", error: error.message }), { status: 500 });
+    return json({ message: "Analytics fetch failed", error: error.message }, 500);
   }
 }

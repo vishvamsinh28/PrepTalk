@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 
 export default function Quiz() {
   const [quizData, setQuizData] = useState([]);
@@ -14,12 +14,12 @@ export default function Quiz() {
   const startQuiz = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("/api/generate-quiz", {
-        category: "Technical", // You can make this dynamic later ✅
+      const response = await postJson("/api/generate-quiz", {
+        category: "Technical",
         numberOfQuestions: 5,
       });
 
-      setQuizData(response.data.quiz);
+      setQuizData(response.quiz);
       setQuizStarted(true);
       setCurrentQuestionIndex(0);
       setScore(0);
@@ -34,25 +34,24 @@ export default function Quiz() {
 
   const handleAnswer = async (selectedOption) => {
     const currentQuestion = quizData[currentQuestionIndex];
+    const nextScore = selectedOption === currentQuestion.answer ? score + 1 : score;
 
-    if (selectedOption === currentQuestion.answer) {
-      setScore(score + 1);
-    }
+    setScore(nextScore);
 
     const nextIndex = currentQuestionIndex + 1;
     if (nextIndex < quizData.length) {
       setCurrentQuestionIndex(nextIndex);
     } else {
       setQuizCompleted(true);
-      saveQuizPerformance();
+      saveQuizPerformance(nextScore);
     }
   };
 
-  const saveQuizPerformance = async () => {
+  const saveQuizPerformance = async (finalScore) => {
     try {
-      await axios.post("/api/save-quiz-result", {
+      await postJson("/api/save-quiz-result", {
         totalQuestions: quizData.length,
-        score,
+        score: finalScore,
       });
     } catch (error) {
       console.error("Error saving quiz result:", error);

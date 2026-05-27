@@ -1,19 +1,10 @@
-import { serialize } from "cookie";
+import { clearAuthCookie } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export async function POST() {
-  const serialized = serialize("prepTalkToken", "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    expires: new Date(0),
-    path: "/",
-  });
+  const serialized = clearAuthCookie();
 
-  return new Response(
-    JSON.stringify({ message: "Logged out" }),
-    {
-      status: 200,
-      headers: { "Set-Cookie": serialized },
-    }
-  );
+  return json({ message: "Logged out" }, 200, {
+    headers: { "Set-Cookie": serialized },
+  });
 }

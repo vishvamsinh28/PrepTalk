@@ -25,14 +25,12 @@ export default function FeedbackClient({ feedbacks, sessions }) {
       {/* Background pattern */}
       <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
 
-      {/* Main container */}
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
         className="max-w-6xl mx-auto relative z-10"
       >
-        {/* Top: Back Button */}
         <motion.div variants={itemVariants} className="mb-8">
           <button
             onClick={() => window.location.href = "/moderator"}
@@ -43,16 +41,14 @@ export default function FeedbackClient({ feedbacks, sessions }) {
           </button>
         </motion.div>
 
-        {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-10">
           <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
             <FaRegCommentDots className="text-3xl text-sky-300" />
           </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-3">All Feedbacks 📝</h1>
+          <h1 className="text-4xl font-bold text-sky-300 mb-3">All Feedbacks</h1>
           <p className="text-gray-400">See what participants are saying about your sessions.</p>
         </motion.div>
 
-        {/* Stats Summary */}
         <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
           <div className="bg-gray-800 p-4 rounded-lg text-center border border-gray-700">
             <FaClipboardList className="text-sky-400 text-3xl mb-2 mx-auto" />
@@ -71,25 +67,6 @@ export default function FeedbackClient({ feedbacks, sessions }) {
           </div>
         </motion.div>
 
-        {/* Filter options (placeholders for now) */}
-        <motion.div variants={itemVariants} className="flex flex-wrap gap-4 mb-8 justify-center">
-          <select className="bg-gray-800 border border-gray-700 text-gray-400 p-2 rounded-lg focus:outline-none focus:border-sky-500">
-            <option>Filter by Session</option>
-            {Object.values(sessions).map((session) => (
-              <option key={session._id} value={session._id}>
-                {session.title}
-              </option>
-            ))}
-          </select>
-          <select className="bg-gray-800 border border-gray-700 text-gray-400 p-2 rounded-lg focus:outline-none focus:border-sky-500">
-            <option>Filter by Rating</option>
-            {[5, 4, 3, 2, 1].map((rating) => (
-              <option key={rating} value={rating}>{rating} Stars</option>
-            ))}
-          </select>
-        </motion.div>
-
-        {/* No Feedback State */}
         {feedbacks.length === 0 ? (
           <motion.div variants={itemVariants} className="text-center text-gray-400 bg-gray-800 p-8 rounded-xl border border-gray-700">
             <FaComments className="text-5xl text-sky-500 mb-4 mx-auto" />
@@ -97,7 +74,6 @@ export default function FeedbackClient({ feedbacks, sessions }) {
             <p className="text-sm text-gray-500">Encourage participants to share their thoughts!</p>
           </motion.div>
         ) : (
-          // Feedback List
           <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={containerVariants}>
             {feedbacks.map((fb) => {
               const session = sessions[fb.sessionId] || {};
@@ -109,8 +85,8 @@ export default function FeedbackClient({ feedbacks, sessions }) {
                   className="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg hover:border-sky-500/50 transition-all duration-300"
                 >
                   <div className="mb-4">
-                    <h3 className="text-xl font-semibold text-sky-300 mb-1">{session.title || "Unknown Session"}</h3>
-                    <p className="text-gray-400 text-sm italic">{session.topic || "Unknown Topic"}</p>
+                    <h3 className="text-xl font-semibold text-sky-300 mb-1">{session.title || "Deleted session"}</h3>
+                    {session.topic && <p className="text-gray-400 text-sm italic">{session.topic}</p>}
                   </div>
 
                   <div className="text-gray-300 space-y-1 mb-4">
@@ -129,9 +105,8 @@ export default function FeedbackClient({ feedbacks, sessions }) {
           </motion.div>
         )}
 
-        {/* Engagement nudge */}
         <motion.div variants={itemVariants} className="text-center text-gray-500 text-sm mt-12">
-          <p>🙏 Thank you for helping improve PrepTalk with your valuable feedback!</p>
+          <p>Thank you for helping improve PrepTalk with your feedback.</p>
         </motion.div>
       </motion.div>
     </div>

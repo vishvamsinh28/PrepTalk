@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 
 export default function QuizHistory() {
   const [quizHistory, setQuizHistory] = useState([]);
@@ -10,8 +10,8 @@ export default function QuizHistory() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get("/api/get-quiz-results");
-        setQuizHistory(response.data.results);
+        const response = await getJson("/api/get-quiz-results");
+        setQuizHistory(response.results);
       } catch (error) {
         console.error("Error fetching quiz history:", error);
       } finally {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
 import { FaRobot, FaCopy } from "react-icons/fa";
 import cleanMarkdown from "@/lib/cleanup";
@@ -22,13 +22,13 @@ export default function QuestionGenerator() {
         setQuestion("");
 
         try {
-            const response = await axios.post("/api/generate-question", {
+            const response = await postJson("/api/generate-question", {
                 category,
                 role,
               });              
 
-            const generatedQuestion = response.data.question;
-            await axios.post("/api/save-question", {
+            const generatedQuestion = response.question;
+            await postJson("/api/save-question", {
                 category,
                 question: generatedQuestion,
             });

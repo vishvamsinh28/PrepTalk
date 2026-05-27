@@ -1,16 +1,12 @@
 import { connectDB } from "@/lib/db";
 import InterviewResult from "@/models/InterviewResult";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateGeminiContent } from "@/lib/gemini";
+import { getCurrentUser } from "@/lib/serverAuth";
 
 export async function POST(req) {
   try {
     const { questions, answers, role } = await req.json();
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const qaPairs = questions.map((q, index) => {
       const ans = answers[index] || "No answer provided.";
@@ -28,36 +24,24 @@ export async function POST(req) {
       ${qaPairs}
     `;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
+    const summary = await generateGeminiContent(
+      { contents: [{ role: "user", parts: [{ text: prompt }] }] },
+      {
         temperature: 0.7,
         topK: 40,
         topP: 0.9,
         maxOutputTokens: 512,
-      },
-    });
-
-    const response = result.response;
-    const summary = response.text().trim();
-
-    const cookieStore = cookies();
-    const token = cookieStore.get("prepTalkToken")?.value;
-
-    let userEmail = "Unknown";
-    if (token) {
-      try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        userEmail = payload.email;
-      } catch (error) {
-        console.error("Token verification failed:", error);
       }
+    );
+
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     await connectDB();
     const interviewResult = new InterviewResult({
-      userEmail,
+      userEmail: user.email,
       role,
       summary,
     });

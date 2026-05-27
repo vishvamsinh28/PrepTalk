@@ -1,18 +1,16 @@
-import { jwtVerify } from "jose";
+import { getAuthPayloadFromRequest } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export async function GET(req) {
   try {
-    const token = req.cookies.get("prepTalkToken")?.value;
+    const payload = await getAuthPayloadFromRequest(req);
 
-    if (!token) {
-      return new Response(JSON.stringify({ message: "No token found" }), { status: 401 });
+    if (!payload) {
+      return json({ message: "No token found" }, 401);
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-
-    return new Response(JSON.stringify({ email: payload.email, role: payload.role }), { status: 200 });
+    return json({ email: payload.email, role: payload.role });
   } catch (error) {
-    return new Response(JSON.stringify({ message: "Invalid token" }), { status: 401 });
+    return json({ message: "Invalid token" }, 401);
   }
 }

@@ -1,9 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
 import { FaChartBar, FaComments, FaClipboardCheck, FaStar, FaArrowLeft } from "react-icons/fa";
+
+function MetricCard({ icon, title, value, detail }) {
+  return (
+    <motion.div
+      variants={{
+        hidden: { y: 20, opacity: 0 },
+        visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } },
+      }}
+      className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-sky-500/10 transition-all duration-300 hover:border-sky-500/50"
+    >
+      <div className="flex items-center mb-4">
+        <div className="bg-sky-500/20 p-2 rounded-lg mr-3">{icon}</div>
+        <h2 className="text-lg font-semibold text-gray-300">{title}</h2>
+      </div>
+      <p className="text-4xl font-bold text-sky-300">{value}</p>
+      <p className="text-gray-500 text-sm mt-2">{detail}</p>
+    </motion.div>
+  );
+}
 
 export default function AnalyticsPage() {
   const [data, setData] = useState(null);
@@ -12,8 +31,8 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const response = await axios.get("/api/analytics");
-        setData(response.data);
+        const response = await getJson("/api/analytics");
+        setData(response);
       } catch (error) {
         console.error("Error fetching analytics:", error);
       } finally {
@@ -24,7 +43,6 @@ export default function AnalyticsPage() {
     fetchAnalytics();
   }, []);
 
-  // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -32,15 +50,6 @@ export default function AnalyticsPage() {
       transition: {
         staggerChildren: 0.1
       }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100 }
     }
   };
 
@@ -54,6 +63,13 @@ export default function AnalyticsPage() {
       </div>
     );
   }
+
+  const sessionCount = Number(data.sessionCount) || 0;
+  const messageCount = Number(data.messageCount) || 0;
+  const feedbackCount = Number(data.feedbackCount) || 0;
+  const averageRating = Number(data.averageRating) || 0;
+  const messagesPerSession = sessionCount > 0 ? Math.round(messageCount / sessionCount) : 0;
+  const feedbackRate = sessionCount > 0 ? Math.round((feedbackCount / sessionCount) * 100) : 0;
 
   if (!data) {
     return (
@@ -77,7 +93,6 @@ export default function AnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
-      {/* Header with background */}
       <div className="relative py-16 bg-gradient-to-r from-blue-900 to-sky-800">
         <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-10"></div>
         <div className="container mx-auto px-4 relative z-10">
@@ -98,127 +113,39 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="container mx-auto px-4 py-12">
-        {/* Summary Cards */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          <motion.div
-            variants={itemVariants}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-sky-500/10 transition-all duration-300 hover:border-sky-500/50"
-          >
-            <div className="flex items-center mb-4">
-              <div className="bg-sky-500/20 p-2 rounded-lg mr-3">
-                <FaChartBar className="text-sky-400 text-xl" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-300">Total Sessions</h2>
-            </div>
-            <p className="text-4xl font-bold text-sky-300">{data.sessionCount}</p>
-            <p className="text-gray-500 text-sm mt-2">
-              {data.sessionCount > 100 ? "Strong engagement" : "Building momentum"}
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-sky-500/10 transition-all duration-300 hover:border-sky-500/50"
-          >
-            <div className="flex items-center mb-4">
-              <div className="bg-sky-500/20 p-2 rounded-lg mr-3">
-                <FaComments className="text-sky-400 text-xl" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-300">Total Messages</h2>
-            </div>
-            <p className="text-4xl font-bold text-sky-300">{data.messageCount}</p>
-            <p className="text-gray-500 text-sm mt-2">
-              ~{Math.round(data.messageCount / data.sessionCount)} messages per session
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-sky-500/10 transition-all duration-300 hover:border-sky-500/50"
-          >
-            <div className="flex items-center mb-4">
-              <div className="bg-sky-500/20 p-2 rounded-lg mr-3">
-                <FaClipboardCheck className="text-sky-400 text-xl" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-300">Total Feedback</h2>
-            </div>
-            <p className="text-4xl font-bold text-sky-300">{data.feedbackCount}</p>
-            <p className="text-gray-500 text-sm mt-2">
-              {Math.round((data.feedbackCount / data.sessionCount) * 100)}% feedback rate
-            </p>
-          </motion.div>
-
-          <motion.div
-            variants={itemVariants}
-            className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg hover:shadow-sky-500/10 transition-all duration-300 hover:border-sky-500/50"
-          >
-            <div className="flex items-center mb-4">
-              <div className="bg-sky-500/20 p-2 rounded-lg mr-3">
-                <FaStar className="text-sky-400 text-xl" />
-              </div>
-              <h2 className="text-lg font-semibold text-gray-300">Average Rating</h2>
-            </div>
-            <p className="text-4xl font-bold text-sky-300">{data.averageRating}</p>
-            <div className="flex text-yellow-400 mt-2">
-              {[...Array(5)].map((_, i) => (
-                <span key={i} className={i < Math.round(data.averageRating) ? "text-yellow-400" : "text-gray-600"}>
-                  ★
-                </span>
-              ))}
-            </div>
-          </motion.div>
+          <MetricCard
+            icon={<FaChartBar className="text-sky-400 text-xl" />}
+            title="Total Sessions"
+            value={sessionCount}
+            detail={sessionCount > 0 ? "Sessions created across the platform" : "No sessions created yet"}
+          />
+          <MetricCard
+            icon={<FaComments className="text-sky-400 text-xl" />}
+            title="Total Messages"
+            value={messageCount}
+            detail={`${messagesPerSession} messages per session`}
+          />
+          <MetricCard
+            icon={<FaClipboardCheck className="text-sky-400 text-xl" />}
+            title="Total Feedback"
+            value={feedbackCount}
+            detail={`${feedbackRate}% feedback rate`}
+          />
+          <MetricCard
+            icon={<FaStar className="text-sky-400 text-xl" />}
+            title="Average Rating"
+            value={averageRating.toFixed(2)}
+            detail={feedbackCount > 0 ? "Average across submitted feedback" : "No ratings submitted yet"}
+          />
         </motion.div>
 
-        {/* Additional Analytics Sections */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
-        >
-          {/* User Engagement Chart Placeholder */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">User Engagement Over Time</h2>
-            <div className="bg-gray-700/50 rounded-lg h-64 flex items-center justify-center">
-              <p className="text-gray-400">Chart visualization would appear here</p>
-            </div>
-          </div>
-          
-          {/* Top Performing Topics */}
-          <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">Top Discussion Topics</h2>
-            <div className="space-y-4">
-              {[
-                { topic: "Leadership Skills", engagement: 94 },
-                { topic: "Technical Interview Prep", engagement: 87 },
-                { topic: "Problem Solving", engagement: 82 },
-                { topic: "Communication Skills", engagement: 78 }
-              ].map((item, index) => (
-                <div key={index} className="bg-gray-700/50 p-3 rounded-lg">
-                  <div className="flex justify-between mb-1">
-                    <span className="text-gray-300">{item.topic}</span>
-                    <span className="text-sky-300">{item.engagement}%</span>
-                  </div>
-                  <div className="w-full bg-gray-600 rounded-full h-2">
-                    <div 
-                      className="bg-gradient-to-r from-sky-400 to-blue-500 h-2 rounded-full" 
-                      style={{ width: `${item.engagement}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Back Button */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

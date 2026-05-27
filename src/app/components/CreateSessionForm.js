@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
 import { FaRocket, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
 
@@ -32,14 +32,16 @@ export default function CreateSessionForm() {
         topic: formData.topic,
         participants: formData.participants
           .split(",")
-          .map((email) => email.trim()),
+          .map((email) => email.trim())
+          .filter(Boolean),
         evaluators: formData.evaluators
           .split(",")
-          .map((email) => email.trim()),
+          .map((email) => email.trim())
+          .filter(Boolean),
       };
 
-      const response = await axios.post("/api/session", payload);
-      setMessage(response.data.message);
+      const response = await postJson("/api/session", payload);
+      setMessage(response.message);
       setIsError(false);
 
       setFormData({
@@ -50,7 +52,7 @@ export default function CreateSessionForm() {
         topic: "",
       });
     } catch (error) {
-      setMessage(error.response?.data?.message || "Session creation failed");
+      setMessage(error.message || "Session creation failed");
       setIsError(true);
     }
   };
@@ -62,7 +64,6 @@ export default function CreateSessionForm() {
       transition={{ duration: 0.6 }}
       className="bg-gray-800 border border-gray-700 p-8 rounded-xl shadow-2xl max-w-xl w-full mx-auto relative z-10"
     >
-      {/* Header */}
       <div className="text-center mb-6">
         <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-3">
           <FaRocket className="text-3xl text-sky-300" />
@@ -71,7 +72,6 @@ export default function CreateSessionForm() {
         <p className="text-gray-400 text-sm">Launch your next discussion effortlessly.</p>
       </div>
 
-      {/* Success or error message */}
       {message && (
         <div
           className={`flex items-center mb-4 text-sm p-3 rounded-lg ${
@@ -89,7 +89,6 @@ export default function CreateSessionForm() {
         </div>
       )}
 
-      {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <input
           name="title"

@@ -1,8 +1,7 @@
 import { connectDB } from "@/lib/db";
 import Question from "@/models/Question";
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { getCurrentUser } from "@/lib/serverAuth";
 
 export async function POST(req) {
   try {
@@ -10,22 +9,13 @@ export async function POST(req) {
 
     await connectDB();
 
-    const cookieStore = cookies();
-    const token = cookieStore.get("prepTalkToken")?.value;
-
-    let userEmail = "Unknown";
-    if (token) {
-      try {
-        const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-        const { payload } = await jwtVerify(token, secret);
-        userEmail = payload.email;
-      } catch (error) {
-        console.error("Token verification failed:", error);
-      }
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const newQuestion = new Question({
-      userEmail,
+      userEmail: user.email,
       category,
       question,
     });

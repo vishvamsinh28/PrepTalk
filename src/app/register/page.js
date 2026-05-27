@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import axios from "axios";
+import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
 import { FaUser, FaEnvelope, FaLock, FaUsersCog } from "react-icons/fa";
 
@@ -31,13 +31,13 @@ export default function RegisterPage() {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("/api/register", formData);
-      setSuccess(response.data.message);
+      const response = await postJson("/api/register", formData);
+      setSuccess(response.message);
       setTimeout(() => {
         router.push("/login");
       }, 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.message || "Registration failed");
     } finally {
       setIsLoading(false);
     }

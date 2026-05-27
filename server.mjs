@@ -13,9 +13,13 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const activeUsers = {};
+const allowedOrigins = (process.env.SOCKET_CORS_ORIGINS || process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 mongoose.connect(process.env.MONGODB_URI).then(() => {
-  console.log("✅ MongoDB connected inside socket server");
+  console.log("MongoDB connected inside socket server");
 }).catch((err) => {
   console.error("MongoDB connection error:", err);
 });
@@ -27,19 +31,20 @@ app.prepare().then(() => {
 
   const io = new Server(server, {
     cors: {
-      origin: ["https://preptalk.onrender.com/"],
+      origin: allowedOrigins,
       methods: ["GET", "POST"]
     }
   });
 
   io.on("connection", (socket) => {
-    console.log("🟢 New client connected:", socket.id);
+    console.log("New client connected:", socket.id);
 
     socket.on("joinRoom", async (sessionId, userEmail) => {
       socket.join(sessionId);
-      console.log(`💬 ${userEmail} joined chat room: ${sessionId}`);
+      console.log(`${userEmail} joined chat room: ${sessionId}`);
 
       if (!activeUsers[sessionId]) activeUsers[sessionId] = [];
+      activeUsers[sessionId] = activeUsers[sessionId].filter((user) => user.socketId !== socket.id);
       activeUsers[sessionId].push({ socketId: socket.id, userEmail });
 
       try {
@@ -65,7 +70,7 @@ app.prepare().then(() => {
 
     socket.on("joinVideoRoom", (sessionId, userEmail) => {
       socket.join(sessionId);
-      console.log(`🎥 ${userEmail} joined video room: ${sessionId}`);
+      console.log(`${userEmail} joined video room: ${sessionId}`);
 
       socket.to(sessionId).emit("userJoinedVideoRoom", { socketId: socket.id, userEmail });
     });
@@ -79,7 +84,7 @@ app.prepare().then(() => {
     });
 
     socket.on("disconnect", () => {
-      console.log("🔴 Client disconnected:", socket.id);
+      console.log("Client disconnected:", socket.id);
 
       for (const sessionId in activeUsers) {
         activeUsers[sessionId] = activeUsers[sessionId].filter(user => user.socketId !== socket.id);

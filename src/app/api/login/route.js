@@ -1,8 +1,8 @@
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import { serialize } from "cookie";
+import { createAuthCookie, signAuthToken } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export async function POST(req) {
   try {
@@ -12,34 +12,22 @@ export async function POST(req) {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
+      return json({ message: "User not found" }, 404);
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return new Response(JSON.stringify({ message: "Invalid credentials" }), { status: 401 });
+      return json({ message: "Invalid credentials" }, 401);
     }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = await signAuthToken(user);
+    const serialized = createAuthCookie(token);
 
-    const serialized = serialize("prepTalkToken", token, {
-        httpOnly: true,
-        secure: false,
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-      });
-
-    return new Response(JSON.stringify({ message: "Login successful" }), {
-      status: 200,
+    return json({ message: "Login successful" }, 200, {
       headers: { "Set-Cookie": serialized },
     });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: "Login failed", error: error.message }), { status: 500 });
+    return json({ message: "Login failed", error: error.message }, 500);
   }
 }

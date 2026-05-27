@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateGeminiContent } from "@/lib/gemini";
 
 export async function POST(req) {
   try {
     const { role, category, numberOfQuestions } = await req.json();
-
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const randomSeed = Math.floor(Math.random() * 1000);
 
@@ -21,18 +18,15 @@ export async function POST(req) {
       ...
     `;
 
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig: {
+    const text = await generateGeminiContent(
+      { contents: [{ role: "user", parts: [{ text: prompt }] }] },
+      {
         temperature: 0.9,
         topK: 40,
         topP: 0.95,
         maxOutputTokens: 2048,
-      },
-    });
-
-    const response = result.response;
-    const text = response.text().trim();
+      }
+    );
 
     const lines = text.split("\n").filter(line => line.trim() !== "");
     const questions = lines.map(line => line.replace(/^\d+\.\s*/, "").trim());

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChalkboardTeacher, FaSignInAlt } from "react-icons/fa";
@@ -13,8 +13,8 @@ export default function ParticipantSessionList({ userEmail }) {
   useEffect(() => {
     const fetchSessions = async () => {
       try {
-        const response = await axios.get("/api/session/list");
-        const filtered = response.data.sessions.filter(session =>
+        const response = await getJson("/api/session/list");
+        const filtered = response.sessions.filter(session =>
           session.participants.includes(userEmail)
         );
         setSessions(filtered);
@@ -49,7 +49,6 @@ export default function ParticipantSessionList({ userEmail }) {
         variants={containerVariants}
         className="relative z-10 max-w-4xl mx-auto"
       >
-        {/* Header */}
         <motion.div variants={itemVariants} className="text-center mb-10">
           <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
             <FaChalkboardTeacher className="text-3xl text-sky-300" />
@@ -58,7 +57,6 @@ export default function ParticipantSessionList({ userEmail }) {
           <p className="text-gray-400 text-sm">Here are the sessions you’ve been invited to join.</p>
         </motion.div>
 
-        {/* No Sessions */}
         {sessions.length === 0 ? (
           <motion.div variants={itemVariants} className="text-center bg-gray-800 p-6 rounded-xl border border-gray-700">
             <p className="text-lg text-sky-400">😔 No sessions assigned yet.</p>

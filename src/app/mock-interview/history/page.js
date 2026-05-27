@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getJson } from "@/lib/clientApi";
 
 export default function InterviewHistoryPage() {
   const [history, setHistory] = useState([]);
@@ -10,8 +10,8 @@ export default function InterviewHistoryPage() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const response = await axios.get("/api/get-interview-results");
-        setHistory(response.data.results);
+        const response = await getJson("/api/get-interview-results");
+        setHistory(response.results);
       } catch (error) {
         console.error("Error fetching interview history:", error);
       } finally {

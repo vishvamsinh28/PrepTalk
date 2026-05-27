@@ -1,13 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateGeminiContent } from "@/lib/gemini";
 import { NextResponse } from "next/server";
 
 export async function POST(req) {
   const formData = await req.json();
 
   const { fullName, summary, experience, skills, education, certifications, jobRole } = formData;
-
-  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 
   const prompt = `
 You are an expert resume reviewer and career coach.
@@ -30,9 +27,7 @@ Resume Details:
 `;
 
   try {
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text().trim();
+    const text = await generateGeminiContent(prompt);
 
     return NextResponse.json({ feedback: text });
   } catch (error) {

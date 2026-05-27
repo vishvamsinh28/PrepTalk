@@ -1,56 +1,17 @@
-import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { getCurrentUser } from "@/lib/serverAuth";
 import SessionList from "../components/SessionList";
-import { FaUserCheck, FaExclamationTriangle } from "react-icons/fa";
+import AuthState from "../components/AuthState";
+import { FaUserCheck } from "react-icons/fa";
 
 export default async function EvaluatorPage() {
-  const cookieStore = cookies();
-  const token = cookieStore.get("prepTalkToken")?.value;
+  const userData = await getCurrentUser();
 
-  if (!token) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100 relative px-4">
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg text-center max-w-md">
-          <FaExclamationTriangle className="text-4xl mb-3 mx-auto" />
-          <p className="text-lg font-medium">No token found.</p>
-          <p className="text-sm text-gray-400">Please login to access the Evaluator panel.</p>
-        </div>
-      </div>
-    );
-  }
-
-  let userData;
-
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-    userData = payload;
-  } catch (error) {
-    console.error("Token verification failed:", error);
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100 relative px-4">
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg text-center max-w-md">
-          <FaExclamationTriangle className="text-4xl mb-3 mx-auto" />
-          <p className="text-lg font-medium">Invalid token.</p>
-          <p className="text-sm text-gray-400">Please login again to continue.</p>
-        </div>
-      </div>
-    );
+  if (!userData) {
+    return <AuthState title="Invalid token." message="Please login again to continue." />;
   }
 
   if (userData.role !== "Evaluator") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100 relative px-4">
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg text-center max-w-md">
-          <FaExclamationTriangle className="text-4xl mb-3 mx-auto" />
-          <p className="text-lg font-medium">Access Denied.</p>
-          <p className="text-sm text-gray-400">This page is restricted to Evaluators only.</p>
-        </div>
-      </div>
-    );
+    return <AuthState title="Access denied." message="This page is restricted to Evaluators only." />;
   }
 
   return (
@@ -70,7 +31,6 @@ export default async function EvaluatorPage() {
           <p className="text-gray-500 text-xs">Your role: <strong className="text-sky-300">{userData.role}</strong></p>
         </div>
 
-        {/* Session list component (already premium from earlier) */}
         <SessionList />
       </div>
     </div>

@@ -8,9 +8,9 @@ export default function MockInterviewPage() {
         <p className="text-gray-400 mb-8 text-center">
           Prep yourself with a fully AI-powered interview simulation! 🚀
         </p>
-        <center>
-        <MockInterview />
-        </center>
+        <div className="flex justify-center">
+          <MockInterview />
+        </div>
       </div>
     </div>
   );

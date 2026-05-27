@@ -1,22 +1,19 @@
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
-import { jwtVerify } from "jose";
+import { getAuthPayloadFromRequest } from "@/lib/auth";
+import { json } from "@/lib/api";
 
 export async function POST(req) {
   try {
-    const { title, description, participants, evaluators } = await req.json();
+    const { title, description, topic, participants, evaluators } = await req.json();
 
-    const token = req.cookies.get("prepTalkToken")?.value;
-
-    if (!token) {
-      return new Response(JSON.stringify({ message: "Unauthorized" }), { status: 401 });
+    const payload = await getAuthPayloadFromRequest(req);
+    if (!payload) {
+      return json({ message: "Unauthorized" }, 401);
     }
 
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
-
     if (payload.role !== "Moderator") {
-      return new Response(JSON.stringify({ message: "Only moderators can create sessions" }), { status: 403 });
+      return json({ message: "Only moderators can create sessions" }, 403);
     }
 
     await connectDB();
@@ -24,6 +21,7 @@ export async function POST(req) {
     const newSession = new Session({
       title,
       description,
+      topic,
       createdBy: payload.email,
       participants,
       evaluators,
@@ -31,9 +29,9 @@ export async function POST(req) {
 
     await newSession.save();
 
-    return new Response(JSON.stringify({ message: "Session created successfully" }), { status: 201 });
+    return json({ message: "Session created successfully" }, 201);
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: "Session creation failed", error: error.message }), { status: 500 });
+    return json({ message: "Session creation failed", error: error.message }, 500);
   }
 }

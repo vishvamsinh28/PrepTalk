@@ -1,13 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaUserGraduate, FaComments, FaClipboardCheck, FaRocket, FaChartLine, FaMedal } from "react-icons/fa";
 
 export default function HomePage() {
   const router = useRouter();
 
-  // Reusable fade animation
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
@@ -24,7 +24,6 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-gray-100 scroll-smooth">
-      {/* Hero Section */}
       <motion.div
         className="relative h-screen flex flex-col justify-center items-center text-center px-4"
         initial="hidden"
@@ -84,7 +83,6 @@ export default function HomePage() {
         </div>
       </motion.div>
 
-      {/* Features Section */}
       <section className="py-20 bg-gray-800">
         <div className="container mx-auto px-4">
           <motion.div className="text-center mb-16" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -119,7 +117,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
       <section className="py-20 bg-gray-900">
         <div className="container mx-auto px-4">
           <motion.div className="text-center mb-16" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
@@ -149,7 +146,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Call to Action */}
       <section className="py-20 bg-gradient-to-r from-blue-900 to-sky-900 text-center">
         <motion.div className="max-w-3xl mx-auto" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
           <h2 className="text-4xl font-bold mb-6 text-white">Ready to Elevate Your Skills?</h2>
@@ -162,11 +158,10 @@ export default function HomePage() {
           >
             Start Free Trial
           </button>
-          <p className="text-sky-200 mt-4 text-sm">No credit card required. 7-day free trial.</p>
+          <p className="text-sky-200 mt-4 text-sm">No credit card required.</p>
         </motion.div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-gray-900 border-t border-gray-800 py-12">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
@@ -175,13 +170,13 @@ export default function HomePage() {
               <p className="text-gray-400 mt-2">Elevate your communication skills.</p>
             </div>
             <div className="flex flex-wrap justify-center gap-6 text-gray-400">
-              {["About", "Features", "Pricing", "Blog", "Contact"].map((link) => (
-                <a key={link} href="#" className="hover:text-sky-300 transition">{link}</a>
-              ))}
+              <Link href="/practice-ai-questions" className="hover:text-sky-300 transition">Practice</Link>
+              <Link href="/mock-interview" className="hover:text-sky-300 transition">Mock Interview</Link>
+              <Link href="/resume-review" className="hover:text-sky-300 transition">Resume Review</Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} PrepTalk. Made with ❤️ by TechCravers.
+            © {new Date().getFullYear()} PrepTalk.
           </div>
         </div>
       </footer>
