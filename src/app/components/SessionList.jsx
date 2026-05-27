@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaCalendarAlt, FaEnvelope, FaLink, FaSpinner, FaExclamationCircle, FaSignInAlt } from "react-icons/fa";
 
-export default function SessionList() {
+export default function SessionList({ compact = false }) {
   const router = useRouter();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ export default function SessionList() {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="mx-auto max-w-7xl"
+        className={compact ? "mx-auto w-full" : "mx-auto max-w-6xl"}
       >
         {loading && (
           <motion.div
@@ -69,10 +69,10 @@ export default function SessionList() {
         )}
 
         {!loading && sessions.length > 0 && (
-          <motion.div className="space-y-6" variants={containerVariants}>
+          <motion.div className={compact ? "grid gap-4" : "grid gap-5 lg:grid-cols-2"} variants={containerVariants}>
             <AnimatePresence>
               {sessions.map((session) => (
-                <SessionCard key={session._id} session={session} router={router} variants={itemVariants} />
+                <SessionCard key={session._id} session={session} router={router} variants={itemVariants} compact={compact} />
               ))}
             </AnimatePresence>
           </motion.div>
@@ -82,7 +82,7 @@ export default function SessionList() {
   );
 }
 
-function SessionCard({ session, router, variants }) {
+function SessionCard({ session, router, variants, compact }) {
   const [origin, setOrigin] = useState("");
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -98,15 +98,15 @@ function SessionCard({ session, router, variants }) {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
+      className="glass-panel h-full rounded-xl p-5 transition hover:-translate-y-1 hover:border-cyan-200/40"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-3">
         <div>
-          <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
-                  <p className="mb-4 max-w-3xl text-sm leading-6 text-slate-300">{session.description}</p>
+          <h3 className={compact ? "mb-2 text-xl font-black text-white" : "mb-2 text-2xl font-black text-white"}>{session.title}</h3>
+          <p className="mb-3 line-clamp-3 text-sm leading-6 text-slate-300">{session.description}</p>
         </div>
         {session.scheduledAt && (
-          <span className="inline-flex items-center gap-2 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-100">
+          <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-100">
             <FaCalendarAlt />
             {new Date(session.scheduledAt).toLocaleString()}
           </span>
@@ -127,7 +127,7 @@ function SessionCard({ session, router, variants }) {
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => router.push(`/session/${session._id}`)}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+          className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
         >
           <FaSignInAlt />
           Join Session
@@ -135,14 +135,14 @@ function SessionCard({ session, router, variants }) {
         {inviteUrl && (
           <button
             onClick={() => navigator.clipboard?.writeText(inviteUrl)}
-            className="flex items-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-5 py-3 font-bold text-cyan-100"
+            className="flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 font-bold text-cyan-100"
           >
             <FaLink />
             Copy Link
           </button>
         )}
         {(session.interviewees || []).length > 0 && (
-          <a href={mailtoHref} className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 py-3 font-bold text-white">
+          <a href={mailtoHref} className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-2.5 font-bold text-white">
             <FaEnvelope />
             Email Invite
           </a>

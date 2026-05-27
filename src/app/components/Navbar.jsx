@@ -2,12 +2,12 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaHome, FaSignOutAlt } from "react-icons/fa";
+import { FaClipboardCheck, FaListAlt, FaPlus, FaSignOutAlt, FaUserFriends } from "react-icons/fa";
 
 function LogoMark() {
   return (
-    <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-950/70 ring-1 ring-white/15">
-      <svg viewBox="0 0 40 40" className="h-8 w-8" aria-hidden="true">
+    <span className="grid h-9 w-9 place-items-center rounded-lg bg-slate-950/70 ring-1 ring-white/15">
+      <svg viewBox="0 0 40 40" className="h-7 w-7" aria-hidden="true">
         <defs>
           <linearGradient id="ptNavGradient" x1="4" y1="4" x2="36" y2="36">
             <stop stopColor="#22d3ee" />
@@ -69,14 +69,18 @@ export default function Navbar() {
 
   if (["/login", "/register", "/"].includes(pathname)) return null;
 
-  const navItems = [
-    {
-      icon: <FaHome />,
-      label: "Dashboard",
-      path: getRoleHome(userRole),
-      isActive: ["/interviewer", "/interviewee", "/dashboard"].includes(pathname),
-    },
-  ];
+  const navItems = userRole === "Interviewer"
+    ? [
+        { icon: <FaPlus />, label: "Create", path: "/interviewer#create-session", isActive: false },
+        { icon: <FaListAlt />, label: "Sessions", path: "/interviewer#sessions", isActive: false },
+        { icon: <FaClipboardCheck />, label: "Reports", path: "/interviewer#reports", isActive: false },
+      ]
+    : userRole === "Interviewee"
+      ? [
+          { icon: <FaUserFriends />, label: "Interviews", path: "/interviewee", isActive: pathname === "/interviewee" },
+          { icon: <FaClipboardCheck />, label: "Reports", path: "/interviewee#reports", isActive: false },
+        ]
+      : [];
 
   const navigateTo = (path) => {
     router.push(path);
@@ -84,22 +88,22 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed left-0 right-0 top-4 z-50 px-4">
+    <nav className="fixed left-0 right-0 top-3 z-50 px-4">
       <div
-        className={`mx-auto max-w-7xl rounded-2xl border px-4 transition-all duration-300 ${
+        className={`mx-auto max-w-6xl rounded-xl border px-3 transition-all duration-300 ${
           isScrolled
             ? "border-slate-700/70 bg-slate-950/82 shadow-2xl shadow-black/25 backdrop-blur-2xl"
             : "border-slate-700/50 bg-slate-950/58 shadow-xl shadow-black/10 backdrop-blur-xl"
         }`}
       >
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-14 items-center justify-between">
           <button
             className="flex items-center gap-3 text-left"
-            onClick={() => router.push("/dashboard")}
-            aria-label="PrepTalk dashboard"
+            onClick={() => router.push(getRoleHome(userRole))}
+            aria-label="PrepTalk home"
           >
             <LogoMark />
-            <span className="text-xl font-black tracking-tight text-white">PrepTalk</span>
+            <span className="text-lg font-black tracking-tight text-white">PrepTalk</span>
           </button>
 
           <div className="hidden md:flex items-center space-x-1">
@@ -113,10 +117,10 @@ export default function Navbar() {
               />
             ))}
 
-            <div className="ml-2 border-l border-white/10 pl-4">
+            <div className={navItems.length > 0 ? "ml-2 border-l border-white/10 pl-3" : ""}>
               <button
                 onClick={handleLogout}
-                className="flex items-center rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-2.5 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="flex items-center rounded-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-3.5 py-2 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
               >
                 <FaSignOutAlt className="mr-1" />
                 Logout
@@ -127,7 +131,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4 md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="rounded-xl border border-white/15 p-2 text-slate-200 hover:text-white focus:outline-none"
+              className="rounded-lg border border-white/15 p-2 text-slate-200 hover:text-white focus:outline-none"
             >
               {!isMenuOpen ? (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,7 +147,7 @@ export default function Navbar() {
         </div>
 
         {isMenuOpen && (
-          <div className="glass-panel md:hidden rounded-b-3xl border-t-0 shadow-lg">
+          <div className="glass-panel md:hidden rounded-b-xl border-t-0 shadow-lg">
             <div className="px-2 pt-2 pb-3 space-y-1">
               {navItems.map((item) => (
                 <MobileNavItem
@@ -161,7 +165,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
+                  className="flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
                 >
                   <FaSignOutAlt className="mr-2" />
                   Logout
@@ -179,7 +183,7 @@ function NavItem({ icon, label, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${isActive
+      className={`flex items-center rounded-lg px-3 py-2 text-sm font-bold transition-colors ${isActive
         ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
         : "text-slate-300 hover:bg-white/10 hover:text-white"
         }`}
@@ -194,7 +198,7 @@ function MobileNavItem({ icon, label, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`flex w-full items-center rounded-2xl px-3 py-3 text-sm font-bold transition-colors ${isActive
+      className={`flex w-full items-center rounded-lg px-3 py-3 text-sm font-bold transition-colors ${isActive
         ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
         : "text-slate-300 hover:bg-white/10 hover:text-white"
         }`}

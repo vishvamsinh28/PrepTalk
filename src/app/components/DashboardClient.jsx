@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaArrowRight, FaClipboardCheck, FaComments, FaUserFriends, FaUserShield, FaVideo } from "react-icons/fa";
+import { FaArrowRight, FaClipboardCheck, FaListAlt, FaPlus, FaUserFriends, FaUserShield } from "react-icons/fa";
 import ProgressDashboard from "./ProgressDashboard";
 
 export default function DashboardClient({ userData }) {
@@ -37,35 +37,40 @@ export default function DashboardClient({ userData }) {
     },
   };
   const action = roleActions[userData?.role];
-  const dashboardStats = [
-    { icon: <FaVideo />, label: "Live rooms", value: "Video" },
-    { icon: <FaComments />, label: "Session chat", value: "Realtime" },
-    { icon: <FaClipboardCheck />, label: "Reports", value: "Tracked" },
-  ];
+  const quickActions = userData?.role === "Interviewer"
+    ? [
+        { icon: <FaPlus />, label: "Create interview", href: "/interviewer" },
+        { icon: <FaListAlt />, label: "Manage sessions", href: "/interviewer#sessions" },
+        { icon: <FaClipboardCheck />, label: "Review reports", href: "/interviewer#reports" },
+      ]
+    : [
+        { icon: <FaListAlt />, label: "Join interviews", href: "/interviewee" },
+        { icon: <FaClipboardCheck />, label: "View feedback", href: "/interviewee#reports" },
+      ];
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-20 pt-28">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
       <div className="soft-grid absolute inset-0 opacity-60"></div>
 
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="relative z-10 mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+        className="relative z-10 mx-auto grid w-full max-w-6xl gap-5 lg:grid-cols-[1.15fr_0.85fr]"
       >
-        <motion.section variants={itemVariants} className="glass-panel rounded-2xl p-8 sm:p-10">
+        <motion.section variants={itemVariants} className="glass-panel rounded-xl p-6 sm:p-8">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Dashboard</p>
-          <h1 className="max-w-2xl text-5xl font-black leading-tight tracking-tight sm:text-6xl">
+          <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-tight sm:text-5xl">
             Welcome back to <span className="gradient-text">PrepTalk.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
             {roleDescriptions[userData?.role] || "Get ready to explore PrepTalk and enhance your skills!"}
           </p>
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <span className="rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-sm text-slate-200">
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-slate-200">
               {userData?.email}
             </span>
-            <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100">
+            <span className="rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100">
               {userData?.role}
             </span>
           </div>
@@ -73,7 +78,7 @@ export default function DashboardClient({ userData }) {
             <motion.a
               variants={itemVariants}
               href={action.href}
-              className={`mt-10 inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r ${action.className} px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
+              className={`mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-gradient-to-r ${action.className} px-6 py-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
             >
               {action.icon}
               {action.label}
@@ -83,24 +88,24 @@ export default function DashboardClient({ userData }) {
         </motion.section>
 
         <motion.aside variants={itemVariants} className="grid gap-5">
-          <div className="glass-panel rounded-2xl p-6">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Today</p>
-            <h2 className="mt-3 text-3xl font-black text-white">Your interview command center</h2>
-            <p className="mt-3 leading-7 text-slate-300">
-              Jump into your role workspace, manage sessions, and keep feedback moving without hunting through pages.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-            {dashboardStats.map((stat) => (
-              <div key={stat.label} className="rounded-2xl border border-white/10 bg-slate-950/35 p-5">
-                <div className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 text-slate-950">
-                  {stat.icon}
-                </div>
-                <p className="text-2xl font-black text-white">{stat.value}</p>
-                <p className="text-sm text-slate-400">{stat.label}</p>
-              </div>
-            ))}
+          <div className="glass-panel rounded-xl p-5">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Next steps</p>
+            <h2 className="mt-2 text-2xl font-black text-white">Useful shortcuts</h2>
+            <div className="mt-5 grid gap-3">
+              {quickActions.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-slate-950/35 px-4 py-3 text-slate-200 transition hover:border-cyan-200/40 hover:bg-cyan-300/10 hover:text-white"
+                >
+                  <span className="inline-flex items-center gap-3 font-bold">
+                    <span className="text-cyan-200">{item.icon}</span>
+                    {item.label}
+                  </span>
+                  <FaArrowRight className="text-sm text-slate-500" />
+                </a>
+              ))}
+            </div>
           </div>
         </motion.aside>
 

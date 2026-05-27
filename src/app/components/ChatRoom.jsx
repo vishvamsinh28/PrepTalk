@@ -78,14 +78,14 @@ export default function ChatRoom({ sessionId, userEmail }) {
   };
 
   return (
-    <div className="relative z-10 flex h-[34rem] w-full flex-col">
-      <div className="mb-4 flex items-center rounded-2xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
+    <div className="relative z-10 flex h-[30rem] w-full flex-col">
+      <div className="mb-4 flex items-center rounded-xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
         <FaUsers className="mr-2 text-cyan-200" />
         <strong className="mr-2 text-white">Active:</strong>
         {activeUsers.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {activeUsers.map((user, idx) => (
-              <span key={idx} className="rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
+              <span key={idx} className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
                 {user}
               </span>
             ))}
@@ -95,7 +95,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         )}
       </div>
 
-      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div

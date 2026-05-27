@@ -217,7 +217,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         ))}
       </div>
 
-      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-white/10 bg-slate-950/35 p-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col justify-between gap-3 rounded-xl border border-white/10 bg-slate-950/35 p-3 sm:flex-row sm:items-center">
         <div className="px-2">
           <p className="text-sm font-bold text-white">{participants.length} participant{participants.length === 1 ? "" : "s"}</p>
           <p className="text-xs text-slate-400">Controls affect your local stream only.</p>
@@ -225,7 +225,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         <div className="flex flex-wrap gap-3">
         <button
           onClick={toggleAudio}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition ${
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
             audioEnabled
               ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
               : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
@@ -236,7 +236,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         </button>
         <button
           onClick={toggleVideo}
-          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition ${
+            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
             videoEnabled
               ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
               : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
@@ -247,7 +247,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         </button>
         <button
           onClick={leaveRoom}
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-400 px-4 py-3 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-rose-500 to-red-400 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
         >
           <FaPhoneSlash />
           Leave Room
@@ -260,9 +260,9 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
 function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
   return (
-    <div className="group relative min-h-72 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
+    <div className="group relative min-h-64 overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
       <video
-        className="h-full min-h-72 w-full object-cover"
+        className="h-full min-h-64 w-full object-cover"
         ref={videoRef}
         autoPlay
         muted={isSelf}
@@ -273,7 +273,7 @@ function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
           <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
           <p className="text-xs text-slate-300">{isSelf ? "You" : "Participant"} {!streamReady && "· Connecting"}</p>
         </div>
-        <span className="rounded-xl border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white">
+        <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white">
           {isSelf ? "Local" : "Remote"}
         </span>
       </div>
@@ -297,9 +297,9 @@ function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   }, [peer, peerId, streamsRef]);
 
   return (
-    <div className="relative min-h-72 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
+    <div className="relative min-h-64 overflow-hidden rounded-xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
       <video
-        className="h-full min-h-72 w-full object-cover"
+        className="h-full min-h-64 w-full object-cover"
         ref={ref}
         autoPlay
         playsInline

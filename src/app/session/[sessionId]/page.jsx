@@ -39,19 +39,19 @@ export default async function SessionRoom(props) {
   const inviteCode = typeof searchParams?.invite === "string" ? searchParams.invite : "";
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
       <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
 
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <div className="mb-6 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
+            <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
               <FaComments className="text-xl text-slate-950" />
             </div>
-            <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl">{session.title}</h1>
+            <h1 className="text-4xl font-black leading-tight tracking-tight text-white">{session.title}</h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{session.description}</p>
           </div>
-          <div className="glass-panel rounded-2xl p-5 text-left lg:min-w-80">
+          <div className="glass-panel rounded-xl p-4 text-left lg:min-w-72">
             <p className="mb-3 flex items-center gap-2 text-sm font-bold text-cyan-100">
               <FaUserTie />
               Created by
@@ -60,7 +60,7 @@ export default async function SessionRoom(props) {
           </div>
         </div>
 
-        <div className="mb-8 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role || "General"}</span>
           <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level || "Entry"}</span>
           <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType || "Mixed"}</span>
@@ -69,8 +69,8 @@ export default async function SessionRoom(props) {
           ))}
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
-          <section className="glass-panel rounded-2xl p-4 sm:p-5">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <section className="glass-panel rounded-xl p-4">
             <div className="mb-4 flex items-center justify-between gap-4 px-1">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Live room</p>
@@ -83,7 +83,7 @@ export default async function SessionRoom(props) {
             <VideoRoom sessionId={sessionId} userEmail={user.email} />
           </section>
 
-          <aside className="glass-panel rounded-2xl p-4 sm:p-5">
+          <aside className="glass-panel rounded-xl p-4">
             <div className="mb-4 px-1">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Conversation</p>
               <h2 className="text-2xl font-black text-white">Live Chat</h2>

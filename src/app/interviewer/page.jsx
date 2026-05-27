@@ -17,40 +17,42 @@ export default async function InterviewerPage() {
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-20 pt-28">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
       <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
 
       <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="mb-8">
           <div>
-            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
+            <div className="mb-4 inline-grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
               <FaMicrophoneAlt className="text-xl text-slate-950" />
             </div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewer workspace</p>
-            <h1 className="text-5xl font-black tracking-tight gradient-text">Run better interviews</h1>
+            <h1 className="text-4xl font-black tracking-tight gradient-text sm:text-5xl">Run better interviews</h1>
             <p className="mt-3 max-w-2xl text-slate-300">Create sessions, send invites, generate AI questions, and review reports from one focused workspace.</p>
-          </div>
-          <div className="glass-panel rounded-2xl p-4 text-sm text-slate-300">
-            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-amber-200">Signed in as</span>
-            <span className="mt-1 block break-all text-white">{userData.email}</span>
+            <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-white/10 bg-slate-950/35 px-3 py-2 text-sm text-slate-300">
+              <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-amber-200">Signed in</span>
+              <span className="min-w-0 truncate text-white">{userData.email}</span>
+            </div>
           </div>
         </div>
 
-        <section className="mb-12">
-          <CreateSessionForm />
-        </section>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(22rem,0.75fr)] xl:items-start">
+          <section id="create-session">
+            <CreateSessionForm />
+          </section>
 
-        <section>
-          <div className="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Manage</p>
-              <h2 className="text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+          <section id="sessions" className="xl:sticky xl:top-24">
+            <div className="mb-5 flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Manage</p>
+                <h2 className="text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+              </div>
             </div>
-          </div>
-          <SessionList />
-        </section>
+            <SessionList compact />
+          </section>
+        </div>
 
-        <section className="mt-14">
+        <section id="reports" className="mt-14">
           <div className="mb-5">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Review</p>
             <h2 className="text-3xl font-black tracking-tight text-white">Submitted Reports</h2>

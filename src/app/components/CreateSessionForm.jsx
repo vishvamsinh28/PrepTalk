@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { FaCheckCircle, FaClipboard, FaEnvelope, FaExclamationTriangle, FaLink, FaRocket } from "react-icons/fa";
 
 const defaultAgenda = "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min";
+const levels = ["Entry", "Mid", "Senior"];
+const interviewTypes = ["Technical", "Behavioral", "Mixed"];
 
 function buildInviteDetails(session) {
   if (!session || typeof window === "undefined") {
@@ -49,6 +51,13 @@ export default function CreateSessionForm() {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const autoGrow = (event, maxHeight = 220) => {
+    event.currentTarget.style.height = "auto";
+    const nextHeight = Math.min(event.currentTarget.scrollHeight, maxHeight);
+    event.currentTarget.style.height = `${nextHeight}px`;
+    event.currentTarget.style.overflowY = event.currentTarget.scrollHeight > maxHeight ? "auto" : "hidden";
   };
 
   const handleSubmit = async (e) => {
@@ -115,15 +124,15 @@ export default function CreateSessionForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="glass-panel relative z-10 mx-auto w-full rounded-2xl p-6 sm:p-8"
+      className="glass-panel relative z-10 mx-auto w-full rounded-xl p-5 sm:p-6"
     >
-      <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">New interview</p>
-          <h2 className="text-3xl font-black tracking-tight text-white">Create session</h2>
+          <h2 className="text-2xl font-black tracking-tight text-white">Create session</h2>
           <p className="mt-2 text-sm text-slate-300">Set up the interview, schedule, agenda, and invite package.</p>
         </div>
-        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400">
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400">
           <FaRocket className="text-xl text-slate-950" />
         </div>
       </div>
@@ -198,9 +207,12 @@ export default function CreateSessionForm() {
           <textarea
             name="description"
             value={formData.description}
-            onChange={handleChange}
+            onChange={(event) => {
+              handleChange(event);
+              autoGrow(event);
+            }}
             placeholder="What this interview will focus on"
-            className="field-surface field-control min-h-24 transition"
+            className="field-surface field-control max-h-56 min-h-24 transition"
           ></textarea>
         </label>
 
@@ -233,30 +245,22 @@ export default function CreateSessionForm() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
           <label className="field-group">
             <span className="field-label">Level</span>
-            <select
+            <SegmentedControl
               name="level"
               value={formData.level}
-              onChange={handleChange}
-              className="field-surface field-control field-select transition"
-            >
-              <option value="Entry">Entry</option>
-              <option value="Mid">Mid</option>
-              <option value="Senior">Senior</option>
-            </select>
+              options={levels}
+              onChange={(value) => setFormData({ ...formData, level: value })}
+            />
           </label>
 
           <label className="field-group">
             <span className="field-label">Interview type</span>
-            <select
+            <SegmentedControl
               name="interviewType"
               value={formData.interviewType}
-              onChange={handleChange}
-              className="field-surface field-control field-select transition"
-            >
-              <option value="Technical">Technical</option>
-              <option value="Behavioral">Behavioral</option>
-              <option value="Mixed">Mixed</option>
-            </select>
+              options={interviewTypes}
+              onChange={(value) => setFormData({ ...formData, interviewType: value })}
+            />
           </label>
         </div>
 
@@ -308,13 +312,16 @@ export default function CreateSessionForm() {
           <textarea
             name="agenda"
             value={formData.agenda}
-            onChange={handleChange}
+            onChange={(event) => {
+              handleChange(event);
+              autoGrow(event, 260);
+            }}
             placeholder="Warm-up - 5 min"
-            className="field-surface field-control min-h-32 transition"
+            className="field-surface field-control max-h-64 min-h-32 transition"
           />
         </label>
 
-        <label className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-slate-950/30 p-4 lg:col-span-2">
+        <label className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-slate-950/30 p-3.5 lg:col-span-2">
           <span>
             <span className="block text-sm font-bold text-white">Create public join link</span>
             <span className="text-xs text-slate-400">Useful for email invites and quick access.</span>
@@ -330,11 +337,37 @@ export default function CreateSessionForm() {
 
         <button
           type="submit"
-          className="w-full rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
+          className="w-full rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
         >
           Create Session
         </button>
       </form>
     </motion.div>
+  );
+}
+
+function SegmentedControl({ name, value, options, onChange }) {
+  return (
+    <div className="grid grid-cols-3 gap-2 rounded-lg border border-white/10 bg-slate-950/35 p-1">
+      {options.map((option) => {
+        const isActive = value === option;
+        return (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={isActive}
+            onClick={() => onChange(option)}
+            className={`min-h-10 rounded-md px-2 text-sm font-bold transition ${
+              isActive
+                ? "bg-cyan-300/15 text-cyan-100 ring-1 ring-cyan-300/35"
+                : "text-slate-300 hover:bg-white/10 hover:text-white"
+            }`}
+          >
+            {option}
+          </button>
+        );
+      })}
+      <input type="hidden" name={name} value={value} readOnly />
+    </div>
   );
 }
