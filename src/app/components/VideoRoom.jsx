@@ -24,6 +24,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
   useEffect(() => {
     let isMounted = true;
+    let didSetupRealtime = false;
     const ably = new Ably.Realtime({ authUrl: "/api/ably/token" });
     const channel = ably.channels.get(`video:${sessionId}`);
     ablyRef.current = ably;
@@ -56,8 +57,9 @@ export default function VideoRoom({ sessionId, userEmail }) {
       remoteMembers.forEach((member) => {
         if (streamRef.current && !peersRef.current.find((p) => p.peerId === member.connectionId)) {
           const peer = createPeer(member.connectionId, streamRef.current);
-          peersRef.current.push({ peerId: member.connectionId, peer, userEmail: member.data?.userEmail });
-          setPeers(existing => [...existing, peer]);
+          const peerData = { peerId: member.connectionId, peer, userEmail: member.data?.userEmail };
+          peersRef.current.push(peerData);
+          setPeers(existing => [...existing, peerData]);
         }
       });
     };
@@ -71,8 +73,9 @@ export default function VideoRoom({ sessionId, userEmail }) {
         if (peersRef.current.find(p => p.peerId === data.from)) return;
 
         const peer = addPeer(data.signal, data.from, streamRef.current);
-        peersRef.current.push({ peerId: data.from, peer, userEmail: data.userEmail });
-        setPeers(existing => [...existing, peer]);
+        const peerData = { peerId: data.from, peer, userEmail: data.userEmail };
+        peersRef.current.push(peerData);
+        setPeers(existing => [...existing, peerData]);
         setParticipants(p => (
           p.some((user) => user.socketId === data.from)
             ? p
@@ -84,6 +87,34 @@ export default function VideoRoom({ sessionId, userEmail }) {
         const item = peersRef.current.find(p => p.peerId === data.from);
         if (item) item.peer.signal(data.signal);
       }
+    };
+
+    const waitForConnection = () => {
+      if (ably.connection.state === "connected") {
+        return Promise.resolve();
+      }
+
+      return new Promise((resolve, reject) => {
+        ably.connection.once("connected", resolve);
+        ably.connection.once("failed", reject);
+      });
+    };
+
+    const setupRealtime = async () => {
+      if (didSetupRealtime) return;
+      didSetupRealtime = true;
+
+      await waitForConnection();
+      if (!isMounted) return;
+
+      connectionIdRef.current = ably.connection.id;
+      await channel.attach();
+      await channel.subscribe("signal-offer", handleSignal);
+      await channel.subscribe("signal-answer", handleSignal);
+      await channel.presence.subscribe("enter", syncPresence);
+      await channel.presence.subscribe("leave", (event) => removePeer(event.connectionId));
+      await channel.presence.enter({ userEmail });
+      await syncPresence();
     };
 
     navigator.mediaDevices
@@ -100,16 +131,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
           userVideo.current.srcObject = currentStream;
         }
 
-        ably.connection.once("connected", async () => {
-          connectionIdRef.current = ably.connection.id;
-          await channel.attach();
-          await channel.subscribe("signal-offer", handleSignal);
-          await channel.subscribe("signal-answer", handleSignal);
-          await channel.presence.subscribe("enter", syncPresence);
-          await channel.presence.subscribe("leave", (event) => removePeer(event.connectionId));
-          await channel.presence.enter({ userEmail });
-          await syncPresence();
-        });
+        setupRealtime().catch((error) => console.error("Unable to start video signaling:", error));
       })
       .catch((error) => console.error("Unable to start video stream:", error));
 
@@ -206,12 +228,12 @@ export default function VideoRoom({ sessionId, userEmail }) {
         />
 
         {/* Peers Videos */}
-        {peers.map((peer, index) => (
+        {peers.map(({ peerId, peer, userEmail: peerEmail }) => (
           <PeerVideoTile
-            key={index}
+            key={peerId}
             peer={peer}
-            peerId={peersRef.current[index]?.peerId}
-            userEmail={participants[index + 1]?.userEmail || "Interviewee"}
+            peerId={peerId}
+            userEmail={peerEmail || participants.find((participant) => participant.socketId === peerId)?.userEmail || "Interviewee"}
             streamsRef={streamsRef}
           />
         ))}

@@ -3,7 +3,8 @@ import { serialize } from "cookie";
 import { getJwtSecret, verifyAuthToken } from "@/lib/token";
 
 const AUTH_COOKIE_NAME = "prepTalkToken";
-const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
+const LOGIN_SESSION_DAYS = 30;
+const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * LOGIN_SESSION_DAYS;
 
 export async function signAuthToken(user) {
   return new SignJWT({
@@ -12,7 +13,7 @@ export async function signAuthToken(user) {
     role: user.role,
   })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
+    .setExpirationTime(`${LOGIN_SESSION_DAYS}d`)
     .sign(getJwtSecret());
 }
 
@@ -27,11 +28,14 @@ export async function getAuthPayloadFromRequest(req) {
 }
 
 export function createAuthCookie(token) {
+  const expires = new Date(Date.now() + TOKEN_MAX_AGE_SECONDS * 1000);
+
   return serialize(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: TOKEN_MAX_AGE_SECONDS,
+    expires,
     path: "/",
   });
 }
