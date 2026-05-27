@@ -21,8 +21,8 @@ export default async function SessionRoom(props) {
     return (
       <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
         <div className="soft-grid absolute inset-0 opacity-60"></div>
-        <div className="glass-panel relative z-10 max-w-md rounded-[2rem] p-8 text-center">
-          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-rose-200" />
+        <div className="glass-panel relative z-10 max-w-md rounded-2xl p-8 text-center">
+          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-amber-200" />
           <p className="text-xl font-black text-white">Session not found</p>
           <p className="mt-2 text-sm text-slate-300">Please check the session ID and try again.</p>
         </div>
@@ -45,13 +45,13 @@ export default async function SessionRoom(props) {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-cyan-500/20">
+            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
               <FaComments className="text-xl text-slate-950" />
             </div>
             <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl">{session.title}</h1>
             <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{session.description}</p>
           </div>
-          <div className="glass-panel rounded-3xl p-5 text-left lg:min-w-80">
+          <div className="glass-panel rounded-2xl p-5 text-left lg:min-w-80">
             <p className="mb-3 flex items-center gap-2 text-sm font-bold text-cyan-100">
               <FaUserTie />
               Created by
@@ -70,7 +70,7 @@ export default async function SessionRoom(props) {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
-          <section className="glass-panel rounded-[2rem] p-4 sm:p-5">
+          <section className="glass-panel rounded-2xl p-4 sm:p-5">
             <div className="mb-4 flex items-center justify-between gap-4 px-1">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Live room</p>
@@ -83,9 +83,9 @@ export default async function SessionRoom(props) {
             <VideoRoom sessionId={sessionId} userEmail={user.email} />
           </section>
 
-          <aside className="glass-panel rounded-[2rem] p-4 sm:p-5">
+          <aside className="glass-panel rounded-2xl p-4 sm:p-5">
             <div className="mb-4 px-1">
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-rose-200">Conversation</p>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Conversation</p>
               <h2 className="text-2xl font-black text-white">Live Chat</h2>
             </div>
             <ChatRoom sessionId={sessionId} userEmail={user.email} />
@@ -101,7 +101,7 @@ export default async function SessionRoom(props) {
         </div>
 
         {user.role === "Interviewer" && (
-          <section className="glass-panel mt-8 rounded-[2rem] p-5 sm:p-7">
+          <section className="glass-panel mt-8 rounded-2xl p-5 sm:p-7">
             <div className="mb-6">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Feedback</p>
               <h2 className="mt-2 text-3xl font-black text-white">Interview Scorecard</h2>

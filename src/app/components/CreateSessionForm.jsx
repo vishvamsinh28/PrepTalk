@@ -115,7 +115,7 @@ export default function CreateSessionForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="glass-panel relative z-10 mx-auto w-full rounded-[2rem] p-6 sm:p-8"
+      className="glass-panel relative z-10 mx-auto w-full rounded-2xl p-6 sm:p-8"
     >
       <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -123,7 +123,7 @@ export default function CreateSessionForm() {
           <h2 className="text-3xl font-black tracking-tight text-white">Create session</h2>
           <p className="mt-2 text-sm text-slate-300">Set up the interview, schedule, agenda, and invite package.</p>
         </div>
-        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300">
+        <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400">
           <FaRocket className="text-xl text-slate-950" />
         </div>
       </div>
@@ -156,12 +156,12 @@ export default function CreateSessionForm() {
           </div>
 
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-            <input readOnly value={inviteDetails.inviteUrl} className="field-surface min-w-0 rounded-xl p-3 text-sm" />
+            <input readOnly value={inviteDetails.inviteUrl} className="field-surface field-control min-w-0 text-sm" />
             <button type="button" onClick={() => copyText("link", inviteDetails.inviteUrl)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-bold text-cyan-100">
               <FaLink />
               Copy link
             </button>
-            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-3 font-black text-slate-950">
+            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
               <FaEnvelope />
               Send email
             </a>
@@ -175,107 +175,122 @@ export default function CreateSessionForm() {
                 Copy email
               </button>
             </div>
-            <textarea readOnly value={inviteDetails.emailBody} className="field-surface min-h-44 w-full rounded-xl p-4 text-sm leading-6" />
+            <textarea readOnly value={inviteDetails.emailBody} className="field-surface field-control min-h-44 text-sm leading-6" />
           </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-2">
-        <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Session title</span>
+        <label className="field-group lg:col-span-2">
+          <span className="field-label">Session title</span>
           <input
             name="title"
             value={formData.title}
             onChange={handleChange}
             placeholder="Frontend mock interview"
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control transition"
             required
           />
         </label>
 
-        <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Description</span>
+        <label className="field-group lg:col-span-2">
+          <span className="field-label">Description</span>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             placeholder="What this interview will focus on"
-            className="field-surface min-h-24 w-full rounded-2xl p-4 transition"
+            className="field-surface field-control min-h-24 transition"
           ></textarea>
         </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Target role</span>
+        <label className="field-group">
+          <span className="field-label">Target role</span>
           <input
             name="role"
             value={formData.role}
             onChange={handleChange}
             placeholder="Frontend Engineer"
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control transition"
             required
           />
         </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Interviewee emails</span>
+        <label className="field-group">
+          <span className="field-label">
+            Interviewee emails
+            <span className="field-hint">Comma separated</span>
+          </span>
           <input
             name="interviewees"
             value={formData.interviewees}
             onChange={handleChange}
             placeholder="candidate@email.com"
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control transition"
           />
         </label>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
-          <select
-            name="level"
-            value={formData.level}
-            onChange={handleChange}
-            className="field-surface w-full rounded-2xl p-4 transition"
-          >
-            <option value="Entry">Entry</option>
-            <option value="Mid">Mid</option>
-            <option value="Senior">Senior</option>
-          </select>
+          <label className="field-group">
+            <span className="field-label">Level</span>
+            <select
+              name="level"
+              value={formData.level}
+              onChange={handleChange}
+              className="field-surface field-control field-select transition"
+            >
+              <option value="Entry">Entry</option>
+              <option value="Mid">Mid</option>
+              <option value="Senior">Senior</option>
+            </select>
+          </label>
 
-          <select
-            name="interviewType"
-            value={formData.interviewType}
-            onChange={handleChange}
-            className="field-surface w-full rounded-2xl p-4 transition"
-          >
-            <option value="Technical">Technical</option>
-            <option value="Behavioral">Behavioral</option>
-            <option value="Mixed">Mixed</option>
-          </select>
+          <label className="field-group">
+            <span className="field-label">Interview type</span>
+            <select
+              name="interviewType"
+              value={formData.interviewType}
+              onChange={handleChange}
+              className="field-surface field-control field-select transition"
+            >
+              <option value="Technical">Technical</option>
+              <option value="Behavioral">Behavioral</option>
+              <option value="Mixed">Mixed</option>
+            </select>
+          </label>
         </div>
 
-        <label className="space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Skills</span>
+        <label className="field-group lg:col-span-2">
+          <span className="field-label">
+            Skills
+            <span className="field-hint">Comma separated</span>
+          </span>
           <input
             name="skills"
             value={formData.skills}
             onChange={handleChange}
             placeholder="React, APIs, System Design"
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control transition"
           />
         </label>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
-          <label className="space-y-2">
-            <span className="text-sm font-bold text-slate-200">Schedule</span>
+          <label className="field-group">
+            <span className="field-label">Schedule</span>
             <input
               type="datetime-local"
               name="scheduledAt"
               value={formData.scheduledAt}
               onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 transition"
+              className="field-surface field-control transition"
             />
           </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-bold text-slate-200">Duration</span>
+          <label className="field-group">
+            <span className="field-label">
+              Duration
+              <span className="field-hint">Minutes</span>
+            </span>
             <input
               type="number"
               min="15"
@@ -283,23 +298,23 @@ export default function CreateSessionForm() {
               name="durationMinutes"
               value={formData.durationMinutes}
               onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 transition"
+              className="field-surface field-control transition"
             />
           </label>
         </div>
 
-        <label className="block space-y-2 lg:col-span-2">
-          <span className="text-sm font-bold text-slate-200">Session agenda</span>
+        <label className="field-group lg:col-span-2">
+          <span className="field-label">Session agenda</span>
           <textarea
             name="agenda"
             value={formData.agenda}
             onChange={handleChange}
             placeholder="Warm-up - 5 min"
-            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+            className="field-surface field-control min-h-32 transition"
           />
         </label>
 
-        <label className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4 lg:col-span-2">
+        <label className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-slate-950/30 p-4 lg:col-span-2">
           <span>
             <span className="block text-sm font-bold text-white">Create public join link</span>
             <span className="text-xs text-slate-400">Useful for email invites and quick access.</span>
@@ -309,13 +324,13 @@ export default function CreateSessionForm() {
             name="publicInviteEnabled"
             checked={formData.publicInviteEnabled}
             onChange={(event) => setFormData({ ...formData, publicInviteEnabled: event.target.checked })}
-            className="h-5 w-5 accent-cyan-300"
+            className="field-toggle"
           />
         </label>
 
         <button
           type="submit"
-          className="w-full rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
+          className="w-full rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
         >
           Create Session
         </button>

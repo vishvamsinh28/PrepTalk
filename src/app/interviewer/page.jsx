@@ -23,7 +23,7 @@ export default async function InterviewerPage() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-cyan-500/20">
+            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
               <FaMicrophoneAlt className="text-xl text-slate-950" />
             </div>
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewer workspace</p>
@@ -31,7 +31,7 @@ export default async function InterviewerPage() {
             <p className="mt-3 max-w-2xl text-slate-300">Create sessions, send invites, generate AI questions, and review reports from one focused workspace.</p>
           </div>
           <div className="glass-panel rounded-2xl p-4 text-sm text-slate-300">
-            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-rose-200">Signed in as</span>
+            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-amber-200">Signed in as</span>
             <span className="mt-1 block break-all text-white">{userData.email}</span>
           </div>
         </div>

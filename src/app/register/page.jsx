@@ -52,11 +52,11 @@ export default function RegisterPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="glass-panel relative z-10 w-full max-w-md space-y-6 rounded-[2rem] p-8"
+        className="glass-panel relative z-10 w-full max-w-md space-y-6 rounded-2xl p-8"
       >
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <div className="grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-rose-500/20">
+            <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 shadow-lg shadow-cyan-500/20">
               <FaRocket className="text-2xl text-slate-950" />
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function RegisterPage() {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="w-full rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 disabled:opacity-70"
+            className="w-full rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 disabled:opacity-70"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">

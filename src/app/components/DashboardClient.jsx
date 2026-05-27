@@ -27,13 +27,13 @@ export default function DashboardClient({ userData }) {
       href: "/interviewer",
       icon: <FaUserShield />,
       label: "Open Interviewer Panel",
-      className: "from-rose-400 via-amber-300 to-cyan-300",
+      className: "from-cyan-300 via-emerald-300 to-blue-400",
     },
     Interviewee: {
       href: "/interviewee",
       icon: <FaUserFriends />,
       label: "Open Interviewee Panel",
-      className: "from-emerald-300 via-cyan-300 to-rose-300",
+      className: "from-emerald-300 via-cyan-300 to-blue-400",
     },
   };
   const action = roleActions[userData?.role];
@@ -44,16 +44,16 @@ export default function DashboardClient({ userData }) {
   ];
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-20 pt-28">
       <div className="soft-grid absolute inset-0 opacity-60"></div>
 
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="relative z-10 mx-auto grid w-full max-w-6xl gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+        className="relative z-10 mx-auto grid w-full max-w-7xl gap-6 lg:grid-cols-[1.1fr_0.9fr]"
       >
-        <motion.section variants={itemVariants} className="glass-panel rounded-[2rem] p-8 sm:p-10">
+        <motion.section variants={itemVariants} className="glass-panel rounded-2xl p-8 sm:p-10">
           <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Dashboard</p>
           <h1 className="max-w-2xl text-5xl font-black leading-tight tracking-tight sm:text-6xl">
             Welcome back to <span className="gradient-text">PrepTalk.</span>
@@ -83,8 +83,8 @@ export default function DashboardClient({ userData }) {
         </motion.section>
 
         <motion.aside variants={itemVariants} className="grid gap-5">
-          <div className="glass-panel rounded-[2rem] p-6">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-rose-200">Today</p>
+          <div className="glass-panel rounded-2xl p-6">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Today</p>
             <h2 className="mt-3 text-3xl font-black text-white">Your interview command center</h2>
             <p className="mt-3 leading-7 text-slate-300">
               Jump into your role workspace, manage sessions, and keep feedback moving without hunting through pages.
@@ -93,8 +93,8 @@ export default function DashboardClient({ userData }) {
 
           <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
             {dashboardStats.map((stat) => (
-              <div key={stat.label} className="rounded-3xl border border-white/10 bg-slate-950/35 p-5">
-                <div className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 text-slate-950">
+              <div key={stat.label} className="rounded-2xl border border-white/10 bg-slate-950/35 p-5">
+                <div className="mb-4 grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-emerald-300 to-blue-400 text-slate-950">
                   {stat.icon}
                 </div>
                 <p className="text-2xl font-black text-white">{stat.value}</p>

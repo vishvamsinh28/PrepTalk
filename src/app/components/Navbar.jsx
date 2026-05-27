@@ -10,9 +10,9 @@ function LogoMark() {
       <svg viewBox="0 0 40 40" className="h-8 w-8" aria-hidden="true">
         <defs>
           <linearGradient id="ptNavGradient" x1="4" y1="4" x2="36" y2="36">
-            <stop stopColor="#ff6b8b" />
-            <stop offset="0.55" stopColor="#f9c74f" />
-            <stop offset="1" stopColor="#22d3ee" />
+            <stop stopColor="#22d3ee" />
+            <stop offset="0.55" stopColor="#34d399" />
+            <stop offset="1" stopColor="#60a5fa" />
           </linearGradient>
         </defs>
         <path d="M8 10.5C8 7.46 10.46 5 13.5 5h13C29.54 5 32 7.46 32 10.5v19C32 32.54 29.54 35 26.5 35h-13C10.46 35 8 32.54 8 29.5v-19Z" fill="url(#ptNavGradient)" />
@@ -86,10 +86,10 @@ export default function Navbar() {
   return (
     <nav className="fixed left-0 right-0 top-4 z-50 px-4">
       <div
-        className={`mx-auto max-w-6xl rounded-3xl border px-4 transition-all duration-300 ${
+        className={`mx-auto max-w-7xl rounded-2xl border px-4 transition-all duration-300 ${
           isScrolled
-            ? "border-white/14 bg-slate-950/78 shadow-2xl shadow-black/30 backdrop-blur-2xl"
-            : "border-white/10 bg-white/[0.07] shadow-xl shadow-black/10 backdrop-blur-xl"
+            ? "border-slate-700/70 bg-slate-950/82 shadow-2xl shadow-black/25 backdrop-blur-2xl"
+            : "border-slate-700/50 bg-slate-950/58 shadow-xl shadow-black/10 backdrop-blur-xl"
         }`}
       >
         <div className="flex h-16 items-center justify-between">
@@ -116,7 +116,7 @@ export default function Navbar() {
             <div className="ml-2 border-l border-white/10 pl-4">
               <button
                 onClick={handleLogout}
-                className="flex items-center rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-2.5 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="flex items-center rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-2.5 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
               >
                 <FaSignOutAlt className="mr-1" />
                 Logout
@@ -161,7 +161,7 @@ export default function Navbar() {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 p-3 font-black text-slate-950"
+                  className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
                 >
                   <FaSignOutAlt className="mr-2" />
                   Logout

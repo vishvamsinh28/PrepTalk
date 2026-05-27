@@ -102,13 +102,13 @@ export default function InterviewScorecard({ sessionId, session }) {
       )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Interviewee</span>
+        <label className="field-group">
+          <span className="field-label">Interviewee</span>
           <select
             name="intervieweeEmail"
             value={formData.intervieweeEmail}
             onChange={updateField}
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control field-select transition"
           >
             {interviewees.map((email) => (
               <option key={email} value={email}>{email}</option>
@@ -116,13 +116,13 @@ export default function InterviewScorecard({ sessionId, session }) {
           </select>
         </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Recommendation</span>
+        <label className="field-group">
+          <span className="field-label">Recommendation</span>
           <select
             name="recommendation"
             value={formData.recommendation}
             onChange={updateField}
-            className="field-surface w-full rounded-2xl p-4 transition"
+            className="field-surface field-control field-select transition"
           >
             <option value="Strong hire">Strong hire</option>
             <option value="Hire">Hire</option>
@@ -134,13 +134,13 @@ export default function InterviewScorecard({ sessionId, session }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         {scoreFields.map(([name, label]) => (
-          <label key={name} className="rounded-3xl border border-white/10 bg-slate-950/30 p-3">
-            <span className="block min-h-8 text-xs font-bold text-slate-300">{label}</span>
+          <label key={name} className="rounded-lg border border-white/10 bg-slate-950/30 p-3">
+            <span className="field-label min-h-8 text-xs">{label}</span>
             <select
               name={name}
               value={formData.scores[name]}
               onChange={updateScore}
-              className="field-surface mt-2 w-full rounded-2xl p-3 transition"
+              className="field-surface field-control field-select mt-2 min-h-11 py-2.5 transition"
             >
               {[1, 2, 3, 4, 5].map((score) => (
                 <option key={score} value={score}>{score}</option>
@@ -151,46 +151,46 @@ export default function InterviewScorecard({ sessionId, session }) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Strengths</span>
+        <label className="field-group">
+          <span className="field-label">Strengths</span>
           <textarea
             name="strengths"
             value={formData.strengths}
             onChange={updateField}
             placeholder="Strengths observed"
-            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+            className="field-surface field-control min-h-32 transition"
             required
           />
         </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Next improvements</span>
+        <label className="field-group">
+          <span className="field-label">Next improvements</span>
           <textarea
             name="improvements"
             value={formData.improvements}
             onChange={updateField}
             placeholder="What to improve next"
-            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+            className="field-surface field-control min-h-32 transition"
             required
           />
         </label>
       </div>
 
-      <label className="block space-y-2">
-        <span className="text-sm font-bold text-slate-200">Private notes</span>
+      <label className="field-group">
+        <span className="field-label">Private notes</span>
         <textarea
           name="notes"
           value={formData.notes}
           onChange={updateField}
           placeholder="Private notes or evidence from the interview"
-          className="field-surface min-h-24 w-full rounded-2xl p-4 transition"
+          className="field-surface field-control min-h-24 transition"
         />
       </label>
 
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          className="rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
         >
           Save Report
         </button>
@@ -205,7 +205,7 @@ export default function InterviewScorecard({ sessionId, session }) {
       </div>
 
       {savedReport?.aiSummary && (
-        <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
+        <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-5">
           <p className="mb-2 text-lg font-black text-cyan-100">AI feedback summary</p>
           <p className="whitespace-pre-wrap leading-7 text-slate-200">{savedReport.aiSummary}</p>
           {savedReport.actionItems?.length > 0 && (

@@ -45,7 +45,7 @@ export default function IntervieweeSessionList() {
         className="max-w-4xl mx-auto"
       >
         {sessions.length === 0 ? (
-          <motion.div variants={itemVariants} className="glass-panel rounded-3xl p-8 text-center">
+          <motion.div variants={itemVariants} className="glass-panel rounded-2xl p-8 text-center">
             <p className="text-lg font-bold text-white">No sessions assigned yet.</p>
             <p className="text-sm text-slate-300">Please check back later.</p>
           </motion.div>
@@ -59,7 +59,7 @@ export default function IntervieweeSessionList() {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="glass-panel rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
+                  className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
                 >
                   <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
                   <p className="mb-4 text-sm leading-6 text-slate-300">{session.description}</p>
@@ -73,7 +73,7 @@ export default function IntervieweeSessionList() {
                   </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
-                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 via-cyan-300 to-rose-300 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
                   >
                     <FaSignInAlt />
                     Join Session

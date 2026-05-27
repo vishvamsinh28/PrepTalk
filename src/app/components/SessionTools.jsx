@@ -50,7 +50,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
 
   return (
     <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="glass-panel rounded-[2rem] p-5">
+      <div className="glass-panel rounded-2xl p-5">
         <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Agenda</p>
         <h2 className="mb-4 text-2xl font-black text-white">Session flow</h2>
         <div className="space-y-3">
@@ -81,7 +81,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
               <FaLink />
               Copy public join link
             </button>
-            <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-3 font-black text-slate-950">
+            <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
               <FaEnvelope />
               Draft email invite
             </a>
@@ -89,15 +89,15 @@ export default function SessionTools({ sessionId, session, userRole }) {
         )}
       </div>
 
-      <div className="glass-panel rounded-[2rem] p-5">
+      <div className="glass-panel rounded-2xl p-5">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-rose-200">AI assistant</p>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">AI assistant</p>
             <h2 className="mt-1 text-2xl font-black text-white">Question bank</h2>
           </div>
           {isInterviewer && (
             <div className="flex flex-wrap gap-2">
-              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
+              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
                 <FaMagic />
                 {loading === "questions" ? "Generating..." : "Generate questions"}
               </button>
@@ -121,7 +121,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
             {questions.length > 0 ? questions.map((item, index) => (
             <article key={`${item.question}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
               <div className="mb-2 flex flex-wrap gap-2">
-                <span className="rounded-lg bg-rose-300/10 px-3 py-1 text-xs font-bold text-rose-100">{item.category}</span>
+                <span className="rounded-lg bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-100">{item.category}</span>
                 {item.skill && <span className="rounded-lg bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{item.skill}</span>}
               </div>
               <p className="font-bold text-white">{item.question}</p>

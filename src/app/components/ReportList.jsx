@@ -42,7 +42,7 @@ export default function ReportList() {
 
   if (reports.length === 0) {
     return (
-      <div className="glass-panel rounded-3xl p-8 text-center">
+      <div className="glass-panel rounded-2xl p-8 text-center">
         <FaClipboardCheck className="mx-auto mb-3 text-4xl text-cyan-200" />
         <p className="text-lg font-bold text-white">No reports yet.</p>
         <p className="text-sm text-slate-300">Completed interview scorecards will appear here.</p>
@@ -53,7 +53,7 @@ export default function ReportList() {
   return (
     <div className="space-y-5">
       {reports.map((report) => (
-        <article key={report._id} className="glass-panel rounded-3xl p-6">
+        <article key={report._id} className="glass-panel rounded-2xl p-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
             <div>
               <h3 className="text-xl font-black text-white">{report.recommendation}</h3>

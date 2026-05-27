@@ -60,7 +60,7 @@ export default function SessionList() {
         {!loading && sessions.length === 0 && (
           <motion.div
             variants={itemVariants}
-            className="glass-panel rounded-3xl p-8 text-center"
+            className="glass-panel rounded-2xl p-8 text-center"
           >
             <FaExclamationCircle className="mx-auto mb-3 text-4xl text-cyan-200" />
             <p className="text-lg font-bold text-white">No sessions found.</p>
@@ -98,7 +98,7 @@ function SessionCard({ session, router, variants }) {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      className="glass-panel rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
+      className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
@@ -127,7 +127,7 @@ function SessionCard({ session, router, variants }) {
       <div className="flex flex-wrap gap-3">
         <button
           onClick={() => router.push(`/session/${session._id}`)}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
         >
           <FaSignInAlt />
           Join Session

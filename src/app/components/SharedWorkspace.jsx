@@ -30,7 +30,7 @@ export default function SharedWorkspace({ sessionId, inviteCode }) {
   };
 
   return (
-    <section className="glass-panel rounded-[2rem] p-5 sm:p-7">
+    <section className="glass-panel rounded-2xl p-5 sm:p-7">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Workspace</p>
@@ -38,7 +38,7 @@ export default function SharedWorkspace({ sessionId, inviteCode }) {
         </div>
         <button
           onClick={saveWorkspace}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-3 font-black text-slate-950"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 font-black text-slate-950"
         >
           <FaSave />
           Save
@@ -46,18 +46,18 @@ export default function SharedWorkspace({ sessionId, inviteCode }) {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-bold text-slate-200">Shared notes</span>
+        <label className="field-group">
+          <span className="field-label">Shared notes</span>
           <textarea
             value={workspace.notes}
             onChange={(event) => setWorkspace({ ...workspace, notes: event.target.value })}
             placeholder="Capture decisions, hints, diagrams, or feedback..."
-            className="field-surface min-h-72 w-full rounded-2xl p-4 transition"
+            className="field-surface field-control min-h-72 transition"
           />
         </label>
 
-        <label className="space-y-2">
-          <span className="flex items-center gap-2 text-sm font-bold text-slate-200">
+        <label className="field-group">
+          <span className="field-label justify-start">
             <FaCode />
             Code pad
           </span>
@@ -65,7 +65,7 @@ export default function SharedWorkspace({ sessionId, inviteCode }) {
             value={workspace.code}
             onChange={(event) => setWorkspace({ ...workspace, code: event.target.value })}
             placeholder="Write pseudocode, SQL, JavaScript, or system design notes..."
-            className="field-surface min-h-72 w-full rounded-2xl p-4 font-mono text-sm transition"
+            className="field-surface field-control min-h-72 font-mono text-sm transition"
           />
         </label>
       </div>

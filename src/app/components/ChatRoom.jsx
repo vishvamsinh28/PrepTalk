@@ -79,7 +79,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
 
   return (
     <div className="relative z-10 flex h-[34rem] w-full flex-col">
-      <div className="mb-4 flex items-center rounded-3xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
+      <div className="mb-4 flex items-center rounded-2xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
         <FaUsers className="mr-2 text-cyan-200" />
         <strong className="mr-2 text-white">Active:</strong>
         {activeUsers.length > 0 ? (
@@ -95,7 +95,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         )}
       </div>
 
-      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-2xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div
@@ -110,7 +110,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
               <div
                 className={`px-3 py-2 rounded-lg text-sm ${
                   msg.sender === userEmail
-                    ? "rounded-br-none bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 font-semibold text-slate-950"
+                    ? "rounded-br-none bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 font-semibold text-slate-950"
                     : "rounded-bl-none border border-white/10 bg-white/10 text-slate-200"
                 }`}
               >
@@ -131,11 +131,12 @@ export default function ChatRoom({ sessionId, userEmail }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
-          className="field-surface min-w-0 flex-grow rounded-l-2xl p-4 transition"
+          className="field-surface min-w-0 flex-grow rounded-l-lg border-r-0 px-4 py-3 transition"
         />
         <button
           onClick={handleSendMessage}
-          className="rounded-r-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-3 text-slate-950 transition hover:brightness-110"
+          className="rounded-r-lg bg-gradient-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 text-slate-950 transition hover:brightness-110"
+          aria-label="Send message"
         >
           <FaPaperPlane />
         </button>
