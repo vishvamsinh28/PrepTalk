@@ -33,7 +33,7 @@ export default function ReportList() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center gap-2 text-sky-400">
+      <div className="flex items-center justify-center gap-2 text-cyan-200">
         <FaSpinner className="animate-spin" />
         <span>Loading reports...</span>
       </div>
@@ -42,10 +42,10 @@ export default function ReportList() {
 
   if (reports.length === 0) {
     return (
-      <div className="text-center bg-gray-800 p-6 rounded-xl border border-gray-700">
-        <FaClipboardCheck className="text-4xl text-sky-500 mb-3 mx-auto" />
-        <p className="text-lg text-sky-400">No reports yet.</p>
-        <p className="text-gray-400 text-sm">Completed interview scorecards will appear here.</p>
+      <div className="glass-panel rounded-3xl p-8 text-center">
+        <FaClipboardCheck className="mx-auto mb-3 text-4xl text-cyan-200" />
+        <p className="text-lg font-bold text-white">No reports yet.</p>
+        <p className="text-sm text-slate-300">Completed interview scorecards will appear here.</p>
       </div>
     );
   }
@@ -53,34 +53,34 @@ export default function ReportList() {
   return (
     <div className="space-y-5">
       {reports.map((report) => (
-        <article key={report._id} className="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg">
+        <article key={report._id} className="glass-panel rounded-3xl p-6">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
             <div>
-              <h3 className="text-xl font-bold text-sky-300">{report.recommendation}</h3>
-              <p className="text-sm text-gray-400">{report.intervieweeEmail}</p>
+              <h3 className="text-xl font-black text-white">{report.recommendation}</h3>
+              <p className="text-sm text-slate-300">{report.intervieweeEmail}</p>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-slate-400">
               {new Date(report.createdAt).toLocaleDateString()}
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
             {Object.entries(report.scores || {}).map(([name, score]) => (
-              <div key={name} className="bg-gray-900 border border-gray-700 rounded-lg p-3">
-                <p className="text-xs text-gray-400">{scoreLabels[name] || name}</p>
-                <p className="text-2xl font-bold text-sky-300">{score}</p>
+              <div key={name} className="rounded-2xl border border-white/10 bg-slate-950/35 p-3">
+                <p className="text-xs text-slate-400">{scoreLabels[name] || name}</p>
+                <p className="text-2xl font-black gradient-text">{score}</p>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="font-semibold text-gray-200 mb-1">Strengths</p>
-              <p className="text-gray-400 whitespace-pre-wrap">{report.strengths}</p>
+              <p className="mb-1 font-bold text-slate-100">Strengths</p>
+              <p className="whitespace-pre-wrap text-slate-300">{report.strengths}</p>
             </div>
             <div>
-              <p className="font-semibold text-gray-200 mb-1">Next improvements</p>
-              <p className="text-gray-400 whitespace-pre-wrap">{report.improvements}</p>
+              <p className="mb-1 font-bold text-slate-100">Next improvements</p>
+              <p className="whitespace-pre-wrap text-slate-300">{report.improvements}</p>
             </div>
           </div>
         </article>

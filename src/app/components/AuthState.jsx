@@ -2,12 +2,12 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 export default function AuthState({ title, message }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100 relative px-4">
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-      <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg text-center max-w-md">
-        <FaExclamationTriangle className="text-4xl mb-3 mx-auto" />
-        <p className="text-lg font-medium">{title}</p>
-        <p className="text-sm text-gray-400">{message}</p>
+    <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
+      <div className="soft-grid absolute inset-0 opacity-60"></div>
+      <div className="glass-panel relative z-10 max-w-md rounded-[2rem] p-8 text-center">
+        <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-rose-200" />
+        <p className="text-xl font-black text-white">{title}</p>
+        <p className="mt-2 text-sm text-slate-300">{message}</p>
       </div>
     </div>
   );

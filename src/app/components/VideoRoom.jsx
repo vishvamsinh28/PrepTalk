@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as Ably from "ably";
 import Peer from "simple-peer";
 import { useRouter } from "next/navigation";
+import { FaMicrophone, FaMicrophoneSlash, FaPhoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 export default function VideoRoom({ sessionId, userEmail }) {
   const router = useRouter();
@@ -195,10 +196,8 @@ export default function VideoRoom({ sessionId, userEmail }) {
   };
 
   return (
-    <div className="flex flex-col items-center p-4 space-y-4">
-      {/* Video Grid */}
-      <div className="flex flex-wrap gap-6 justify-center">
-        {/* Self Video */}
+    <div className="space-y-5">
+      <div className="grid auto-rows-fr gap-4 lg:grid-cols-2">
         <VideoTile
           videoRef={userVideo}
           userEmail={userEmail}
@@ -218,26 +217,42 @@ export default function VideoRoom({ sessionId, userEmail }) {
         ))}
       </div>
 
-      {/* Controls */}
-      <div className="flex space-x-4 mt-4">
+      <div className="flex flex-col justify-between gap-3 rounded-3xl border border-white/10 bg-slate-950/35 p-3 sm:flex-row sm:items-center">
+        <div className="px-2">
+          <p className="text-sm font-bold text-white">{participants.length} participant{participants.length === 1 ? "" : "s"}</p>
+          <p className="text-xs text-slate-400">Controls affect your local stream only.</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
         <button
           onClick={toggleAudio}
-          className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-black transition ${
+            audioEnabled
+              ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
+              : "border border-rose-300/25 bg-rose-400/15 text-rose-100 hover:bg-rose-400/20"
+          }`}
         >
+          {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
           {audioEnabled ? "Mute Mic" : "Unmute Mic"}
         </button>
         <button
           onClick={toggleVideo}
-          className="px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600 transition"
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-black transition ${
+            videoEnabled
+              ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
+              : "border border-rose-300/25 bg-rose-400/15 text-rose-100 hover:bg-rose-400/20"
+          }`}
         >
+          {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
           {videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
         </button>
         <button
           onClick={leaveRoom}
-          className="px-4 py-2 bg-red-500 text-white rounded shadow hover:bg-red-600 transition"
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-red-400 px-4 py-3 text-sm font-black text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5"
         >
+          <FaPhoneSlash />
           Leave Room
         </button>
+        </div>
       </div>
     </div>
   );
@@ -245,18 +260,23 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
 function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="group relative min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
       <video
-        className="w-64 rounded shadow mb-2 bg-black"
+        className="h-full min-h-72 w-full object-cover"
         ref={videoRef}
         autoPlay
         muted={isSelf}
         playsInline
       />
-      <span className="text-sm text-gray-600">
-        {userEmail} {isSelf && "(You)"}
-        {!streamReady && " (Connecting...)"} 
-      </span>
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/80 to-transparent p-4">
+        <div>
+          <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
+          <p className="text-xs text-slate-300">{isSelf ? "You" : "Participant"} {!streamReady && "· Connecting"}</p>
+        </div>
+        <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white">
+          {isSelf ? "Local" : "Remote"}
+        </span>
+      </div>
     </div>
   );
 }
@@ -277,14 +297,17 @@ function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   }, [peer, peerId, streamsRef]);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="relative min-h-72 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 shadow-2xl shadow-black/30">
       <video
-        className="w-64 rounded shadow mb-2 bg-black"
+        className="h-full min-h-72 w-full object-cover"
         ref={ref}
         autoPlay
         playsInline
       />
-      <span className="text-sm text-gray-600">{userEmail}</span>
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+        <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
+        <p className="text-xs text-slate-300">Remote participant</p>
+      </div>
     </div>
   );
 }

@@ -60,20 +60,20 @@ export default function InterviewScorecard({ sessionId, session }) {
 
   if (interviewees.length === 0) {
     return (
-      <div className="bg-yellow-500/10 border border-yellow-500/40 text-yellow-200 p-4 rounded-lg text-sm">
+      <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm text-amber-100">
         Add at least one interviewee to this session before submitting a report.
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5 text-left">
+    <form onSubmit={handleSubmit} className="space-y-6 text-left">
       {message && (
         <div
-          className={`flex items-center gap-2 text-sm p-3 rounded-lg ${
+          className={`flex items-center gap-2 rounded-2xl p-3 text-sm ${
             isError
-              ? "bg-red-500/10 border border-red-500/50 text-red-300"
-              : "bg-green-500/10 border border-green-500/50 text-green-300"
+              ? "border border-red-300/30 bg-red-500/10 text-red-100"
+              : "border border-emerald-300/30 bg-emerald-500/10 text-emerald-100"
           }`}
         >
           {isError ? <FaExclamationTriangle /> : <FaCheckCircle />}
@@ -81,14 +81,14 @@ export default function InterviewScorecard({ sessionId, session }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="space-y-2">
-          <span className="text-sm text-gray-300">Interviewee</span>
+          <span className="text-sm font-bold text-slate-200">Interviewee</span>
           <select
             name="intervieweeEmail"
             value={formData.intervieweeEmail}
             onChange={updateField}
-            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500"
+            className="field-surface w-full rounded-2xl p-4 transition"
           >
             {interviewees.map((email) => (
               <option key={email} value={email}>{email}</option>
@@ -97,12 +97,12 @@ export default function InterviewScorecard({ sessionId, session }) {
         </label>
 
         <label className="space-y-2">
-          <span className="text-sm text-gray-300">Recommendation</span>
+          <span className="text-sm font-bold text-slate-200">Recommendation</span>
           <select
             name="recommendation"
             value={formData.recommendation}
             onChange={updateField}
-            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500"
+            className="field-surface w-full rounded-2xl p-4 transition"
           >
             <option value="Strong hire">Strong hire</option>
             <option value="Hire">Hire</option>
@@ -112,15 +112,15 @@ export default function InterviewScorecard({ sessionId, session }) {
         </label>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         {scoreFields.map(([name, label]) => (
-          <label key={name} className="space-y-2">
-            <span className="block text-xs text-gray-300 min-h-8">{label}</span>
+          <label key={name} className="rounded-3xl border border-white/10 bg-slate-950/30 p-3">
+            <span className="block min-h-8 text-xs font-bold text-slate-300">{label}</span>
             <select
               name={name}
               value={formData.scores[name]}
               onChange={updateScore}
-              className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500"
+              className="field-surface mt-2 w-full rounded-2xl p-3 transition"
             >
               {[1, 2, 3, 4, 5].map((score) => (
                 <option key={score} value={score}>{score}</option>
@@ -130,35 +130,46 @@ export default function InterviewScorecard({ sessionId, session }) {
         ))}
       </div>
 
-      <textarea
-        name="strengths"
-        value={formData.strengths}
-        onChange={updateField}
-        placeholder="Strengths observed"
-        className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg min-h-24 focus:outline-none focus:border-sky-500"
-        required
-      />
+      <div className="grid gap-4 md:grid-cols-2">
+        <label className="space-y-2">
+          <span className="text-sm font-bold text-slate-200">Strengths</span>
+          <textarea
+            name="strengths"
+            value={formData.strengths}
+            onChange={updateField}
+            placeholder="Strengths observed"
+            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+            required
+          />
+        </label>
 
-      <textarea
-        name="improvements"
-        value={formData.improvements}
-        onChange={updateField}
-        placeholder="What to improve next"
-        className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg min-h-24 focus:outline-none focus:border-sky-500"
-        required
-      />
+        <label className="space-y-2">
+          <span className="text-sm font-bold text-slate-200">Next improvements</span>
+          <textarea
+            name="improvements"
+            value={formData.improvements}
+            onChange={updateField}
+            placeholder="What to improve next"
+            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+            required
+          />
+        </label>
+      </div>
 
-      <textarea
-        name="notes"
-        value={formData.notes}
-        onChange={updateField}
-        placeholder="Private notes or evidence from the interview"
-        className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg min-h-20 focus:outline-none focus:border-sky-500"
-      />
+      <label className="block space-y-2">
+        <span className="text-sm font-bold text-slate-200">Private notes</span>
+        <textarea
+          name="notes"
+          value={formData.notes}
+          onChange={updateField}
+          placeholder="Private notes or evidence from the interview"
+          className="field-surface min-h-24 w-full rounded-2xl p-4 transition"
+        />
+      </label>
 
       <button
         type="submit"
-        className="bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white px-6 py-3 rounded-lg font-medium transition"
+        className="rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
       >
         Save Report
       </button>

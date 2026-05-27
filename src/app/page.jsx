@@ -2,177 +2,223 @@
 
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { FaUserGraduate, FaComments, FaClipboardCheck, FaRocket, FaChartLine, FaMedal } from "react-icons/fa";
+import {
+  FaArrowRight,
+  FaChartLine,
+  FaClipboardCheck,
+  FaComments,
+  FaMedal,
+  FaRocket,
+  FaUserGraduate,
+} from "react-icons/fa";
+
+const fadeIn = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0 },
+};
+
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+const features = [
+  { icon: <FaUserGraduate />, title: "Role-based prep", desc: "Interviewers build focused rooms while candidates join only the sessions assigned to them." },
+  { icon: <FaComments />, title: "Live room context", desc: "Video, chat, and presence stay together so interview feedback has the right evidence." },
+  { icon: <FaClipboardCheck />, title: "Structured scorecards", desc: "Capture communication, depth, problem solving, confidence, and role fit in one pass." },
+  { icon: <FaRocket />, title: "Fast session setup", desc: "Define the target role, level, type, skills, and invitees without extra admin work." },
+  { icon: <FaChartLine />, title: "Progress trail", desc: "Reports stay organized so interviewees can see what changed after every practice round." },
+  { icon: <FaMedal />, title: "Cleaner decisions", desc: "A polished workflow helps teams spend less time coordinating and more time coaching." },
+];
+
+const stats = [
+  ["5", "score dimensions"],
+  ["2", "clear user roles"],
+  ["1", "live practice room"],
+];
 
 export default function HomePage() {
   const router = useRouter();
 
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const staggerContainer = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-gray-100 scroll-smooth">
-      <motion.div
-        className="relative h-screen flex flex-col justify-center items-center text-center px-4"
-        initial="hidden"
-        animate="visible"
-        variants={fadeIn}
-        transition={{ duration: 1 }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900 to-gray-900 opacity-70"></div>
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-10"></div>
-
-        <div className="z-10 max-w-5xl mx-auto">
-          <motion.div variants={fadeIn}>
-            <div className="mb-4">
-              <span className="inline-block bg-sky-500 p-2 rounded-full animate-pulse">
-                <span className="text-4xl">PT</span>
+    <main className="app-shell overflow-hidden">
+      <section className="relative min-h-screen px-5 py-8 sm:px-8 lg:px-12">
+        <div className="soft-grid absolute inset-0 opacity-70" />
+        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col">
+          <header className="flex items-center justify-between">
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center gap-3 text-left"
+              aria-label="PrepTalk home"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 font-black text-slate-950 shadow-lg shadow-rose-500/20">
+                PT
               </span>
+              <span className="text-xl font-black tracking-tight">PrepTalk</span>
+            </button>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => router.push("/login")}
+                className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/85 transition hover:border-cyan-300/70 hover:text-white"
+              >
+                Login
+              </button>
+              <button
+                onClick={() => router.push("/register")}
+                className="rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+              >
+                Start
+              </button>
             </div>
-            <h1 className="text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-300 to-blue-500 leading-tight">
-              PrepTalk
-            </h1>
-            <p className="text-xl text-sky-100 max-w-2xl mx-auto mb-8">
-              Run focused mock interviews with live video, chat, interviewer-led sessions, and practical scorecards.
+          </header>
+
+          <div className="grid flex-1 items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr] lg:py-10">
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+              className="max-w-3xl"
+            >
+              <motion.p variants={fadeIn} className="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
+                Practice interviews with less friction and better feedback.
+              </motion.p>
+              <motion.h1 variants={fadeIn} className="text-5xl font-black leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl">
+                Interview prep that feels <span className="gradient-text">sharp, live, and human.</span>
+              </motion.h1>
+              <motion.p variants={fadeIn} className="mt-6 max-w-2xl text-lg leading-8 text-slate-200/82">
+                PrepTalk gives interviewers a polished room to run mock interviews and gives candidates clear reports they can actually act on.
+              </motion.p>
+              <motion.div variants={fadeIn} className="mt-9 flex flex-col gap-4 sm:flex-row">
+                <button
+                  onClick={() => router.push("/register")}
+                  className="inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-xl shadow-rose-500/20 transition hover:-translate-y-1"
+                >
+                  Get started free
+                  <FaArrowRight />
+                </button>
+                <button
+                  onClick={() => router.push("/login")}
+                  className="rounded-full border border-white/15 bg-white/[0.08] px-7 py-4 font-bold text-white transition hover:border-cyan-300/70 hover:bg-white/[0.12]"
+                >
+                  Sign in
+                </button>
+              </motion.div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="glass-panel rounded-[2rem] p-5 sm:p-7"
+            >
+              <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/50 p-5">
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-cyan-200">Live mock room</p>
+                    <h2 className="text-2xl font-black">Frontend Engineer</h2>
+                  </div>
+                  <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-300/30">
+                    Active
+                  </span>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="aspect-video rounded-2xl bg-gradient-to-br from-rose-400/35 via-indigo-500/20 to-cyan-300/25 p-4">
+                    <div className="flex h-full flex-col justify-between rounded-xl bg-black/25 p-4">
+                      <span className="h-3 w-16 rounded-full bg-white/50" />
+                      <p className="text-sm font-semibold text-white/85">Interviewer</p>
+                    </div>
+                  </div>
+                  <div className="aspect-video rounded-2xl bg-gradient-to-br from-cyan-300/30 via-violet-500/20 to-amber-300/30 p-4">
+                    <div className="flex h-full flex-col justify-between rounded-xl bg-black/25 p-4">
+                      <span className="h-3 w-20 rounded-full bg-white/50" />
+                      <p className="text-sm font-semibold text-white/85">Candidate</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-5 grid gap-3">
+                  {["System design tradeoffs", "React state strategy", "Communication clarity"].map((item, index) => (
+                    <div key={item} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-3">
+                      <span className="text-sm text-slate-200">{item}</span>
+                      <span className="rounded-full bg-cyan-300/15 px-3 py-1 text-xs font-bold text-cyan-100">
+                        {index + 3}/5
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative px-5 py-20 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">What changes</p>
+              <h2 className="text-4xl font-black tracking-tight sm:text-5xl">A calmer way to run serious practice.</h2>
+            </div>
+            <p className="text-lg leading-8 text-slate-300">
+              The interface keeps setup, live conversation, and review close together so every practice session has a clean beginning, middle, and next step.
             </p>
-          </motion.div>
+          </div>
 
           <motion.div
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 justify-center"
-            variants={fadeIn}
+            className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
           >
+            {features.map((feature) => (
+              <motion.article key={feature.title} variants={fadeIn} className="glass-panel rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40">
+                <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-rose-400/90 via-amber-300/90 to-cyan-300/90 text-xl text-slate-950">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-black">{feature.title}</h3>
+                <p className="mt-3 leading-7 text-slate-300">{feature.desc}</p>
+              </motion.article>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="px-5 pb-24 sm:px-8 lg:px-12">
+        <div className="glass-panel mx-auto grid max-w-7xl gap-8 rounded-[2rem] p-8 md:grid-cols-[1.1fr_0.9fr] md:p-10">
+          <div>
+            <h2 className="text-4xl font-black tracking-tight">Ready to make your next mock interview count?</h2>
+            <p className="mt-4 max-w-2xl text-slate-300">
+              Create an account, pick your role, and move straight into a workflow that looks as focused as the interview should feel.
+            </p>
             <button
               onClick={() => router.push("/register")}
-              className="bg-gradient-to-r from-sky-400 to-blue-500 text-white px-8 py-4 rounded-lg font-semibold shadow-xl hover:scale-105 transform transition duration-300"
+              className="mt-7 inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1"
             >
-              Get Started Free
+              Create account
+              <FaArrowRight />
             </button>
-            <button
-              onClick={() => router.push("/login")}
-              className="bg-gray-800 text-sky-400 border border-sky-500 px-8 py-4 rounded-lg font-semibold shadow-lg hover:bg-gray-700 hover:scale-105 transition transform duration-300"
-            >
-              Login
-            </button>
-          </motion.div>
-
-          <motion.div
-            className="mt-16 flex justify-center"
-            variants={fadeIn}
-          >
-            <div className="animate-bounce bg-sky-500/20 p-3 w-12 h-12 ring-1 ring-sky-500/50 rounded-full flex items-center justify-center cursor-pointer"
-              onClick={() => window.scrollTo({ top: window.innerHeight, behavior: "smooth" })}
-            >
-              <svg className="w-6 h-6 text-sky-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-              </svg>
-            </div>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <section className="py-20 bg-gray-800">
-        <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-16" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="text-4xl font-bold mb-4 text-sky-300">Why Choose PrepTalk?</h2>
-            <p className="max-w-2xl mx-auto text-gray-300 text-lg">
-              A clean workflow for interviewers and interviewees to practice live, capture evidence, and improve faster.
-            </p>
-          </motion.div>
-
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
-            variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            {[
-              { icon: <FaUserGraduate />, title: "Two Clear Roles", desc: "Interviewers create sessions. Interviewees join assigned rooms." },
-              { icon: <FaComments />, title: "Live Interview Room", desc: "Video, presence, and chat in one focused session space." },
-              { icon: <FaClipboardCheck />, title: "Structured Scorecards", desc: "Rate communication, depth, problem solving, confidence, and role fit." },
-              { icon: <FaRocket />, title: "Session Builder", desc: "Set target role, level, interview type, skills, and invitees." },
-              { icon: <FaChartLine />, title: "Report History", desc: "Save practical reports interviewees can use after each session." },
-              { icon: <FaMedal />, title: "Fresh Start Ready", desc: "Built around clean data and the simplified role model." },
-            ].map((feature, i) => (
-              <motion.div key={i} className="bg-gray-900 border border-gray-700 p-8 rounded-xl shadow-lg group hover:shadow-sky-500/20 hover:border-sky-500/50 transition-all duration-300"
-                variants={fadeIn}>
-                <div className="text-center">
-                  <div className="flex justify-center items-center text-sky-400 text-4xl mb-4 group-hover:scale-110 transform transition">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold text-sky-300 mb-3 group-hover:text-sky-400 transition">{feature.title}</h3>
-                  <p className="text-gray-400 group-hover:text-gray-300 transition">{feature.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-gray-900">
-        <div className="container mx-auto px-4">
-          <motion.div className="text-center mb-16" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <h2 className="text-4xl font-bold mb-4 text-sky-300">Success Stories</h2>
-            <p className="max-w-2xl mx-auto text-gray-300 text-lg">
-              PrepTalk has helped thousands achieve their career goals.
-            </p>
-          </motion.div>
-
-          <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto"
-            variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            {[
-              { quote: "PrepTalk transformed my interview skills. After just 3 weeks of practice, I secured offers from two top tech companies!", author: "Mira S.", position: "Software Engineer at TechGiant Inc." },
-              { quote: "The feedback I received was invaluable. I'm now leading discussions in my MBA program with confidence.", author: "James L.", position: "MBA Candidate, Business School" },
-            ].map((t, i) => (
-              <motion.div key={i} className="bg-gray-800 border border-gray-700 p-8 rounded-xl shadow-lg relative group hover:border-sky-500/50 transition"
-                variants={fadeIn}>
-                <div className="absolute -top-5 left-5 text-5xl text-sky-500 opacity-40 group-hover:opacity-60">“</div>
-                <p className="text-gray-300 mb-6">{t.quote}</p>
-                <div>
-                  <p className="font-semibold text-sky-300">{t.author}</p>
-                  <p className="text-gray-400 text-sm">{t.position}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-gradient-to-r from-blue-900 to-sky-900 text-center">
-        <motion.div className="max-w-3xl mx-auto" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2 className="text-4xl font-bold mb-6 text-white">Ready to Elevate Your Skills?</h2>
-          <p className="text-sky-100 text-lg mb-10">
-            Join thousands of successful professionals who’ve transformed their communication abilities with PrepTalk.
-          </p>
-          <button
-            onClick={() => router.push("/register")}
-            className="bg-sky-400 hover:bg-sky-500 text-gray-900 font-bold px-10 py-4 rounded-lg shadow-lg hover:shadow-sky-400/50 transform hover:scale-105 transition duration-300"
-          >
-            Start Free Trial
-          </button>
-          <p className="text-sky-200 mt-4 text-sm">No credit card required.</p>
-        </motion.div>
-      </section>
-
-      <footer className="bg-gray-900 border-t border-gray-800 py-12">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-6 md:mb-0 text-center md:text-left">
-              <h3 className="text-2xl font-bold text-sky-400">PrepTalk</h3>
-              <p className="text-gray-400 mt-2">Elevate your communication skills.</p>
-            </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">
-            © {new Date().getFullYear()} PrepTalk.
+          <div className="grid grid-cols-3 gap-3">
+            {stats.map(([value, label]) => (
+              <div key={label} className="rounded-3xl border border-white/10 bg-slate-950/40 p-4 text-center">
+                <p className="text-4xl font-black gradient-text">{value}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-300">{label}</p>
+              </div>
+            ))}
           </div>
         </div>
+      </section>
+
+      <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-slate-400">
+        © {new Date().getFullYear()} PrepTalk. Built for better practice.
       </footer>
-    </div>
+    </main>
   );
 }

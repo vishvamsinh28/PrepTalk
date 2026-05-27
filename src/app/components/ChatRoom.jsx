@@ -78,26 +78,24 @@ export default function ChatRoom({ sessionId, userEmail }) {
   };
 
   return (
-    <div className="w-full max-w-2xl bg-gray-800 border border-gray-700 rounded-xl shadow-xl p-6 relative z-10">
-      {/* Active Users */}
-      <div className="flex items-center mb-4 bg-gray-700 p-3 rounded-lg text-gray-300 text-sm">
-        <FaUsers className="text-sky-400 mr-2" />
-        <strong className="mr-2">Active Users:</strong>
+    <div className="relative z-10 flex h-[34rem] w-full flex-col">
+      <div className="mb-4 flex items-center rounded-3xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
+        <FaUsers className="mr-2 text-cyan-200" />
+        <strong className="mr-2 text-white">Active:</strong>
         {activeUsers.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {activeUsers.map((user, idx) => (
-              <span key={idx} className="bg-sky-500/20 px-2 py-0.5 rounded text-sky-300 text-xs">
+              <span key={idx} className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
                 {user}
               </span>
             ))}
           </div>
         ) : (
-          <span className="text-gray-400">No users online</span>
+          <span className="text-slate-400">No users online</span>
         )}
       </div>
 
-      {/* Messages */}
-      <div className="bg-gray-700 rounded-lg p-4 h-64 overflow-y-auto space-y-3 mb-4 custom-scroll">
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-3xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div
@@ -112,11 +110,11 @@ export default function ChatRoom({ sessionId, userEmail }) {
               <div
                 className={`px-3 py-2 rounded-lg text-sm ${
                   msg.sender === userEmail
-                    ? "bg-sky-500 text-white rounded-br-none"
-                    : "bg-gray-600 text-gray-200 rounded-bl-none"
+                    ? "rounded-br-none bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 font-semibold text-slate-950"
+                    : "rounded-bl-none border border-white/10 bg-white/10 text-slate-200"
                 }`}
               >
-                <strong className="block text-xs opacity-70 mb-1">
+                <strong className="mb-1 block text-xs opacity-70">
                   {msg.sender === userEmail ? "You" : msg.sender}
                 </strong>
                 {msg.message}
@@ -127,18 +125,17 @@ export default function ChatRoom({ sessionId, userEmail }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="flex mt-2">
+      <div className="flex">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-grow bg-gray-700 border border-gray-600 text-gray-100 p-3 rounded-l-lg focus:outline-none focus:border-sky-500"
+          className="field-surface min-w-0 flex-grow rounded-l-2xl p-4 transition"
         />
         <button
           onClick={handleSendMessage}
-          className="bg-gradient-to-r from-sky-500 to-blue-500 text-white px-5 py-3 rounded-r-lg hover:scale-105 transform transition duration-300"
+          className="rounded-r-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-3 text-slate-950 transition hover:brightness-110"
         >
           <FaPaperPlane />
         </button>

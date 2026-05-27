@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock, FaUsersCog } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaRocket, FaUsersCog } from "react-icons/fa";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,40 +44,40 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-screen justify-center items-center bg-gray-900 text-gray-100">
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-      
+    <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-10">
+      <div className="soft-grid absolute inset-0 opacity-60"></div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700 w-full max-w-md space-y-6 relative z-10"
+        className="glass-panel relative z-10 w-full max-w-md space-y-6 rounded-[2rem] p-8"
       >
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <div className="bg-sky-500/20 p-3 rounded-full">
-              <span className="text-3xl">🚀</span>
+            <div className="grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-rose-500/20">
+              <FaRocket className="text-2xl text-slate-950" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-sky-300">Create Your Account</h2>
-          <p className="text-gray-400 mt-2">Join PrepTalk and elevate your skills today</p>
+          <h2 className="text-4xl font-black tracking-tight gradient-text">Create account</h2>
+          <p className="mt-3 text-slate-300">Join PrepTalk and elevate your skills today.</p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-lg text-sm">
+          <div className="rounded-2xl border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-100">
             {error}
           </div>
         )}
         
         {success && (
-          <div className="bg-green-500/10 border border-green-500/50 text-green-400 p-3 rounded-lg text-sm">
+          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-500/10 p-3 text-sm text-emerald-100">
             {success}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
               <FaUser />
             </div>
             <input
@@ -86,13 +86,13 @@ export default function RegisterPage() {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className="bg-gray-700 border border-gray-600 w-full p-3 pl-10 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
               required
             />
           </div>
           
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
               <FaEnvelope />
             </div>
             <input
@@ -101,13 +101,13 @@ export default function RegisterPage() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="bg-gray-700 border border-gray-600 w-full p-3 pl-10 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
               required
             />
           </div>
           
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
               <FaLock />
             </div>
             <input
@@ -116,20 +116,20 @@ export default function RegisterPage() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="bg-gray-700 border border-gray-600 w-full p-3 pl-10 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
               required
             />
           </div>
           
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
               <FaUsersCog />
             </div>
             <select 
               name="role" 
               value={formData.role} 
               onChange={handleChange} 
-              className="bg-gray-700 border border-gray-600 w-full p-3 pl-10 rounded-lg focus:outline-none focus:border-sky-500 transition-colors appearance-none"
+              className="field-surface w-full appearance-none rounded-2xl p-4 pl-12 transition"
             >
               <option value="Interviewee">Interviewee</option>
               <option value="Interviewer">Interviewer</option>
@@ -139,7 +139,7 @@ export default function RegisterPage() {
           <button 
             type="submit" 
             disabled={isLoading}
-            className="bg-gradient-to-r from-sky-400 to-blue-500 text-white w-full p-3 rounded-lg font-medium hover:from-sky-500 hover:to-blue-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 shadow-lg hover:shadow-sky-500/30 disabled:opacity-70"
+            className="w-full rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 disabled:opacity-70"
           >
             {isLoading ? (
               <span className="flex items-center justify-center">
@@ -153,20 +153,20 @@ export default function RegisterPage() {
           </button>
         </form>
 
-        <div className="text-center text-gray-400 text-sm">
+        <div className="text-center text-sm text-slate-300">
           <p>
             Already have an account?{" "}
             <button 
               onClick={() => router.push("/login")}
-              className="text-sky-400 hover:text-sky-300 font-medium transition-colors"
+              className="font-bold text-cyan-200 transition hover:text-white"
             >
               Sign in
             </button>
           </p>
         </div>
         
-        <div className="border-t border-gray-700 pt-5 mt-6">
-          <p className="text-xs text-center text-gray-500">
+        <div className="mt-6 border-t border-white/10 pt-5">
+          <p className="text-center text-xs text-slate-400">
             By registering, you agree to PrepTalk's Terms of Service and Privacy Policy
           </p>
         </div>

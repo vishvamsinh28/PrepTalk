@@ -5,7 +5,7 @@ import ChatRoom from "@/app/components/ChatRoom";
 import VideoRoom from "@/app/components/VideoRoom";
 import InterviewScorecard from "@/app/components/InterviewScorecard";
 import AuthState from "@/app/components/AuthState";
-import { FaComments, FaExclamationTriangle } from "react-icons/fa";
+import { FaComments, FaExclamationTriangle, FaUserTie } from "react-icons/fa";
 
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
@@ -16,12 +16,12 @@ export default async function SessionRoom(props) {
 
   if (!session) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900 text-gray-100 relative px-4">
-        <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5"></div>
-        <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-6 rounded-lg text-center max-w-md">
-          <FaExclamationTriangle className="text-4xl mb-3 mx-auto" />
-          <p className="text-lg font-medium">Session not found</p>
-          <p className="text-sm text-gray-400">Please check the session ID and try again.</p>
+      <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
+        <div className="soft-grid absolute inset-0 opacity-60"></div>
+        <div className="glass-panel relative z-10 max-w-md rounded-[2rem] p-8 text-center">
+          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-rose-200" />
+          <p className="text-xl font-black text-white">Session not found</p>
+          <p className="mt-2 text-sm text-slate-300">Please check the session ID and try again.</p>
         </div>
       </div>
     );
@@ -35,52 +35,67 @@ export default async function SessionRoom(props) {
   const sessionData = JSON.parse(JSON.stringify(session));
 
   return (
-    <div className="min-h-screen text-center bg-gray-900 text-gray-100 relative px-4 py-10">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5 z-0"></div>
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
+      <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
 
-      {/* Container */}
-      <div className="relative z-10 max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
-            <FaComments className="text-3xl text-sky-300" />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-cyan-500/20">
+              <FaComments className="text-xl text-slate-950" />
+            </div>
+            <h1 className="text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl">{session.title}</h1>
+            <p className="mt-3 max-w-3xl text-base leading-7 text-slate-300">{session.description}</p>
           </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-2">{session.title}</h1>
-          <p className="text-gray-400 text-sm mb-2">{session.description}</p>
-          <div className="flex flex-wrap justify-center gap-2 mb-3">
-            <span className="bg-sky-500/10 border border-sky-500/30 text-sky-200 px-3 py-1 rounded-full text-xs">{session.role}</span>
-            <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.level}</span>
-            <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.interviewType}</span>
-            {session.skills?.map((skill) => (
-              <span key={skill} className="bg-gray-800 border border-gray-600 text-gray-300 px-3 py-1 rounded-full text-xs">{skill}</span>
-            ))}
+          <div className="glass-panel rounded-3xl p-5 text-left lg:min-w-80">
+            <p className="mb-3 flex items-center gap-2 text-sm font-bold text-cyan-100">
+              <FaUserTie />
+              Created by
+            </p>
+            <p className="break-all text-sm text-slate-300">{session.createdBy}</p>
           </div>
-          <p className="text-gray-500 text-xs">
-            Created by: <strong className="text-sky-300">{session.createdBy}</strong>
-          </p>
         </div>
 
-        {/* Video + Chat layout */}
-        <div className="flex flex-col md:flex-row gap-8 justify-between">
-          {/* Video Room */}
-          <div className="md:w-2/3 bg-gray-800 p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">Video Interview</h2>
-            <VideoRoom sessionId={sessionId} userEmail={user.email} />
-          </div>
+        <div className="mb-8 flex flex-wrap gap-2">
+          <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
+          <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
+          <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
+          {session.skills?.map((skill) => (
+            <span key={skill} className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+          ))}
+        </div>
 
-          {/* Chat Room */}
-          <div className="md:w-1/3 bg-gray-800 p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">Live Chat</h2>
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_390px]">
+          <section className="glass-panel rounded-[2rem] p-4 sm:p-5">
+            <div className="mb-4 flex items-center justify-between gap-4 px-1">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Live room</p>
+                <h2 className="text-2xl font-black text-white">Video Interview</h2>
+              </div>
+              <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-100">
+                In session
+              </span>
+            </div>
+            <VideoRoom sessionId={sessionId} userEmail={user.email} />
+          </section>
+
+          <aside className="glass-panel rounded-[2rem] p-4 sm:p-5">
+            <div className="mb-4 px-1">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-rose-200">Conversation</p>
+              <h2 className="text-2xl font-black text-white">Live Chat</h2>
+            </div>
             <ChatRoom sessionId={sessionId} userEmail={user.email} />
-          </div>
+          </aside>
         </div>
 
         {user.role === "Interviewer" && (
-          <div className="mt-16 bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-sky-300 mb-6">Interview Scorecard</h2>
+          <section className="glass-panel mt-8 rounded-[2rem] p-5 sm:p-7">
+            <div className="mb-6">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Feedback</p>
+              <h2 className="mt-2 text-3xl font-black text-white">Interview Scorecard</h2>
+            </div>
             <InterviewScorecard sessionId={sessionId} session={sessionData} />
-          </div>
+          </section>
         )}
       </div>
     </div>

@@ -68,22 +68,22 @@ export default function CreateSessionForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="bg-gray-800 border border-gray-700 p-8 rounded-xl shadow-2xl max-w-xl w-full mx-auto relative z-10"
+      className="glass-panel relative z-10 mx-auto w-full max-w-2xl rounded-[2rem] p-8"
     >
       <div className="text-center mb-6">
-        <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-3">
-          <FaRocket className="text-3xl text-sky-300" />
+        <div className="mb-4 inline-grid h-14 w-14 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300">
+          <FaRocket className="text-xl text-slate-950" />
         </div>
-        <h2 className="text-3xl font-bold text-sky-300 mb-1">Create New Session</h2>
-        <p className="text-gray-400 text-sm">Invite interviewees and start a practice session.</p>
+        <h2 className="mb-2 text-3xl font-black tracking-tight text-white">Create New Session</h2>
+        <p className="text-sm text-slate-300">Invite interviewees and start a practice session.</p>
       </div>
 
       {message && (
         <div
-          className={`flex items-center mb-4 text-sm p-3 rounded-lg ${
+          className={`mb-4 flex items-center rounded-2xl p-3 text-sm ${
             isError
-              ? "bg-red-500/10 border border-red-500/50 text-red-400"
-              : "bg-green-500/10 border border-green-500/50 text-green-400"
+              ? "border border-red-300/30 bg-red-500/10 text-red-100"
+              : "border border-emerald-300/30 bg-emerald-500/10 text-emerald-100"
           }`}
         >
           {isError ? (
@@ -101,7 +101,7 @@ export default function CreateSessionForm() {
           value={formData.title}
           onChange={handleChange}
           placeholder="Session Title"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          className="field-surface w-full rounded-2xl p-4 transition"
           required
         />
 
@@ -110,7 +110,7 @@ export default function CreateSessionForm() {
           value={formData.description}
           onChange={handleChange}
           placeholder="Session Description"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          className="field-surface min-h-28 w-full rounded-2xl p-4 transition"
         ></textarea>
 
         <input
@@ -118,7 +118,7 @@ export default function CreateSessionForm() {
           value={formData.role}
           onChange={handleChange}
           placeholder="Target role (Frontend Engineer, Product Manager...)"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          className="field-surface w-full rounded-2xl p-4 transition"
           required
         />
 
@@ -127,7 +127,7 @@ export default function CreateSessionForm() {
             name="level"
             value={formData.level}
             onChange={handleChange}
-            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+            className="field-surface w-full rounded-2xl p-4 transition"
           >
             <option value="Entry">Entry</option>
             <option value="Mid">Mid</option>
@@ -138,7 +138,7 @@ export default function CreateSessionForm() {
             name="interviewType"
             value={formData.interviewType}
             onChange={handleChange}
-            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+            className="field-surface w-full rounded-2xl p-4 transition"
           >
             <option value="Technical">Technical</option>
             <option value="Behavioral">Behavioral</option>
@@ -151,7 +151,7 @@ export default function CreateSessionForm() {
           value={formData.skills}
           onChange={handleChange}
           placeholder="Skills to assess (React, APIs, System Design)"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          className="field-surface w-full rounded-2xl p-4 transition"
         />
 
         <input
@@ -159,12 +159,12 @@ export default function CreateSessionForm() {
           value={formData.interviewees}
           onChange={handleChange}
           placeholder="Interviewee emails (comma separated)"
-          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          className="field-surface w-full rounded-2xl p-4 transition"
         />
 
         <button
           type="submit"
-          className="bg-gradient-to-r from-sky-400 to-blue-500 text-white w-full p-3 rounded-lg font-medium hover:from-sky-500 hover:to-blue-600 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 shadow-lg hover:shadow-sky-500/30"
+          className="w-full rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
         >
           Create Session
         </button>

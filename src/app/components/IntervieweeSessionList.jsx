@@ -37,7 +37,7 @@ export default function IntervieweeSessionList() {
   };
 
   return (
-    <div className="text-gray-100">
+    <div className="text-slate-100">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -45,9 +45,9 @@ export default function IntervieweeSessionList() {
         className="max-w-4xl mx-auto"
       >
         {sessions.length === 0 ? (
-          <motion.div variants={itemVariants} className="text-center bg-gray-800 p-6 rounded-xl border border-gray-700">
-            <p className="text-lg text-sky-400">No sessions assigned yet.</p>
-            <p className="text-gray-400 text-sm">Please check back later.</p>
+          <motion.div variants={itemVariants} className="glass-panel rounded-3xl p-8 text-center">
+            <p className="text-lg font-bold text-white">No sessions assigned yet.</p>
+            <p className="text-sm text-slate-300">Please check back later.</p>
           </motion.div>
         ) : (
           <motion.div className="space-y-6" variants={containerVariants}>
@@ -59,21 +59,21 @@ export default function IntervieweeSessionList() {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="bg-gray-800 border border-gray-700 p-6 rounded-xl shadow-lg transition-all hover:border-sky-500/50"
+                  className="glass-panel rounded-3xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
                 >
-                  <h3 className="text-2xl font-bold text-sky-300 mb-2">{session.title}</h3>
-                  <p className="text-gray-400 text-sm mb-4">{session.description}</p>
+                  <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
+                  <p className="mb-4 text-sm leading-6 text-slate-300">{session.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="bg-sky-500/10 border border-sky-500/30 text-sky-200 px-3 py-1 rounded-full text-xs">{session.role}</span>
-                    <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.level}</span>
-                    <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.interviewType}</span>
+                    <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
+                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
+                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
                     {session.skills?.map((skill) => (
-                      <span key={skill} className="bg-gray-900 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">{skill}</span>
+                      <span key={skill} className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
                     ))}
                   </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
-                    className="bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-medium hover:scale-105 transition"
+                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 via-cyan-300 to-rose-300 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
                   >
                     <FaSignInAlt />
                     Join Session

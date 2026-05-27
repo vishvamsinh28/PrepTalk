@@ -17,20 +17,17 @@ export default async function InterviewerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 relative px-4 py-10">
-      {/* Background pattern */}
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5 z-0"></div>
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
+      <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
 
-      {/* Container */}
-      <div className="relative z-10 max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
-            <FaMicrophoneAlt className="text-3xl text-sky-300" />
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <div className="mb-12 text-center">
+          <div className="mb-5 inline-grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 shadow-lg shadow-cyan-500/20">
+            <FaMicrophoneAlt className="text-2xl text-slate-950" />
           </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-2">Interviewer Panel</h1>
-          <p className="text-gray-400 text-sm mb-4">Welcome, {userData.email}!</p>
-          <p className="text-gray-500 text-xs">Your role: <strong className="text-sky-300">Interviewer</strong></p>
+          <h1 className="mb-3 text-5xl font-black tracking-tight gradient-text">Interviewer Panel</h1>
+          <p className="text-slate-300">Welcome, {userData.email}</p>
+          <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewer workspace</p>
         </div>
 
         <div className="mb-16">
@@ -39,12 +36,12 @@ export default async function InterviewerPage() {
 
         {/* Session list */}
         <div>
-          <h2 className="text-2xl text-center font-bold text-sky-300 mb-6">Your Sessions</h2>
+          <h2 className="mb-6 text-center text-3xl font-black tracking-tight text-white">Your Sessions</h2>
           <SessionList />
         </div>
 
         <div className="mt-16">
-          <h2 className="text-2xl text-center font-bold text-sky-300 mb-6">Submitted Reports</h2>
+          <h2 className="mb-6 text-center text-3xl font-black tracking-tight text-white">Submitted Reports</h2>
           <ReportList />
         </div>
       </div>
