@@ -6,10 +6,44 @@ import Peer from "simple-peer";
 import { useRouter } from "next/navigation";
 import { FaMicrophone, FaMicrophoneSlash, FaPhoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 
+const WEBRTC_CONFIG = {
+  iceServers: [
+    { urls: "stun:stun.l.google.com:19302" },
+    { urls: "stun:global.stun.twilio.com:3478" },
+  ],
+};
+
+function requestUserMedia(constraints) {
+  if (typeof navigator === "undefined") {
+    return Promise.reject(new Error("Camera is not available in this browser."));
+  }
+
+  if (navigator.mediaDevices?.getUserMedia) {
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }
+
+  const legacyGetUserMedia =
+    navigator.getUserMedia ||
+    navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia ||
+    navigator.msGetUserMedia;
+
+  if (!legacyGetUserMedia) {
+    return Promise.reject(
+      new Error("Camera access requires a supported browser and HTTPS connection.")
+    );
+  }
+
+  return new Promise((resolve, reject) => {
+    legacyGetUserMedia.call(navigator, constraints, resolve, reject);
+  });
+}
+
 export default function VideoRoom({ sessionId, userEmail }) {
   const router = useRouter();
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
+  const [mediaError, setMediaError] = useState("");
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [participants, setParticipants] = useState([{ socketId: "self", userEmail }]);
@@ -55,7 +89,11 @@ export default function VideoRoom({ sessionId, userEmail }) {
       ]);
 
       remoteMembers.forEach((member) => {
-        if (streamRef.current && !peersRef.current.find((p) => p.peerId === member.connectionId)) {
+        if (
+          streamRef.current &&
+          shouldInitiatePeer(member.connectionId) &&
+          !peersRef.current.find((p) => p.peerId === member.connectionId)
+        ) {
           const peer = createPeer(member.connectionId, streamRef.current);
           const peerData = { peerId: member.connectionId, peer, userEmail: member.data?.userEmail };
           peersRef.current.push(peerData);
@@ -117,8 +155,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
       await syncPresence();
     };
 
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
+    requestUserMedia({ video: true, audio: true })
       .then(currentStream => {
         if (!isMounted) {
           currentStream.getTracks().forEach(track => track.stop());
@@ -133,7 +170,12 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
         setupRealtime().catch((error) => console.error("Unable to start video signaling:", error));
       })
-      .catch((error) => console.error("Unable to start video stream:", error));
+      .catch((error) => {
+        console.error("Unable to start video stream:", error);
+        if (isMounted) {
+          setMediaError(error.message || "Unable to access camera and microphone.");
+        }
+      });
 
     return () => {
       isMounted = false;
@@ -148,11 +190,22 @@ export default function VideoRoom({ sessionId, userEmail }) {
     };
   }, [sessionId, userEmail]);
 
+  function shouldInitiatePeer(remoteConnectionId) {
+    const selfId = connectionIdRef.current;
+
+    if (!selfId || !remoteConnectionId) {
+      return false;
+    }
+
+    return selfId < remoteConnectionId;
+  }
+
   function createPeer(userToSignal, stream) {
     const peer = new Peer({
       initiator: true,
       trickle: false,
       stream,
+      config: WEBRTC_CONFIG,
     });
 
     peer.on("signal", signal => {
@@ -176,6 +229,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
       initiator: false,
       trickle: false,
       stream,
+      config: WEBRTC_CONFIG,
     });
 
     peer.on("signal", signal => {
@@ -219,6 +273,12 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
   return (
     <div className="space-y-5">
+      {mediaError && (
+        <div className="rounded-xl border border-amber-300/30 bg-amber-400/10 p-4 text-sm text-amber-100">
+          {mediaError}
+        </div>
+      )}
+
       <div className="grid auto-rows-fr gap-4 lg:grid-cols-2">
         <VideoTile
           videoRef={userVideo}
