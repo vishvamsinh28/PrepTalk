@@ -34,7 +34,8 @@ export default function LoginPage() {
       const response = await postJson("/api/login", formData);
       setSuccess(response.message);
       setTimeout(() => {
-        router.push("/dashboard");
+        router.replace("/dashboard");
+        router.refresh();
       }, 1000);
     } catch (err) {
       setError(err.message || "Login failed");
