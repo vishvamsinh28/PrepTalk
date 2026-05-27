@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaHome, FaChartBar, FaComments, FaSignOutAlt, FaUser, FaRobot, FaMicrophone } from "react-icons/fa";
+import { FaHome, FaSignOutAlt } from "react-icons/fa";
 
 function getRoleHome(role) {
   if (role === "Interviewer") return "/interviewer";
@@ -56,48 +56,8 @@ export default function Navbar() {
       icon: <FaHome />,
       label: "Dashboard",
       path: getRoleHome(userRole),
-    isActive: ["/interviewer", "/interviewee", "/dashboard"].includes(pathname),
+      isActive: ["/interviewer", "/interviewee", "/dashboard"].includes(pathname),
     },
-    {
-      icon: <FaRobot />,
-      label: "Practice AI Questions",
-      path: "/practice-ai-questions",
-      isActive: pathname === "/practice-ai-questions",
-    },
-    {
-      icon: <FaUser />,
-      label: "Resume Review",
-      path: "/resume-review",
-      isActive: pathname === "/resume-review",
-    },
-    {
-      icon: <FaMicrophone />,
-      label: "Mock Interview",
-      path: "/mock-interview",
-      isActive: pathname === "/mock-interview",
-    },
-    {
-      icon: <FaComments />,
-      label: "Interview History",
-      path: "/mock-interview/history",
-      isActive: pathname === "/mock-interview/history",
-    },
-    ...(userRole === "Interviewer"
-      ? [
-          {
-            icon: <FaChartBar />,
-            label: "Analytics",
-            path: "/interviewer/analytics",
-            isActive: pathname === "/interviewer/analytics",
-          },
-          {
-            icon: <FaComments />,
-            label: "Feedbacks",
-            path: "/feedbacks",
-            isActive: pathname === "/feedbacks",
-          },
-        ]
-      : []),
   ];
 
   const navigateTo = (path) => {

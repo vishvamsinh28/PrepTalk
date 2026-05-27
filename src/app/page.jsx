@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { FaUserGraduate, FaComments, FaClipboardCheck, FaRocket, FaChartLine, FaMedal } from "react-icons/fa";
 
@@ -38,15 +37,14 @@ export default function HomePage() {
           <motion.div variants={fadeIn}>
             <div className="mb-4">
               <span className="inline-block bg-sky-500 p-2 rounded-full animate-pulse">
-                <span className="text-4xl">🎙️</span>
+                <span className="text-4xl">PT</span>
               </span>
             </div>
             <h1 className="text-6xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-sky-300 to-blue-500 leading-tight">
               PrepTalk
             </h1>
             <p className="text-xl text-sky-100 max-w-2xl mx-auto mb-8">
-              Master your interview skills and dominate group discussions with our
-              real-time collaborative platform designed for ambitious students and professionals.
+              Run focused mock interviews with live video, chat, interviewer-led sessions, and practical scorecards.
             </p>
           </motion.div>
 
@@ -58,13 +56,13 @@ export default function HomePage() {
               onClick={() => router.push("/register")}
               className="bg-gradient-to-r from-sky-400 to-blue-500 text-white px-8 py-4 rounded-lg font-semibold shadow-xl hover:scale-105 transform transition duration-300"
             >
-              🚀 Get Started Free
+              Get Started Free
             </button>
             <button
               onClick={() => router.push("/login")}
               className="bg-gray-800 text-sky-400 border border-sky-500 px-8 py-4 rounded-lg font-semibold shadow-lg hover:bg-gray-700 hover:scale-105 transition transform duration-300"
             >
-              🔑 Login
+              Login
             </button>
           </motion.div>
 
@@ -88,19 +86,19 @@ export default function HomePage() {
           <motion.div className="text-center mb-16" variants={fadeIn} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <h2 className="text-4xl font-bold mb-4 text-sky-300">Why Choose PrepTalk?</h2>
             <p className="max-w-2xl mx-auto text-gray-300 text-lg">
-              Your personal practice ground for high-stakes interviews and group discussions. Build confidence, skill, and success!
+              A clean workflow for interviewers and interviewees to practice live, capture evidence, and improve faster.
             </p>
           </motion.div>
 
           <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto"
             variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
             {[
-              { icon: <FaUserGraduate />, title: "Role-Based Experience", desc: "Interviewer and interviewee workflows with tailored interfaces." },
-              { icon: <FaComments />, title: "Real-Time Collaboration", desc: "Dynamic discussions with instant messaging & audio features." },
-              { icon: <FaClipboardCheck />, title: "Comprehensive Feedback", desc: "Get actionable insights to boost your performance fast." },
-              { icon: <FaRocket />, title: "AI-Powered Insights", desc: "Personalized recommendations to play on your strengths." },
-              { icon: <FaChartLine />, title: "Progress Tracking", desc: "Track your improvement over time with detailed analytics." },
-              { icon: <FaMedal />, title: "Industry Templates", desc: "Practice with curated questions from top companies." },
+              { icon: <FaUserGraduate />, title: "Two Clear Roles", desc: "Interviewers create sessions. Interviewees join assigned rooms." },
+              { icon: <FaComments />, title: "Live Interview Room", desc: "Video, presence, and chat in one focused session space." },
+              { icon: <FaClipboardCheck />, title: "Structured Scorecards", desc: "Rate communication, depth, problem solving, confidence, and role fit." },
+              { icon: <FaRocket />, title: "Session Builder", desc: "Set target role, level, interview type, skills, and invitees." },
+              { icon: <FaChartLine />, title: "Report History", desc: "Save practical reports interviewees can use after each session." },
+              { icon: <FaMedal />, title: "Fresh Start Ready", desc: "Built around clean data and the simplified role model." },
             ].map((feature, i) => (
               <motion.div key={i} className="bg-gray-900 border border-gray-700 p-8 rounded-xl shadow-lg group hover:shadow-sky-500/20 hover:border-sky-500/50 transition-all duration-300"
                 variants={fadeIn}>
@@ -168,11 +166,6 @@ export default function HomePage() {
             <div className="mb-6 md:mb-0 text-center md:text-left">
               <h3 className="text-2xl font-bold text-sky-400">PrepTalk</h3>
               <p className="text-gray-400 mt-2">Elevate your communication skills.</p>
-            </div>
-            <div className="flex flex-wrap justify-center gap-6 text-gray-400">
-              <Link href="/practice-ai-questions" className="hover:text-sky-300 transition">Practice</Link>
-              <Link href="/mock-interview" className="hover:text-sky-300 transition">Mock Interview</Link>
-              <Link href="/resume-review" className="hover:text-sky-300 transition">Resume Review</Link>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-gray-500 text-sm">

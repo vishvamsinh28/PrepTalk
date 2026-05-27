@@ -10,7 +10,10 @@ export default function CreateSessionForm() {
     title: "",
     description: "",
     interviewees: "",
-    topic: "",
+    role: "",
+    level: "Entry",
+    interviewType: "Technical",
+    skills: "",
   });
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -28,7 +31,13 @@ export default function CreateSessionForm() {
       const payload = {
         title: formData.title,
         description: formData.description,
-        topic: formData.topic,
+        role: formData.role,
+        level: formData.level,
+        interviewType: formData.interviewType,
+        skills: formData.skills
+          .split(",")
+          .map((skill) => skill.trim())
+          .filter(Boolean),
         interviewees: formData.interviewees
           .split(",")
           .map((email) => email.trim())
@@ -43,7 +52,10 @@ export default function CreateSessionForm() {
         title: "",
         description: "",
         interviewees: "",
-        topic: "",
+        role: "",
+        level: "Entry",
+        interviewType: "Technical",
+        skills: "",
       });
     } catch (error) {
       setMessage(error.message || "Session creation failed");
@@ -101,21 +113,46 @@ export default function CreateSessionForm() {
           className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
         ></textarea>
 
-        <select
-          name="topic"
-          value={formData.topic}
+        <input
+          name="role"
+          value={formData.role}
           onChange={handleChange}
-          className="bg-gray-700 border border-gray-600 text-gray-400 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          placeholder="Target role (Frontend Engineer, Product Manager...)"
+          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
           required
-        >
-          <option value="">-- Select a Topic --</option>
-          <option value="Artificial Intelligence">Artificial Intelligence</option>
-          <option value="Climate Change">Climate Change</option>
-          <option value="Future of Work">Future of Work</option>
-          <option value="Education System">Education System</option>
-          <option value="Mental Health Awareness">Mental Health Awareness</option>
-          <option value="Women Empowerment">Women Empowerment</option>
-        </select>
+        />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <select
+            name="level"
+            value={formData.level}
+            onChange={handleChange}
+            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          >
+            <option value="Entry">Entry</option>
+            <option value="Mid">Mid</option>
+            <option value="Senior">Senior</option>
+          </select>
+
+          <select
+            name="interviewType"
+            value={formData.interviewType}
+            onChange={handleChange}
+            className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+          >
+            <option value="Technical">Technical</option>
+            <option value="Behavioral">Behavioral</option>
+            <option value="Mixed">Mixed</option>
+          </select>
+        </div>
+
+        <input
+          name="skills"
+          value={formData.skills}
+          onChange={handleChange}
+          placeholder="Skills to assess (React, APIs, System Design)"
+          className="bg-gray-700 border border-gray-600 text-gray-100 w-full p-3 rounded-lg focus:outline-none focus:border-sky-500 transition-colors"
+        />
 
         <input
           name="interviewees"

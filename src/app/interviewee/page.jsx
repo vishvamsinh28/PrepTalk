@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/serverAuth";
 import IntervieweeSessionList from "../components/IntervieweeSessionList";
+import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
 import { FaUserFriends } from "react-icons/fa";
 
@@ -34,7 +35,12 @@ export default async function IntervieweePage() {
         {/* Session List */}
         <div>
           <h2 className="text-2xl font-bold text-center text-sky-300 mb-6">Your Sessions</h2>
-          <IntervieweeSessionList userEmail={userData.email} />
+          <IntervieweeSessionList />
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold text-center text-sky-300 mb-6">Your Reports</h2>
+          <ReportList />
         </div>
       </div>
     </div>

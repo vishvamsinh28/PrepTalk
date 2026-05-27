@@ -18,8 +18,8 @@ export default function DashboardClient({ userData }) {
   };
 
   const roleDescriptions = {
-    Interviewer: "As an Interviewer, you can create sessions, run interviews, and provide feedback.",
-    Interviewee: "As an Interviewee, you can join sessions, practice interviews, and improve your answers."
+    Interviewer: "As an Interviewer, you can create sessions, run live interviews, and submit structured reports.",
+    Interviewee: "As an Interviewee, you can join assigned interviews and review your reports after each session."
   };
   const roleActions = {
     Interviewer: {

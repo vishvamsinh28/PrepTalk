@@ -7,8 +7,6 @@ Create a `.env.local` file with your app credentials:
 ```bash
 MONGODB_URI=your_mongodb_uri
 JWT_SECRET=your_jwt_secret
-GEMINI_API_KEY=your_gemini_api_key
-GEMINI_MODEL=gemini-3.1-flash-lite
 ABLY_API_KEY=your_ably_api_key
 ```
 

@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaChalkboardTeacher, FaSignInAlt } from "react-icons/fa";
+import { FaSignInAlt } from "react-icons/fa";
 
-export default function IntervieweeSessionList({ userEmail }) {
+export default function IntervieweeSessionList() {
   const [sessions, setSessions] = useState([]);
   const router = useRouter();
 
@@ -14,17 +14,14 @@ export default function IntervieweeSessionList({ userEmail }) {
     const fetchSessions = async () => {
       try {
         const response = await getJson("/api/session/list");
-        const filtered = response.sessions.filter((session) =>
-          session.interviewees.includes(userEmail)
-        );
-        setSessions(filtered);
+        setSessions(response.sessions || []);
       } catch (error) {
         console.error("Error fetching sessions:", error);
       }
     };
 
     fetchSessions();
-  }, [userEmail]);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -40,23 +37,13 @@ export default function IntervieweeSessionList({ userEmail }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 px-4 py-10 relative">
-      <div className="absolute inset-0 bg-[url('/images/pattern.svg')] bg-repeat opacity-5 z-0"></div>
-
+    <div className="text-gray-100">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="relative z-10 max-w-4xl mx-auto"
+        className="max-w-4xl mx-auto"
       >
-        <motion.div variants={itemVariants} className="text-center mb-10">
-          <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
-            <FaChalkboardTeacher className="text-3xl text-sky-300" />
-          </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-2">Your Sessions</h1>
-          <p className="text-gray-400 text-sm">Here are the sessions you’ve been invited to join.</p>
-        </motion.div>
-
         {sessions.length === 0 ? (
           <motion.div variants={itemVariants} className="text-center bg-gray-800 p-6 rounded-xl border border-gray-700">
             <p className="text-lg text-sky-400">No sessions assigned yet.</p>
@@ -76,6 +63,14 @@ export default function IntervieweeSessionList({ userEmail }) {
                 >
                   <h3 className="text-2xl font-bold text-sky-300 mb-2">{session.title}</h3>
                   <p className="text-gray-400 text-sm mb-4">{session.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <span className="bg-sky-500/10 border border-sky-500/30 text-sky-200 px-3 py-1 rounded-full text-xs">{session.role}</span>
+                    <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.level}</span>
+                    <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.interviewType}</span>
+                    {session.skills?.map((skill) => (
+                      <span key={skill} className="bg-gray-900 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-xs">{skill}</span>
+                    ))}
+                  </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
                     className="bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 font-medium hover:scale-105 transition"

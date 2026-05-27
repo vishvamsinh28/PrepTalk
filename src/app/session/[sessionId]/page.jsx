@@ -3,7 +3,7 @@ import Session from "@/models/Session";
 import { getCurrentUser } from "@/lib/serverAuth";
 import ChatRoom from "@/app/components/ChatRoom";
 import VideoRoom from "@/app/components/VideoRoom";
-import FeedbackForm from "@/app/components/FeedbackForm";
+import InterviewScorecard from "@/app/components/InterviewScorecard";
 import AuthState from "@/app/components/AuthState";
 import { FaComments, FaExclamationTriangle } from "react-icons/fa";
 
@@ -32,6 +32,8 @@ export default async function SessionRoom(props) {
     return <AuthState title="Invalid token." message="Please login again to continue." />;
   }
 
+  const sessionData = JSON.parse(JSON.stringify(session));
+
   return (
     <div className="min-h-screen text-center bg-gray-900 text-gray-100 relative px-4 py-10">
       {/* Background pattern */}
@@ -44,8 +46,16 @@ export default async function SessionRoom(props) {
           <div className="bg-sky-500/20 p-3 rounded-full inline-flex mb-4">
             <FaComments className="text-3xl text-sky-300" />
           </div>
-          <h1 className="text-4xl font-bold text-sky-300 mb-2">{session.title} 💬</h1>
+          <h1 className="text-4xl font-bold text-sky-300 mb-2">{session.title}</h1>
           <p className="text-gray-400 text-sm mb-2">{session.description}</p>
+          <div className="flex flex-wrap justify-center gap-2 mb-3">
+            <span className="bg-sky-500/10 border border-sky-500/30 text-sky-200 px-3 py-1 rounded-full text-xs">{session.role}</span>
+            <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.level}</span>
+            <span className="bg-gray-700 border border-gray-600 text-gray-200 px-3 py-1 rounded-full text-xs">{session.interviewType}</span>
+            {session.skills?.map((skill) => (
+              <span key={skill} className="bg-gray-800 border border-gray-600 text-gray-300 px-3 py-1 rounded-full text-xs">{skill}</span>
+            ))}
+          </div>
           <p className="text-gray-500 text-xs">
             Created by: <strong className="text-sky-300">{session.createdBy}</strong>
           </p>
@@ -55,21 +65,21 @@ export default async function SessionRoom(props) {
         <div className="flex flex-col md:flex-row gap-8 justify-between">
           {/* Video Room */}
           <div className="md:w-2/3 bg-gray-800 p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">Video Discussion 🎥</h2>
+            <h2 className="text-xl font-bold text-sky-300 mb-4">Video Interview</h2>
             <VideoRoom sessionId={sessionId} userEmail={user.email} />
           </div>
 
           {/* Chat Room */}
           <div className="md:w-1/3 bg-gray-800 p-4 rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold text-sky-300 mb-4">Live Chat 💬</h2>
+            <h2 className="text-xl font-bold text-sky-300 mb-4">Live Chat</h2>
             <ChatRoom sessionId={sessionId} userEmail={user.email} />
           </div>
         </div>
 
         {user.role === "Interviewer" && (
           <div className="mt-16 bg-gray-800 p-6 rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-sky-300 mb-6">Submit Feedback 📝</h2>
-            <FeedbackForm sessionId={sessionId} userEmail={user.email} role={user.role} />
+            <h2 className="text-2xl font-bold text-sky-300 mb-6">Interview Scorecard</h2>
+            <InterviewScorecard sessionId={sessionId} session={sessionData} />
           </div>
         )}
       </div>

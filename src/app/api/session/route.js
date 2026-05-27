@@ -5,7 +5,7 @@ import { json } from "@/lib/api";
 
 export async function POST(req) {
   try {
-    const { title, description, topic, interviewees } = await req.json();
+    const { title, description, role, level, interviewType, skills, interviewees } = await req.json();
 
     const payload = await getAuthPayloadFromRequest(req);
     if (!payload) {
@@ -16,12 +16,19 @@ export async function POST(req) {
       return json({ message: "Only interviewers can create sessions" }, 403);
     }
 
+    if (!title || !role) {
+      return json({ message: "Session title and target role are required" }, 400);
+    }
+
     await connectDB();
 
     const newSession = new Session({
       title,
       description,
-      topic,
+      role,
+      level,
+      interviewType,
+      skills,
       createdBy: payload.email,
       interviewees,
     });

@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@/lib/serverAuth";
 import CreateSessionForm from "../components/CreateSessionForm";
 import SessionList from "../components/SessionList";
+import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
 import { FaMicrophoneAlt } from "react-icons/fa";
 
@@ -40,6 +41,11 @@ export default async function InterviewerPage() {
         <div>
           <h2 className="text-2xl text-center font-bold text-sky-300 mb-6">Your Sessions</h2>
           <SessionList />
+        </div>
+
+        <div className="mt-16">
+          <h2 className="text-2xl text-center font-bold text-sky-300 mb-6">Submitted Reports</h2>
+          <ReportList />
         </div>
       </div>
     </div>
