@@ -16,29 +16,40 @@ export default async function IntervieweePage() {
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-20 pt-28">
       <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
 
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <div className="mb-12 text-center">
-          <div className="mb-5 inline-grid h-16 w-16 place-items-center rounded-3xl bg-gradient-to-br from-emerald-300 via-cyan-300 to-rose-300 shadow-lg shadow-cyan-500/20">
-            <FaUserFriends className="text-2xl text-slate-950" />
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <div className="mb-5 inline-grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-emerald-300 via-cyan-300 to-rose-300 shadow-lg shadow-cyan-500/20">
+              <FaUserFriends className="text-xl text-slate-950" />
+            </div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewee workspace</p>
+            <h1 className="text-5xl font-black tracking-tight gradient-text">Your practice room</h1>
+            <p className="mt-3 max-w-2xl text-slate-300">Join assigned sessions, review prep guidance, and track your feedback history.</p>
           </div>
-          <h1 className="mb-3 text-5xl font-black tracking-tight gradient-text">Interviewee Panel</h1>
-          <p className="text-slate-300">Welcome, {userData.email}</p>
-          <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewee workspace</p>
+          <div className="glass-panel rounded-2xl p-4 text-sm text-slate-300">
+            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-rose-200">Signed in as</span>
+            <span className="mt-1 block break-all text-white">{userData.email}</span>
+          </div>
         </div>
 
-        {/* Session List */}
-        <div>
-          <h2 className="mb-6 text-center text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+        <section>
+          <div className="mb-5">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Assigned</p>
+            <h2 className="text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+          </div>
           <IntervieweeSessionList />
-        </div>
+        </section>
 
-        <div className="mt-16">
-          <h2 className="mb-6 text-center text-3xl font-black tracking-tight text-white">Your Reports</h2>
+        <section className="mt-14">
+          <div className="mb-5">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Feedback</p>
+            <h2 className="text-3xl font-black tracking-tight text-white">Your Reports</h2>
+          </div>
           <ReportList />
-        </div>
+        </section>
       </div>
     </div>
   );

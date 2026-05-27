@@ -45,7 +45,7 @@ export default function SessionList() {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="max-w-5xl mx-auto"
+        className="mx-auto max-w-7xl"
       >
         {loading && (
           <motion.div
@@ -103,7 +103,7 @@ function SessionCard({ session, router, variants }) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
-          <p className="mb-4 text-sm leading-6 text-slate-300">{session.description}</p>
+                  <p className="mb-4 max-w-3xl text-sm leading-6 text-slate-300">{session.description}</p>
         </div>
         {session.scheduledAt && (
           <span className="inline-flex items-center gap-2 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-100">
@@ -114,11 +114,11 @@ function SessionCard({ session, router, variants }) {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
-        <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
-        <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
+        <span className="rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role || "General"}</span>
+        <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level || "Entry"}</span>
+        <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType || "Mixed"}</span>
         {session.skills?.map((skill) => (
-          <span key={skill} className="rounded-xl border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+          <span key={skill} className="rounded-lg border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
         ))}
       </div>
 

@@ -75,7 +75,7 @@ export async function POST(req) {
 
     await newSession.save();
 
-    return json({ message: "Session created successfully" }, 201);
+    return json({ message: "Session created successfully", session: newSession }, 201);
   } catch (error) {
     console.error(error);
     return json({ message: "Session creation failed", error: error.message }, 500);
