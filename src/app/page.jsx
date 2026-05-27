@@ -64,13 +64,13 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.push("/login")}
-                className="rounded-full border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/85 transition hover:border-cyan-300/70 hover:text-white"
+                className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/85 transition hover:border-cyan-300/70 hover:text-white"
               >
                 Login
               </button>
               <button
                 onClick={() => router.push("/register")}
-                className="rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
               >
                 Start
               </button>
@@ -84,7 +84,7 @@ export default function HomePage() {
               variants={staggerContainer}
               className="max-w-3xl"
             >
-              <motion.p variants={fadeIn} className="mb-5 inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
+              <motion.p variants={fadeIn} className="mb-5 inline-flex rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
                 Practice interviews with less friction and better feedback.
               </motion.p>
               <motion.h1 variants={fadeIn} className="text-5xl font-black leading-[1.02] tracking-tight sm:text-7xl lg:text-8xl">
@@ -96,14 +96,14 @@ export default function HomePage() {
               <motion.div variants={fadeIn} className="mt-9 flex flex-col gap-4 sm:flex-row">
                 <button
                   onClick={() => router.push("/register")}
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-xl shadow-rose-500/20 transition hover:-translate-y-1"
+                  className="inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-xl shadow-rose-500/20 transition hover:-translate-y-1"
                 >
                   Get started free
                   <FaArrowRight />
                 </button>
                 <button
                   onClick={() => router.push("/login")}
-                  className="rounded-full border border-white/15 bg-white/[0.08] px-7 py-4 font-bold text-white transition hover:border-cyan-300/70 hover:bg-white/[0.12]"
+                  className="rounded-xl border border-white/15 bg-white/[0.08] px-7 py-4 font-bold text-white transition hover:border-cyan-300/70 hover:bg-white/[0.12]"
                 >
                   Sign in
                 </button>
@@ -122,7 +122,7 @@ export default function HomePage() {
                     <p className="text-sm font-semibold text-cyan-200">Live mock room</p>
                     <h2 className="text-2xl font-black">Frontend Engineer</h2>
                   </div>
-                  <span className="rounded-full bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-300/30">
+                  <span className="rounded-xl bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-300/30">
                     Active
                   </span>
                 </div>
@@ -130,13 +130,13 @@ export default function HomePage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="aspect-video rounded-2xl bg-gradient-to-br from-rose-400/35 via-indigo-500/20 to-cyan-300/25 p-4">
                     <div className="flex h-full flex-col justify-between rounded-xl bg-black/25 p-4">
-                      <span className="h-3 w-16 rounded-full bg-white/50" />
+                      <span className="h-3 w-16 rounded-xl bg-white/50" />
                       <p className="text-sm font-semibold text-white/85">Interviewer</p>
                     </div>
                   </div>
                   <div className="aspect-video rounded-2xl bg-gradient-to-br from-cyan-300/30 via-violet-500/20 to-amber-300/30 p-4">
                     <div className="flex h-full flex-col justify-between rounded-xl bg-black/25 p-4">
-                      <span className="h-3 w-20 rounded-full bg-white/50" />
+                      <span className="h-3 w-20 rounded-xl bg-white/50" />
                       <p className="text-sm font-semibold text-white/85">Candidate</p>
                     </div>
                   </div>
@@ -146,7 +146,7 @@ export default function HomePage() {
                   {["System design tradeoffs", "React state strategy", "Communication clarity"].map((item, index) => (
                     <div key={item} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.08] px-4 py-3">
                       <span className="text-sm text-slate-200">{item}</span>
-                      <span className="rounded-full bg-cyan-300/15 px-3 py-1 text-xs font-bold text-cyan-100">
+                      <span className="rounded-xl bg-cyan-300/15 px-3 py-1 text-xs font-bold text-cyan-100">
                         {index + 3}/5
                       </span>
                     </div>
@@ -199,7 +199,7 @@ export default function HomePage() {
             </p>
             <button
               onClick={() => router.push("/register")}
-              className="mt-7 inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1"
+              className="mt-7 inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1"
             >
               Create account
               <FaArrowRight />

@@ -14,6 +14,10 @@ export default function CreateSessionForm() {
     level: "Entry",
     interviewType: "Technical",
     skills: "",
+    scheduledAt: "",
+    durationMinutes: 60,
+    agenda: "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min",
+    publicInviteEnabled: true,
   });
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -42,6 +46,10 @@ export default function CreateSessionForm() {
           .split(",")
           .map((email) => email.trim())
           .filter(Boolean),
+        scheduledAt: formData.scheduledAt,
+        durationMinutes: formData.durationMinutes,
+        agenda: formData.agenda,
+        publicInviteEnabled: formData.publicInviteEnabled,
       };
 
       const response = await postJson("/api/session", payload);
@@ -56,6 +64,10 @@ export default function CreateSessionForm() {
         level: "Entry",
         interviewType: "Technical",
         skills: "",
+        scheduledAt: "",
+        durationMinutes: 60,
+        agenda: "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min",
+        publicInviteEnabled: true,
       });
     } catch (error) {
       setMessage(error.message || "Session creation failed");
@@ -161,6 +173,57 @@ export default function CreateSessionForm() {
           placeholder="Interviewee emails (comma separated)"
           className="field-surface w-full rounded-2xl p-4 transition"
         />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <label className="space-y-2">
+            <span className="text-sm font-bold text-slate-200">Schedule</span>
+            <input
+              type="datetime-local"
+              name="scheduledAt"
+              value={formData.scheduledAt}
+              onChange={handleChange}
+              className="field-surface w-full rounded-2xl p-4 transition"
+            />
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-bold text-slate-200">Duration</span>
+            <input
+              type="number"
+              min="15"
+              step="5"
+              name="durationMinutes"
+              value={formData.durationMinutes}
+              onChange={handleChange}
+              className="field-surface w-full rounded-2xl p-4 transition"
+            />
+          </label>
+        </div>
+
+        <label className="block space-y-2">
+          <span className="text-sm font-bold text-slate-200">Session agenda</span>
+          <textarea
+            name="agenda"
+            value={formData.agenda}
+            onChange={handleChange}
+            placeholder="Warm-up - 5 min"
+            className="field-surface min-h-32 w-full rounded-2xl p-4 transition"
+          />
+        </label>
+
+        <label className="flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-950/30 p-4">
+          <span>
+            <span className="block text-sm font-bold text-white">Create public join link</span>
+            <span className="text-xs text-slate-400">Useful for email invites and quick access.</span>
+          </span>
+          <input
+            type="checkbox"
+            name="publicInviteEnabled"
+            checked={formData.publicInviteEnabled}
+            onChange={(event) => setFormData({ ...formData, publicInviteEnabled: event.target.checked })}
+            className="h-5 w-5 accent-cyan-300"
+          />
+        </label>
 
         <button
           type="submit"

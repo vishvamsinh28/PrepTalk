@@ -6,9 +6,12 @@ import VideoRoom from "@/app/components/VideoRoom";
 import InterviewScorecard from "@/app/components/InterviewScorecard";
 import AuthState from "@/app/components/AuthState";
 import { FaComments, FaExclamationTriangle, FaUserTie } from "react-icons/fa";
+import SessionTools from "@/app/components/SessionTools";
+import SharedWorkspace from "@/app/components/SharedWorkspace";
 
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
+  const searchParams = await props.searchParams;
 
   await connectDB();
 
@@ -33,6 +36,7 @@ export default async function SessionRoom(props) {
   }
 
   const sessionData = JSON.parse(JSON.stringify(session));
+  const inviteCode = typeof searchParams?.invite === "string" ? searchParams.invite : "";
 
   return (
     <div className="app-shell relative min-h-screen overflow-hidden px-5 py-24">
@@ -57,11 +61,11 @@ export default async function SessionRoom(props) {
         </div>
 
         <div className="mb-8 flex flex-wrap gap-2">
-          <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
-          <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
-          <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
+          <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role || "General"}</span>
+          <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level || "Entry"}</span>
+          <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType || "Mixed"}</span>
           {session.skills?.map((skill) => (
-            <span key={skill} className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+            <span key={skill} className="rounded-xl border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
           ))}
         </div>
 
@@ -72,7 +76,7 @@ export default async function SessionRoom(props) {
                 <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Live room</p>
                 <h2 className="text-2xl font-black text-white">Video Interview</h2>
               </div>
-              <span className="rounded-full border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-100">
+              <span className="rounded-xl border border-emerald-300/25 bg-emerald-300/10 px-3 py-1 text-xs font-bold text-emerald-100">
                 In session
               </span>
             </div>
@@ -86,6 +90,14 @@ export default async function SessionRoom(props) {
             </div>
             <ChatRoom sessionId={sessionId} userEmail={user.email} />
           </aside>
+        </div>
+
+        <div className="mt-8">
+          <SessionTools sessionId={sessionId} session={sessionData} userRole={user.role} />
+        </div>
+
+        <div className="mt-8">
+          <SharedWorkspace sessionId={sessionId} inviteCode={inviteCode} />
         </div>
 
         {user.role === "Interviewer" && (

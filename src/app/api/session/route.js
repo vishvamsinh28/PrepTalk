@@ -2,10 +2,46 @@ import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { json } from "@/lib/api";
+import crypto from "crypto";
+
+function parseAgenda(agenda) {
+  if (Array.isArray(agenda)) {
+    return agenda
+      .map((item) => ({
+        title: String(item.title || "").trim(),
+        minutes: Number(item.minutes) || 10,
+      }))
+      .filter((item) => item.title);
+  }
+
+  return String(agenda || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const match = line.match(/^(.+?)(?:\s*[-–]\s*(\d+)\s*min(?:utes?)?)?$/i);
+      return {
+        title: match?.[1]?.trim() || line,
+        minutes: Number(match?.[2]) || 10,
+      };
+    });
+}
 
 export async function POST(req) {
   try {
-    const { title, description, role, level, interviewType, skills, interviewees } = await req.json();
+    const {
+      title,
+      description,
+      role,
+      level,
+      interviewType,
+      skills,
+      interviewees,
+      scheduledAt,
+      durationMinutes,
+      agenda,
+      publicInviteEnabled,
+    } = await req.json();
 
     const payload = await getAuthPayloadFromRequest(req);
     if (!payload) {
@@ -31,6 +67,10 @@ export async function POST(req) {
       skills,
       createdBy: payload.email,
       interviewees,
+      scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
+      durationMinutes: Number(durationMinutes) || 60,
+      agenda: parseAgenda(agenda),
+      inviteCode: publicInviteEnabled ? crypto.randomBytes(8).toString("hex") : undefined,
     });
 
     await newSession.save();

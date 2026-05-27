@@ -25,6 +25,8 @@ const InterviewReportSchema = new mongoose.Schema(
     strengths: { type: String, required: true },
     improvements: { type: String, required: true },
     notes: { type: String },
+    aiSummary: { type: String },
+    actionItems: [{ type: String }],
   },
   { timestamps: true }
 );

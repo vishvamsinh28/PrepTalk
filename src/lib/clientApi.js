@@ -29,3 +29,10 @@ export function postJson(url, body) {
     body: JSON.stringify(body),
   });
 }
+
+export function patchJson(url, body) {
+  return requestJson(url, {
+    method: "PATCH",
+    body: JSON.stringify(body),
+  });
+}

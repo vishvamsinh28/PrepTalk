@@ -64,16 +64,16 @@ export default function IntervieweeSessionList() {
                   <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
                   <p className="mb-4 text-sm leading-6 text-slate-300">{session.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
-                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
-                    <span className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
+                    <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
+                    <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
+                    <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
                     {session.skills?.map((skill) => (
-                      <span key={skill} className="rounded-full border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+                      <span key={skill} className="rounded-xl border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
                     ))}
                   </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
-                    className="flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-300 via-cyan-300 to-rose-300 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+                    className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-300 via-cyan-300 to-rose-300 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
                   >
                     <FaSignInAlt />
                     Join Session

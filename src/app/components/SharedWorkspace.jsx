@@ -1,0 +1,76 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getJson, patchJson } from "@/lib/clientApi";
+import { FaCode, FaSave } from "react-icons/fa";
+
+export default function SharedWorkspace({ sessionId, inviteCode }) {
+  const [workspace, setWorkspace] = useState({ notes: "", code: "" });
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    const suffix = inviteCode ? `?invite=${encodeURIComponent(inviteCode)}` : "";
+    getJson(`/api/session/${sessionId}/workspace${suffix}`)
+      .then((data) => setWorkspace(data.workspace || { notes: "", code: "" }))
+      .catch((error) => console.error("Workspace fetch error:", error));
+  }, [sessionId, inviteCode]);
+
+  const saveWorkspace = async () => {
+    setStatus("Saving...");
+    try {
+      const data = await patchJson(`/api/session/${sessionId}/workspace`, {
+        ...workspace,
+        inviteCode,
+      });
+      setWorkspace(data.workspace || workspace);
+      setStatus("Saved");
+    } catch (error) {
+      setStatus(error.message || "Save failed");
+    }
+  };
+
+  return (
+    <section className="glass-panel rounded-[2rem] p-5 sm:p-7">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Workspace</p>
+          <h2 className="mt-1 text-3xl font-black text-white">Whiteboard & coding pad</h2>
+        </div>
+        <button
+          onClick={saveWorkspace}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-5 py-3 font-black text-slate-950"
+        >
+          <FaSave />
+          Save
+        </button>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <label className="space-y-2">
+          <span className="text-sm font-bold text-slate-200">Shared notes</span>
+          <textarea
+            value={workspace.notes}
+            onChange={(event) => setWorkspace({ ...workspace, notes: event.target.value })}
+            placeholder="Capture decisions, hints, diagrams, or feedback..."
+            className="field-surface min-h-72 w-full rounded-2xl p-4 transition"
+          />
+        </label>
+
+        <label className="space-y-2">
+          <span className="flex items-center gap-2 text-sm font-bold text-slate-200">
+            <FaCode />
+            Code pad
+          </span>
+          <textarea
+            value={workspace.code}
+            onChange={(event) => setWorkspace({ ...workspace, code: event.target.value })}
+            placeholder="Write pseudocode, SQL, JavaScript, or system design notes..."
+            className="field-surface min-h-72 w-full rounded-2xl p-4 font-mono text-sm transition"
+          />
+        </label>
+      </div>
+
+      {status && <p className="mt-3 text-sm text-slate-300">{status}</p>}
+    </section>
+  );
+}

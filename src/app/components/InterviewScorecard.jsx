@@ -30,6 +30,8 @@ export default function InterviewScorecard({ sessionId, session }) {
   });
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
+  const [savedReport, setSavedReport] = useState(null);
+  const [summaryLoading, setSummaryLoading] = useState(false);
 
   const updateField = (event) => {
     setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
@@ -49,12 +51,30 @@ export default function InterviewScorecard({ sessionId, session }) {
     setIsError(false);
 
     try {
-      await postJson("/api/reports", { sessionId, ...formData });
+      const response = await postJson("/api/reports", { sessionId, ...formData });
+      setSavedReport(response.report);
       setMessage("Interview report saved.");
       setIsError(false);
     } catch (error) {
       setMessage(error.message || "Could not save interview report.");
       setIsError(true);
+    }
+  };
+
+  const generateSummary = async () => {
+    if (!savedReport?._id) return;
+    setSummaryLoading(true);
+    setMessage("");
+    try {
+      const response = await postJson("/api/reports/summary", { reportId: savedReport._id });
+      setSavedReport(response.report);
+      setMessage("AI feedback summary generated.");
+      setIsError(false);
+    } catch (error) {
+      setMessage(error.message || "Could not generate summary.");
+      setIsError(true);
+    } finally {
+      setSummaryLoading(false);
     }
   };
 
@@ -167,12 +187,34 @@ export default function InterviewScorecard({ sessionId, session }) {
         />
       </label>
 
-      <button
-        type="submit"
-        className="rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
-      >
-        Save Report
-      </button>
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          className="rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+        >
+          Save Report
+        </button>
+        <button
+          type="button"
+          onClick={generateSummary}
+          disabled={!savedReport?._id || summaryLoading}
+          className="rounded-xl border border-white/15 bg-white/10 px-7 py-4 font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {summaryLoading ? "Generating summary..." : "Generate AI Summary"}
+        </button>
+      </div>
+
+      {savedReport?.aiSummary && (
+        <div className="rounded-3xl border border-cyan-300/20 bg-cyan-300/10 p-5">
+          <p className="mb-2 text-lg font-black text-cyan-100">AI feedback summary</p>
+          <p className="whitespace-pre-wrap leading-7 text-slate-200">{savedReport.aiSummary}</p>
+          {savedReport.actionItems?.length > 0 && (
+            <ul className="mt-4 space-y-2 text-sm text-slate-200">
+              {savedReport.actionItems.map((item) => <li key={item}>- {item}</li>)}
+            </ul>
+          )}
+        </div>
+      )}
     </form>
   );
 }

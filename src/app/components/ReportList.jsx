@@ -83,6 +83,18 @@ export default function ReportList() {
               <p className="whitespace-pre-wrap text-slate-300">{report.improvements}</p>
             </div>
           </div>
+
+          {report.aiSummary && (
+            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
+              <p className="mb-2 font-black text-cyan-100">AI summary</p>
+              <p className="whitespace-pre-wrap text-sm leading-6 text-slate-200">{report.aiSummary}</p>
+              {report.actionItems?.length > 0 && (
+                <ul className="mt-3 space-y-1 text-sm text-slate-200">
+                  {report.actionItems.map((item) => <li key={item}>- {item}</li>)}
+                </ul>
+              )}
+            </div>
+          )}
         </article>
       ))}
     </div>

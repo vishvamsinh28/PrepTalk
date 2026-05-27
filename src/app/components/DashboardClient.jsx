@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { FaArrowRight, FaClipboardCheck, FaComments, FaUserFriends, FaUserShield, FaVideo } from "react-icons/fa";
+import ProgressDashboard from "./ProgressDashboard";
 
 export default function DashboardClient({ userData }) {
   const containerVariants = {
@@ -61,10 +62,10 @@ export default function DashboardClient({ userData }) {
             {roleDescriptions[userData?.role] || "Get ready to explore PrepTalk and enhance your skills!"}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm text-slate-200">
+            <span className="rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-sm text-slate-200">
               {userData?.email}
             </span>
-            <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100">
+            <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-bold text-cyan-100">
               {userData?.role}
             </span>
           </div>
@@ -72,7 +73,7 @@ export default function DashboardClient({ userData }) {
             <motion.a
               variants={itemVariants}
               href={action.href}
-              className={`mt-10 inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r ${action.className} px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
+              className={`mt-10 inline-flex items-center justify-center gap-3 rounded-xl bg-gradient-to-r ${action.className} px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
             >
               {action.icon}
               {action.label}
@@ -102,6 +103,10 @@ export default function DashboardClient({ userData }) {
             ))}
           </div>
         </motion.aside>
+
+        <motion.div variants={itemVariants} className="lg:col-span-2">
+          <ProgressDashboard />
+        </motion.div>
       </motion.div>
     </div>
   );

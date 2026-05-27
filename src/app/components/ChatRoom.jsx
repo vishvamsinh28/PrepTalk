@@ -85,7 +85,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         {activeUsers.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {activeUsers.map((user, idx) => (
-              <span key={idx} className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
+              <span key={idx} className="rounded-xl border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
                 {user}
               </span>
             ))}

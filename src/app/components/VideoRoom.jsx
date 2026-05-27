@@ -225,7 +225,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         <div className="flex flex-wrap gap-3">
         <button
           onClick={toggleAudio}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-black transition ${
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition ${
             audioEnabled
               ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
               : "border border-rose-300/25 bg-rose-400/15 text-rose-100 hover:bg-rose-400/20"
@@ -236,7 +236,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         </button>
         <button
           onClick={toggleVideo}
-          className={`inline-flex items-center gap-2 rounded-full px-4 py-3 text-sm font-black transition ${
+          className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition ${
             videoEnabled
               ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
               : "border border-rose-300/25 bg-rose-400/15 text-rose-100 hover:bg-rose-400/20"
@@ -247,7 +247,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
         </button>
         <button
           onClick={leaveRoom}
-          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-rose-500 to-red-400 px-4 py-3 text-sm font-black text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-400 px-4 py-3 text-sm font-black text-white shadow-lg shadow-rose-500/20 transition hover:-translate-y-0.5"
         >
           <FaPhoneSlash />
           Leave Room
@@ -273,7 +273,7 @@ function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
           <p className="max-w-[15rem] truncate text-sm font-black text-white">{userEmail}</p>
           <p className="text-xs text-slate-300">{isSelf ? "You" : "Participant"} {!streamReady && "· Connecting"}</p>
         </div>
-        <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white">
+        <span className="rounded-xl border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-white">
           {isSelf ? "Local" : "Remote"}
         </span>
       </div>

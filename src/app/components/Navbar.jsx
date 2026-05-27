@@ -4,6 +4,24 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaHome, FaSignOutAlt } from "react-icons/fa";
 
+function LogoMark() {
+  return (
+    <span className="grid h-11 w-11 place-items-center rounded-2xl bg-slate-950/70 ring-1 ring-white/15">
+      <svg viewBox="0 0 40 40" className="h-8 w-8" aria-hidden="true">
+        <defs>
+          <linearGradient id="ptNavGradient" x1="4" y1="4" x2="36" y2="36">
+            <stop stopColor="#ff6b8b" />
+            <stop offset="0.55" stopColor="#f9c74f" />
+            <stop offset="1" stopColor="#22d3ee" />
+          </linearGradient>
+        </defs>
+        <path d="M8 10.5C8 7.46 10.46 5 13.5 5h13C29.54 5 32 7.46 32 10.5v19C32 32.54 29.54 35 26.5 35h-13C10.46 35 8 32.54 8 29.5v-19Z" fill="url(#ptNavGradient)" />
+        <path d="M14 15h7.2c3.1 0 5.1 1.7 5.1 4.4s-2 4.4-5.1 4.4h-3.3V29H14V15Zm3.9 3v2.9H21c.9 0 1.5-.5 1.5-1.4S22 18 21 18h-3.1Z" fill="#071827" />
+      </svg>
+    </span>
+  );
+}
+
 function getRoleHome(role) {
   if (role === "Interviewer") return "/interviewer";
   if (role === "Interviewee") return "/interviewee";
@@ -66,22 +84,21 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-        ? "border-b border-white/10 bg-slate-950/75 shadow-lg shadow-black/20 backdrop-blur-xl"
-        : "bg-slate-950/35 backdrop-blur-xl"
+    <nav className="fixed left-0 right-0 top-4 z-50 px-4">
+      <div
+        className={`mx-auto max-w-6xl rounded-3xl border px-4 transition-all duration-300 ${
+          isScrolled
+            ? "border-white/14 bg-slate-950/78 shadow-2xl shadow-black/30 backdrop-blur-2xl"
+            : "border-white/10 bg-white/[0.07] shadow-xl shadow-black/10 backdrop-blur-xl"
         }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      >
+        <div className="flex h-16 items-center justify-between">
           <button
             className="flex items-center gap-3 text-left"
             onClick={() => router.push("/dashboard")}
             aria-label="PrepTalk dashboard"
           >
-            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-gradient-to-br from-rose-400 via-amber-300 to-cyan-300 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20">
-              PT
-            </span>
+            <LogoMark />
             <span className="text-xl font-black tracking-tight text-white">PrepTalk</span>
           </button>
 
@@ -99,7 +116,7 @@ export default function Navbar() {
             <div className="ml-2 border-l border-white/10 pl-4">
               <button
                 onClick={handleLogout}
-                className="flex items-center rounded-full bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-2 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="flex items-center rounded-xl bg-gradient-to-r from-rose-400 via-amber-300 to-cyan-300 px-4 py-2.5 text-sm font-black text-slate-950 shadow-md shadow-cyan-500/20 transition hover:-translate-y-0.5"
               >
                 <FaSignOutAlt className="mr-1" />
                 Logout
@@ -110,7 +127,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4 md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="rounded-full border border-white/15 p-2 text-slate-200 hover:text-white focus:outline-none"
+              className="rounded-xl border border-white/15 p-2 text-slate-200 hover:text-white focus:outline-none"
             >
               {!isMenuOpen ? (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -162,7 +179,7 @@ function NavItem({ icon, label, onClick, isActive }) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center rounded-full px-4 py-2 text-sm font-bold transition-colors ${isActive
+      className={`flex items-center rounded-xl px-4 py-2.5 text-sm font-bold transition-colors ${isActive
         ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
         : "text-slate-300 hover:bg-white/10 hover:text-white"
         }`}

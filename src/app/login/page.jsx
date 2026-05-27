@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
-import { FaEnvelope, FaKey, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaEye, FaEyeSlash, FaKey, FaLock } from "react-icons/fa";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -94,14 +95,22 @@ export default function LoginPage() {
               <FaLock />
             </div>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
+              className="field-surface w-full rounded-2xl p-4 pl-12 pr-12 transition"
               required
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+              className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-300 transition hover:text-white"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
           
           <button 
