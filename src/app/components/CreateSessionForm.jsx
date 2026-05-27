@@ -348,7 +348,7 @@ export default function CreateSessionForm() {
 
 function SegmentedControl({ name, value, options, onChange }) {
   return (
-    <div className="grid grid-cols-3 gap-2 rounded-lg border border-white/10 bg-slate-950/35 p-1">
+    <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-white/10 bg-slate-950/40 p-1">
       {options.map((option) => {
         const isActive = value === option;
         return (
@@ -357,10 +357,10 @@ function SegmentedControl({ name, value, options, onChange }) {
             type="button"
             aria-pressed={isActive}
             onClick={() => onChange(option)}
-            className={`min-h-10 rounded-md px-2 text-sm font-bold transition ${
+            className={`min-h-10 rounded-md border px-2 text-sm font-bold transition ${
               isActive
-                ? "bg-cyan-300/15 text-cyan-100 ring-1 ring-cyan-300/35"
-                : "text-slate-300 hover:bg-white/10 hover:text-white"
+                ? "border-cyan-300/45 bg-cyan-300/14 text-cyan-100 shadow-inner shadow-cyan-300/10"
+                : "border-transparent bg-transparent text-slate-300 hover:border-white/10 hover:bg-slate-800/45 hover:text-white"
             }`}
           >
             {option}
