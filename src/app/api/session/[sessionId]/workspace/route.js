@@ -10,9 +10,8 @@ export async function GET(req, props) {
     const user = await getAuthPayloadFromRequest(req);
     if (!user) return json({ message: "Unauthorized" }, 401);
 
-    const { searchParams } = new URL(req.url);
     await connectDB();
-    const session = await findSessionForUser(sessionId, user, searchParams.get("invite"));
+    const session = await findSessionForUser(sessionId, user);
     if (!session) return json({ message: "Session not found" }, 404);
 
     return json({ workspace: session.workspace || { notes: "", code: "" } });
@@ -28,9 +27,9 @@ export async function PATCH(req, props) {
     const user = await getAuthPayloadFromRequest(req);
     if (!user) return json({ message: "Unauthorized" }, 401);
 
-    const { notes, code, inviteCode } = await req.json();
+    const { notes, code } = await req.json();
     await connectDB();
-    const session = await findSessionForUser(sessionId, user, inviteCode);
+    const session = await findSessionForUser(sessionId, user);
     if (!session) return json({ message: "Session not found" }, 404);
 
     const workspace = {

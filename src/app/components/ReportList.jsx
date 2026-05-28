@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getJson } from "@/lib/clientApi";
-import { FaClipboardCheck, FaSpinner } from "react-icons/fa";
+import { deleteJson, getJson } from "@/lib/clientApi";
+import { FaClipboardCheck, FaSpinner, FaTrash } from "react-icons/fa";
 
 const scoreLabels = {
   communication: "Communication",
@@ -14,6 +14,8 @@ const scoreLabels = {
 
 export default function ReportList() {
   const [reports, setReports] = useState([]);
+  const [canDeleteReports, setCanDeleteReports] = useState(false);
+  const [deletingId, setDeletingId] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +23,7 @@ export default function ReportList() {
       try {
         const response = await getJson("/api/reports");
         setReports(response.reports || []);
+        setCanDeleteReports(Boolean(response.canDeleteReports));
       } catch (error) {
         console.error("Error fetching reports:", error);
       } finally {
@@ -30,6 +33,20 @@ export default function ReportList() {
 
     fetchReports();
   }, []);
+
+  const deleteReport = async (report) => {
+    if (!window.confirm(`Delete report for ${report.intervieweeEmail}?`)) return;
+
+    setDeletingId(report._id);
+    try {
+      await deleteJson("/api/reports", { reportId: report._id });
+      setReports((current) => current.filter((item) => item._id !== report._id));
+    } catch (error) {
+      console.error("Report delete failed:", error);
+    } finally {
+      setDeletingId("");
+    }
+  };
 
   if (loading) {
     return (
@@ -54,14 +71,27 @@ export default function ReportList() {
     <div className="space-y-5">
       {reports.map((report) => (
         <article key={report._id} className="glass-panel rounded-2xl p-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-4">
             <div>
               <h3 className="text-xl font-black text-white">{report.recommendation}</h3>
               <p className="text-sm text-slate-300">{report.intervieweeEmail}</p>
             </div>
-            <p className="text-xs text-slate-400">
-              {new Date(report.createdAt).toLocaleDateString()}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 md:justify-end">
+              <p className="text-xs text-slate-400">
+                {new Date(report.createdAt).toLocaleDateString()}
+              </p>
+              {canDeleteReports && (
+                <button
+                  type="button"
+                  onClick={() => deleteReport(report)}
+                  disabled={deletingId === report._id}
+                  className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-3 py-2 text-xs font-bold text-rose-100 disabled:opacity-60"
+                >
+                  <FaTrash />
+                  {deletingId === report._id ? "Deleting..." : "Delete"}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">

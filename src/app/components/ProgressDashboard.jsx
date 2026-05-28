@@ -39,7 +39,7 @@ export default function ProgressDashboard() {
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Progress</p>
-          <h2 className="mt-1 text-2xl font-black text-white">Score trends</h2>
+          <h2 className="mt-1 text-2xl font-black text-white">Score averages</h2>
         </div>
         <div className="grid h-12 w-12 place-items-center rounded-2xl bg-linear-to-br from-cyan-300 via-emerald-300 to-blue-400 text-slate-950">
           <FaChartLine />

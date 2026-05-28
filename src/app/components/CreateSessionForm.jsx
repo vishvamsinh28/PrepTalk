@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaClipboard, FaEnvelope, FaExclamationTriangle, FaLink, FaRocket } from "react-icons/fa";
+import { FaCheckCircle, FaClipboard, FaEnvelope, FaExclamationTriangle, FaRocket } from "react-icons/fa";
 
 const defaultAgenda = "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min";
 const levels = ["Entry", "Mid", "Senior"];
@@ -14,9 +14,7 @@ function buildInviteDetails(session) {
     return { inviteUrl: "", emailBody: "", mailtoHref: "" };
   }
 
-  const inviteUrl = session.inviteCode
-    ? `${window.location.origin}/session/${session._id}?invite=${session.inviteCode}`
-    : `${window.location.origin}/session/${session._id}`;
+  const inviteUrl = `${window.location.origin}/session/${session._id}`;
   const interviewees = session.interviewees || [];
   const scheduledText = session.scheduledAt
     ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n`
@@ -42,7 +40,6 @@ export default function CreateSessionForm() {
     scheduledAt: "",
     durationMinutes: 60,
     agenda: defaultAgenda,
-    publicInviteEnabled: true,
   });
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
@@ -84,13 +81,13 @@ export default function CreateSessionForm() {
         scheduledAt: formData.scheduledAt,
         durationMinutes: formData.durationMinutes,
         agenda: formData.agenda,
-        publicInviteEnabled: formData.publicInviteEnabled,
       };
 
       const response = await postJson("/api/session", payload);
       setMessage(response.message);
       setIsError(false);
       setCreatedSession(response.session);
+      window.dispatchEvent(new CustomEvent("preptalk:sessions-updated"));
 
       setFormData({
         title: "",
@@ -103,7 +100,6 @@ export default function CreateSessionForm() {
         scheduledAt: "",
         durationMinutes: 60,
         agenda: defaultAgenda,
-        publicInviteEnabled: true,
       });
     } catch (error) {
       setMessage(error.message || "Session creation failed");
@@ -159,7 +155,7 @@ export default function CreateSessionForm() {
           <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="font-black text-emerald-100">Session ready</p>
-              <p className="mt-1 text-sm text-slate-300">Send this invite link to interviewees. The email draft includes the same link.</p>
+              <p className="mt-1 text-sm text-slate-300">Send this link only to assigned interviewees. Users who are not assigned cannot open the room.</p>
             </div>
             {copied && <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white">Copied {copied}</span>}
           </div>
@@ -167,7 +163,7 @@ export default function CreateSessionForm() {
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
             <input readOnly value={inviteDetails.inviteUrl} className="field-surface field-control min-w-0 text-sm" />
             <button type="button" onClick={() => copyText("link", inviteDetails.inviteUrl)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-bold text-cyan-100">
-              <FaLink />
+              <FaClipboard />
               Copy link
             </button>
             <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
@@ -318,20 +314,6 @@ export default function CreateSessionForm() {
             }}
             placeholder="Warm-up - 5 min"
             className="field-surface field-control max-h-64 min-h-32 transition"
-          />
-        </label>
-
-        <label className="flex items-center justify-between gap-4 rounded-lg border border-white/10 bg-slate-950/30 p-3.5 lg:col-span-2">
-          <span>
-            <span className="block text-sm font-bold text-white">Create public join link</span>
-            <span className="text-xs text-slate-400">Useful for email invites and quick access.</span>
-          </span>
-          <input
-            type="checkbox"
-            name="publicInviteEnabled"
-            checked={formData.publicInviteEnabled}
-            onChange={(event) => setFormData({ ...formData, publicInviteEnabled: event.target.checked })}
-            className="field-toggle"
           />
         </label>
 

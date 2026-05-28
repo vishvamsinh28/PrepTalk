@@ -3,7 +3,6 @@ import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { json } from "@/lib/api";
 import { normalizeEmailList, normalizeStringList, normalizeText } from "@/lib/validation";
-import crypto from "crypto";
 
 function parseAgenda(agenda) {
   if (Array.isArray(agenda)) {
@@ -43,7 +42,6 @@ export async function POST(req) {
       scheduledAt,
       durationMinutes,
       agenda,
-      publicInviteEnabled,
     } = await req.json();
 
     const payload = await getAuthPayloadFromRequest(req);
@@ -75,7 +73,6 @@ export async function POST(req) {
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
       durationMinutes: Number(durationMinutes) || 60,
       agenda: parseAgenda(agenda),
-      inviteCode: publicInviteEnabled ? crypto.randomBytes(8).toString("hex") : undefined,
     });
 
     await newSession.save();

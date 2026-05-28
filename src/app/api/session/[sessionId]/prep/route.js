@@ -43,3 +43,24 @@ export async function POST(req, props) {
     return json({ message: "Failed to generate prep guide", error: error.message }, 500);
   }
 }
+
+export async function DELETE(req, props) {
+  try {
+    const { sessionId } = await props.params;
+    const user = await getAuthPayloadFromRequest(req);
+    if (!user) return json({ message: "Unauthorized" }, 401);
+    if (user.role !== "Interviewer") return json({ message: "Only interviewers can clear prep guides" }, 403);
+
+    await connectDB();
+    const session = await findOwnedSession(sessionId, user);
+    if (!session) return json({ message: "Session not found" }, 404);
+
+    session.prepGuide = "";
+    await session.save();
+
+    return json({ prepGuide: "" });
+  } catch (error) {
+    console.error("Prep guide clear error:", error);
+    return json({ message: "Failed to clear prep guide", error: error.message }, 500);
+  }
+}

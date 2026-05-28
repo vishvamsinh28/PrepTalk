@@ -41,7 +41,6 @@ const SessionSchema = new mongoose.Schema(
     agenda: [AgendaItemSchema],
     questionBank: [QuestionSchema],
     prepGuide: { type: String },
-    inviteCode: { type: String, unique: true, sparse: true },
     workspace: { type: WorkspaceSchema, default: () => ({}) },
   },
   { timestamps: true }

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getJson } from "@/lib/clientApi";
+import { deleteJson, getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaCalendarAlt, FaEnvelope, FaLink, FaSpinner, FaExclamationCircle, FaSignInAlt } from "react-icons/fa";
+import { FaCalendarAlt, FaEnvelope, FaLink, FaSpinner, FaExclamationCircle, FaSignInAlt, FaTrash } from "react-icons/fa";
 
 export default function SessionList({ compact = false }) {
   const router = useRouter();
@@ -24,6 +24,11 @@ export default function SessionList({ compact = false }) {
     };
 
     fetchSessions();
+    window.addEventListener("preptalk:sessions-updated", fetchSessions);
+
+    return () => {
+      window.removeEventListener("preptalk:sessions-updated", fetchSessions);
+    };
   }, []);
 
   const containerVariants = {
@@ -75,7 +80,14 @@ export default function SessionList({ compact = false }) {
           >
             <AnimatePresence>
               {sessions.map((session) => (
-                <SessionCard key={session._id} session={session} router={router} variants={itemVariants} compact={compact} />
+                <SessionCard
+                  key={session._id}
+                  session={session}
+                  router={router}
+                  variants={itemVariants}
+                  compact={compact}
+                  onDeleted={(sessionId) => setSessions((current) => current.filter((item) => item._id !== sessionId))}
+                />
               ))}
             </AnimatePresence>
           </motion.div>
@@ -85,15 +97,33 @@ export default function SessionList({ compact = false }) {
   );
 }
 
-function SessionCard({ session, router, variants, compact }) {
+function SessionCard({ session, router, variants, compact, onDeleted }) {
   const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
-  const inviteUrl = origin && session.inviteCode
-    ? `${origin}/session/${session._id}?invite=${session.inviteCode}`
-    : "";
+  const inviteUrl = origin ? `${origin}/session/${session._id}` : "";
   const mailtoHref = `mailto:${(session.interviewees || []).join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(`Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role}\n${session.scheduledAt ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n` : ""}${inviteUrl ? `Join link: ${inviteUrl}\n` : ""}\n\nSee you there.`)}`;
+  const deleteSession = async () => {
+    if (!window.confirm(`Delete "${session.title}" and its saved chat/reports?`)) return;
+
+    setDeleting(true);
+    try {
+      await deleteJson(`/api/session/${session._id}`);
+      onDeleted(session._id);
+    } catch (error) {
+      console.error("Session delete failed:", error);
+      setDeleting(false);
+    }
+  };
+  const copyLink = async () => {
+    if (!inviteUrl) return;
+    await navigator.clipboard?.writeText(inviteUrl);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1800);
+  };
 
   return (
     <motion.div
@@ -126,30 +156,43 @@ function SessionCard({ session, router, variants, compact }) {
       </div>
 
       <p className="mb-5 text-xs text-slate-400">Interviewees: <span className="text-slate-200">{session.interviewees?.join(", ") || "None assigned"}</span></p>
+      {copied && (
+        <p className="mb-3 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-xs font-bold text-emerald-100">
+          Link copied
+        </p>
+      )}
 
-      <div className="flex flex-wrap gap-3">
+      <div className="grid gap-2 sm:grid-cols-2">
         <button
           onClick={() => router.push(`/session/${session._id}`)}
-          className="flex items-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
         >
           <FaSignInAlt />
           Join Session
         </button>
         {inviteUrl && (
           <button
-            onClick={() => navigator.clipboard?.writeText(inviteUrl)}
-            className="flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 font-bold text-cyan-100"
+            onClick={copyLink}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 font-bold text-cyan-100"
           >
             <FaLink />
             Copy Link
           </button>
         )}
         {(session.interviewees || []).length > 0 && (
-          <a href={mailtoHref} className="flex items-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-2.5 font-bold text-white">
+          <a href={mailtoHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-2.5 font-bold text-white">
             <FaEnvelope />
             Email Invite
           </a>
         )}
+        <button
+          onClick={deleteSession}
+          disabled={deleting}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-2.5 font-bold text-rose-100 disabled:opacity-60"
+        >
+          <FaTrash />
+          {deleting ? "Deleting..." : "Delete"}
+        </button>
       </div>
     </motion.div>
   );

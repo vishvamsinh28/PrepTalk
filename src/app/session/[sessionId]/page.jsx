@@ -12,26 +12,8 @@ import { isValidObjectId, userCanAccessSession } from "@/lib/sessionAccess";
 
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
-  const searchParams = await props.searchParams;
-
-  await connectDB();
 
   if (!isValidObjectId(sessionId)) {
-    return (
-      <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
-        <div className="soft-grid absolute inset-0 opacity-60"></div>
-        <div className="glass-panel relative z-10 max-w-md rounded-2xl p-8 text-center">
-          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-amber-200" />
-          <p className="text-xl font-black text-white">Session not found</p>
-          <p className="mt-2 text-sm text-slate-300">Please check the session ID and try again.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const session = await Session.findById(sessionId);
-
-  if (!session) {
     return (
       <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
         <div className="soft-grid absolute inset-0 opacity-60"></div>
@@ -49,10 +31,25 @@ export default async function SessionRoom(props) {
     return <AuthState title="Invalid token." message="Please login again to continue." />;
   }
 
-  const sessionData = JSON.parse(JSON.stringify(session));
-  const inviteCode = typeof searchParams?.invite === "string" ? searchParams.invite : "";
+  await connectDB();
+  const session = await Session.findById(sessionId);
 
-  if (!userCanAccessSession(session, user, inviteCode)) {
+  if (!session) {
+    return (
+      <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">
+        <div className="soft-grid absolute inset-0 opacity-60"></div>
+        <div className="glass-panel relative z-10 max-w-md rounded-2xl p-8 text-center">
+          <FaExclamationTriangle className="mx-auto mb-4 text-4xl text-amber-200" />
+          <p className="text-xl font-black text-white">Session not found</p>
+          <p className="mt-2 text-sm text-slate-300">Please check the session ID and try again.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const sessionData = JSON.parse(JSON.stringify(session));
+
+  if (!userCanAccessSession(session, user)) {
     return <AuthState title="Access denied." message="You do not have access to this session." />;
   }
 
@@ -106,7 +103,7 @@ export default async function SessionRoom(props) {
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Conversation</p>
               <h2 className="text-2xl font-black text-white">Live Chat</h2>
             </div>
-            <ChatRoom sessionId={sessionId} userEmail={user.email} inviteCode={inviteCode} />
+            <ChatRoom sessionId={sessionId} userEmail={user.email} />
           </aside>
         </div>
 
@@ -115,7 +112,7 @@ export default async function SessionRoom(props) {
         </div>
 
         <div className="mt-8">
-          <SharedWorkspace sessionId={sessionId} inviteCode={inviteCode} />
+          <SharedWorkspace sessionId={sessionId} />
         </div>
 
         {user.role === "Interviewer" && (

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { postJson } from "@/lib/clientApi";
-import { FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import { FaCheckCircle, FaChevronDown, FaExclamationTriangle } from "react-icons/fa";
 
 const scoreFields = [
   ["communication", "Communication"],
@@ -32,16 +32,16 @@ export default function InterviewScorecard({ sessionId, session }) {
   const [isError, setIsError] = useState(false);
   const [savedReport, setSavedReport] = useState(null);
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [openSelect, setOpenSelect] = useState("");
 
   const updateField = (event) => {
     setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
-  const updateScore = (event) => {
-    const value = Number(event.target.value);
+  const updateScore = (name, value) => {
     setFormData((current) => ({
       ...current,
-      scores: { ...current.scores, [event.target.name]: value },
+      scores: { ...current.scores, [name]: value },
     }));
   };
 
@@ -104,31 +104,26 @@ export default function InterviewScorecard({ sessionId, session }) {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <label className="field-group">
           <span className="field-label">Interviewee</span>
-          <select
-            name="intervieweeEmail"
+          <ScorecardSelect
+            id="intervieweeEmail"
             value={formData.intervieweeEmail}
-            onChange={updateField}
-            className="field-surface field-control field-select transition"
-          >
-            {interviewees.map((email) => (
-              <option key={email} value={email}>{email}</option>
-            ))}
-          </select>
+            options={interviewees}
+            openSelect={openSelect}
+            setOpenSelect={setOpenSelect}
+            onChange={(value) => setFormData((current) => ({ ...current, intervieweeEmail: value }))}
+          />
         </label>
 
         <label className="field-group">
           <span className="field-label">Recommendation</span>
-          <select
-            name="recommendation"
+          <ScorecardSelect
+            id="recommendation"
             value={formData.recommendation}
-            onChange={updateField}
-            className="field-surface field-control field-select transition"
-          >
-            <option value="Strong hire">Strong hire</option>
-            <option value="Hire">Hire</option>
-            <option value="Needs more practice">Needs more practice</option>
-            <option value="No hire">No hire</option>
-          </select>
+            options={["Strong hire", "Hire", "Needs more practice", "No hire"]}
+            openSelect={openSelect}
+            setOpenSelect={setOpenSelect}
+            onChange={(value) => setFormData((current) => ({ ...current, recommendation: value }))}
+          />
         </label>
       </div>
 
@@ -136,16 +131,15 @@ export default function InterviewScorecard({ sessionId, session }) {
         {scoreFields.map(([name, label]) => (
           <label key={name} className="rounded-lg border border-white/10 bg-slate-950/30 p-3">
             <span className="field-label min-h-8 text-xs">{label}</span>
-            <select
-              name={name}
+            <ScorecardSelect
+              id={name}
               value={formData.scores[name]}
-              onChange={updateScore}
-              className="field-surface field-control field-select mt-2 min-h-11 py-2.5 transition"
-            >
-              {[1, 2, 3, 4, 5].map((score) => (
-                <option key={score} value={score}>{score}</option>
-              ))}
-            </select>
+              options={[1, 2, 3, 4, 5]}
+              openSelect={openSelect}
+              setOpenSelect={setOpenSelect}
+              onChange={(value) => updateScore(name, value)}
+              compact
+            />
           </label>
         ))}
       </div>
@@ -216,5 +210,66 @@ export default function InterviewScorecard({ sessionId, session }) {
         </div>
       )}
     </form>
+  );
+}
+
+function ScorecardSelect({ id, value, options, onChange, openSelect, setOpenSelect, compact = false }) {
+  const isOpen = openSelect === id;
+
+  const chooseValue = (nextValue) => {
+    onChange(nextValue);
+    setOpenSelect("");
+  };
+
+  return (
+    <div className={compact ? "relative mt-2" : "relative"}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        onClick={() => setOpenSelect(isOpen ? "" : id)}
+        onBlur={(event) => {
+          if (!event.currentTarget.parentElement?.contains(event.relatedTarget)) {
+            setOpenSelect("");
+          }
+        }}
+        className={`field-surface field-control flex items-center justify-between gap-3 text-left transition ${
+          compact ? "min-h-11 py-2.5" : ""
+        }`}
+      >
+        <span className="min-w-0 truncate">{value}</span>
+        <FaChevronDown className={`shrink-0 text-xs text-cyan-200 transition ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div
+          role="listbox"
+          tabIndex={-1}
+          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-lg border border-cyan-300/25 bg-slate-950 shadow-2xl shadow-black/40"
+        >
+          {options.map((option) => {
+            const isSelected = option === value;
+
+            return (
+              <button
+                key={option}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => chooseValue(option)}
+                className={`block w-full px-4 py-3 text-left text-sm font-bold transition ${
+                  isSelected
+                    ? "bg-cyan-300/14 text-cyan-100"
+                    : "text-slate-200 hover:bg-white/10 hover:text-white"
+                }`}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

@@ -19,7 +19,7 @@ export async function GET(req) {
     }
 
     await connectDB();
-    const session = await findSessionForUser(sessionId, user, searchParams.get("invite"));
+    const session = await findSessionForUser(sessionId, user);
     if (!session) {
       return json({ message: "Session not found" }, 404);
     }
@@ -40,14 +40,14 @@ export async function POST(req) {
       return json({ message: "Unauthorized" }, 401);
     }
 
-    const { sessionId, message, inviteCode } = await req.json();
+    const { sessionId, message } = await req.json();
     const cleanMessage = normalizeText(message, 2000);
     if (!sessionId || !cleanMessage) {
       return json({ message: "sessionId and message are required" }, 400);
     }
 
     await connectDB();
-    const session = await findSessionForUser(sessionId, user, inviteCode);
+    const session = await findSessionForUser(sessionId, user);
     if (!session) {
       return json({ message: "Session not found" }, 404);
     }

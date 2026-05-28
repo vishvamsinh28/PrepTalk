@@ -15,7 +15,10 @@ function normalizeQuestions(value) {
       question: String(item.question || "").trim(),
       followUps: Array.isArray(item.followUps)
         ? item.followUps.map((followUp) => String(followUp).trim()).filter(Boolean)
-        : [],
+        : String(item.followUps || "")
+            .split(/\n|;/)
+            .map((followUp) => followUp.trim())
+            .filter(Boolean),
     }))
     .filter((item) => item.question)
     .slice(0, 12);
@@ -72,5 +75,26 @@ export async function POST(req, props) {
   } catch (error) {
     console.error("Question generation error:", error);
     return json({ message: "Failed to generate questions", error: error.message }, 500);
+  }
+}
+
+export async function DELETE(req, props) {
+  try {
+    const { sessionId } = await props.params;
+    const user = await getAuthPayloadFromRequest(req);
+    if (!user) return json({ message: "Unauthorized" }, 401);
+    if (user.role !== "Interviewer") return json({ message: "Only interviewers can clear questions" }, 403);
+
+    await connectDB();
+    const session = await findOwnedSession(sessionId, user);
+    if (!session) return json({ message: "Session not found" }, 404);
+
+    session.questionBank = [];
+    await session.save();
+
+    return json({ questions: [] });
+  } catch (error) {
+    console.error("Question clear error:", error);
+    return json({ message: "Failed to clear questions", error: error.message }, 500);
   }
 }

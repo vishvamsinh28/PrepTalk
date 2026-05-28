@@ -36,3 +36,10 @@ export function patchJson(url, body) {
     body: JSON.stringify(body),
   });
 }
+
+export function deleteJson(url, body = {}) {
+  return requestJson(url, {
+    method: "DELETE",
+    body: JSON.stringify(body),
+  });
+}

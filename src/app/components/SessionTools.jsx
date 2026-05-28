@@ -1,30 +1,75 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { postJson } from "@/lib/clientApi";
-import { FaCalendarAlt, FaEnvelope, FaLink, FaMagic, FaQuestionCircle } from "react-icons/fa";
+import { deleteJson, postJson } from "@/lib/clientApi";
+import { FaCalendarAlt, FaEnvelope, FaEraser, FaLink, FaMagic, FaQuestionCircle } from "react-icons/fa";
+
+function normalizeQuestionList(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (typeof item === "string") {
+        return { category: "General", skill: "", question: item, followUps: [] };
+      }
+
+      return {
+        category: String(item?.category || "General").trim(),
+        skill: String(item?.skill || "").trim(),
+        question: String(item?.question || "").trim(),
+        followUps: Array.isArray(item?.followUps)
+          ? item.followUps.map((followUp) => String(followUp).trim()).filter(Boolean)
+          : String(item?.followUps || "")
+              .split(/\n|;/)
+              .map((followUp) => followUp.trim())
+              .filter(Boolean),
+      };
+    })
+    .filter((item) => item.question);
+}
 
 export default function SessionTools({ sessionId, session, userRole }) {
-  const [questions, setQuestions] = useState(session.questionBank || []);
+  const [questions, setQuestions] = useState(normalizeQuestionList(session.questionBank));
   const [prepGuide, setPrepGuide] = useState(session.prepGuide || "");
   const [loading, setLoading] = useState("");
   const [origin, setOrigin] = useState("");
+  const [copiedInvite, setCopiedInvite] = useState(false);
 
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
 
   const inviteUrl = useMemo(() => {
-    if (!session.inviteCode || !origin) return "";
-    return `${origin}/session/${sessionId}?invite=${session.inviteCode}`;
-  }, [origin, session.inviteCode, sessionId]);
+    if (!origin) return "";
+    return `${origin}/session/${sessionId}`;
+  }, [origin, sessionId]);
 
   const generateQuestions = async () => {
     setLoading("questions");
     try {
       const data = await postJson(`/api/session/${sessionId}/questions`, {});
-      setQuestions(data.questions || []);
+      setQuestions(normalizeQuestionList(data.questions));
       setPrepGuide(data.prepGuide || "");
+    } finally {
+      setLoading("");
+    }
+  };
+
+  const clearQuestions = async () => {
+    setLoading("clear-questions");
+    try {
+      await deleteJson(`/api/session/${sessionId}/questions`);
+      setQuestions([]);
+    } finally {
+      setLoading("");
+    }
+  };
+
+  const clearPrep = async () => {
+    setLoading("clear-prep");
+    try {
+      await deleteJson(`/api/session/${sessionId}/prep`);
+      setPrepGuide("");
     } finally {
       setLoading("");
     }
@@ -43,6 +88,8 @@ export default function SessionTools({ sessionId, session, userRole }) {
   const copyInvite = async () => {
     if (!inviteUrl) return;
     await navigator.clipboard?.writeText(inviteUrl);
+    setCopiedInvite(true);
+    window.setTimeout(() => setCopiedInvite(false), 1800);
   };
 
   const mailtoHref = `mailto:${(session.interviewees || []).join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(`Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role}\n${session.scheduledAt ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n` : ""}${inviteUrl ? `Join link: ${inviteUrl}\n` : ""}\n\nSee you there.`)}`;
@@ -79,7 +126,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
           <div className="mt-5 space-y-3">
             <button onClick={copyInvite} className="flex w-full items-center justify-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-bold text-cyan-100">
               <FaLink />
-              Copy public join link
+              {copiedInvite ? "Link copied" : "Copy assigned-user link"}
             </button>
             <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
               <FaEnvelope />
@@ -90,20 +137,28 @@ export default function SessionTools({ sessionId, session, userRole }) {
       </div>
 
       <div className="glass-panel rounded-2xl p-5">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="mb-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">AI assistant</p>
             <h2 className="mt-1 text-2xl font-black text-white">Question bank</h2>
           </div>
           {isInterviewer && (
-            <div className="flex flex-wrap gap-2">
-              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
+            <div className="grid gap-2 sm:grid-cols-2 xl:w-[28rem]">
+              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 text-sm font-black text-slate-950 disabled:opacity-70">
                 <FaMagic />
                 {loading === "questions" ? "Generating..." : "Generate questions"}
               </button>
-              <button onClick={generatePrep} disabled={!!loading} className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white disabled:opacity-70">
+              <button onClick={generatePrep} disabled={!!loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white disabled:opacity-70">
                 <FaQuestionCircle />
                 {loading === "prep" ? "Generating..." : "Prep guide"}
+              </button>
+              <button onClick={clearQuestions} disabled={!!loading || questions.length === 0} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-sm font-bold text-rose-100 disabled:opacity-50">
+                <FaEraser />
+                {loading === "clear-questions" ? "Clearing..." : "Clear questions"}
+              </button>
+              <button onClick={clearPrep} disabled={!!loading || !prepGuide} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-bold text-white disabled:opacity-50">
+                <FaEraser />
+                {loading === "clear-prep" ? "Clearing..." : "Clear prep"}
               </button>
             </div>
           )}
@@ -120,19 +175,26 @@ export default function SessionTools({ sessionId, session, userRole }) {
           {isInterviewer ? (
             <div className="grid gap-3">
               {questions.length > 0 ? questions.map((item, index) => (
-              <article key={`${item.question}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
-                <div className="mb-2 flex flex-wrap gap-2">
-                  <span className="rounded-lg bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-100">{item.category}</span>
-                  {item.skill && <span className="rounded-lg bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{item.skill}</span>}
-                </div>
-                <p className="font-bold text-white">{item.question}</p>
-                {item.followUps?.length > 0 && (
-                  <ul className="mt-3 space-y-1 text-sm text-slate-300">
-                    {item.followUps.map((followUp) => <li key={followUp}>- {followUp}</li>)}
-                  </ul>
-                )}
-              </article>
-            )) : (
+                <article key={`${item.question}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+                  <div className="mb-3 flex items-start gap-3">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-cyan-300/15 text-sm font-black text-cyan-100">
+                      {index + 1}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        <span className="rounded-lg bg-amber-300/10 px-3 py-1 text-xs font-bold text-amber-100">{item.category || "General"}</span>
+                        {item.skill && <span className="rounded-lg bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{item.skill}</span>}
+                      </div>
+                      <p className="break-words font-bold leading-6 text-white">{item.question}</p>
+                    </div>
+                  </div>
+                  {item.followUps?.length > 0 && (
+                    <ul className="ml-11 space-y-1 text-sm leading-6 text-slate-300">
+                      {item.followUps.map((followUp) => <li key={followUp}>- {followUp}</li>)}
+                    </ul>
+                  )}
+                </article>
+              )) : (
               <p className="rounded-2xl border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-300">
                 Generate an AI question bank for this role, level, and skill set.
               </p>

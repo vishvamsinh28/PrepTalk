@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { verifyAuthToken } from "@/lib/token";
 
 const AUTH_PAGES = new Set(["/", "/login", "/register"]);
-const PROTECTED_PATHS = ["/dashboard", "/interviewer", "/interviewee"];
+const PROTECTED_PATHS = ["/dashboard", "/interviewer", "/interviewee", "/session"];
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
@@ -44,5 +44,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/register", "/dashboard/:path*", "/interviewer/:path*", "/interviewee/:path*"],
+  matcher: ["/", "/login", "/register", "/dashboard/:path*", "/interviewer/:path*", "/interviewee/:path*", "/session/:path*"],
 };

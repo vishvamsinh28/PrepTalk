@@ -18,7 +18,7 @@ export async function GET(req) {
       : { intervieweeEmail: user.email };
     const reports = await InterviewReport.find(query).sort({ createdAt: -1 });
 
-    return json({ reports });
+    return json({ reports, canDeleteReports: user.role === "Interviewer" });
   } catch (error) {
     console.error("Report fetch error:", error);
     return json({ message: "Failed to fetch reports", error: error.message }, 500);
@@ -71,5 +71,34 @@ export async function POST(req) {
   } catch (error) {
     console.error("Report save error:", error);
     return json({ message: "Failed to save report", error: error.message }, 500);
+  }
+}
+
+export async function DELETE(req) {
+  try {
+    const user = await getAuthPayloadFromRequest(req);
+    if (!user) return json({ message: "Unauthorized" }, 401);
+    if (user.role !== "Interviewer") {
+      return json({ message: "Only interviewers can delete reports" }, 403);
+    }
+
+    const { reportId } = await req.json();
+    if (!isValidObjectId(reportId)) {
+      return json({ message: "Invalid reportId" }, 400);
+    }
+
+    await connectDB();
+    const report = await InterviewReport.findById(reportId);
+    if (!report) return json({ message: "Report not found" }, 404);
+    if (report.interviewerEmail !== user.email) {
+      return json({ message: "Forbidden" }, 403);
+    }
+
+    await InterviewReport.deleteOne({ _id: reportId });
+
+    return json({ message: "Report deleted" });
+  } catch (error) {
+    console.error("Report delete error:", error);
+    return json({ message: "Failed to delete report", error: error.message }, 500);
   }
 }

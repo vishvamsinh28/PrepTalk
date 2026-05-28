@@ -5,22 +5,23 @@ export function isValidObjectId(id) {
   return mongoose.Types.ObjectId.isValid(String(id || ""));
 }
 
-export function userCanAccessSession(session, user, inviteCode = "") {
+export function userCanAccessSession(session, user) {
   if (!session || !user?.email) return false;
-  if (session.createdBy === user.email) return true;
-  if (session.interviewees?.includes(user.email)) return true;
-  return Boolean(inviteCode && session.inviteCode && inviteCode === session.inviteCode);
+  const email = String(user.email).toLowerCase();
+  if (session.createdBy === email) return true;
+  if (session.interviewees?.includes(email)) return true;
+  return false;
 }
 
 export function userOwnsSession(session, user) {
-  return Boolean(session && user?.email && session.createdBy === user.email);
+  return Boolean(session && user?.email && session.createdBy === String(user.email).toLowerCase());
 }
 
-export async function findSessionForUser(sessionId, user, inviteCode = "") {
+export async function findSessionForUser(sessionId, user) {
   if (!isValidObjectId(sessionId)) return null;
 
   const session = await Session.findById(sessionId);
-  if (!userCanAccessSession(session, user, inviteCode)) return null;
+  if (!userCanAccessSession(session, user)) return null;
 
   return session;
 }

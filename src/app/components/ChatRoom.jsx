@@ -10,7 +10,7 @@ function uniqueUsers(members) {
   return [...new Set(members.map((member) => member.data?.userEmail).filter(Boolean))];
 }
 
-export default function ChatRoom({ sessionId, userEmail, inviteCode = "" }) {
+export default function ChatRoom({ sessionId, userEmail }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
@@ -21,13 +21,12 @@ export default function ChatRoom({ sessionId, userEmail, inviteCode = "" }) {
 
   useEffect(() => {
     let isMounted = true;
-    const ably = new Ably.Realtime({ authUrl: "/api/ably/token" });
+    const ably = new Ably.Realtime({ authUrl: `/api/ably/token?sessionId=${encodeURIComponent(sessionId)}` });
     const channel = ably.channels.get(`chat:${sessionId}`);
     ablyRef.current = ably;
     channelRef.current = channel;
 
-    const suffix = inviteCode ? `&invite=${encodeURIComponent(inviteCode)}` : "";
-    getJson(`/api/messages?sessionId=${encodeURIComponent(sessionId)}${suffix}`)
+    getJson(`/api/messages?sessionId=${encodeURIComponent(sessionId)}`)
       .then((data) => {
         if (isMounted) setMessages(data.messages);
       })
@@ -58,7 +57,7 @@ export default function ChatRoom({ sessionId, userEmail, inviteCode = "" }) {
       channel.presence.unsubscribe(updatePresence);
       ably.close();
     };
-  }, [sessionId, userEmail, inviteCode]);
+  }, [sessionId, userEmail]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,7 +70,7 @@ export default function ChatRoom({ sessionId, userEmail, inviteCode = "" }) {
     setMessage("");
 
     try {
-      const saved = await postJson("/api/messages", { sessionId, message: text, inviteCode });
+      const saved = await postJson("/api/messages", { sessionId, message: text });
       await channelRef.current?.publish("message", saved.message);
     } catch (error) {
       console.error("Error sending message:", error);

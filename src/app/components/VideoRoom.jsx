@@ -12,6 +12,42 @@ const WEBRTC_CONFIG = {
     { urls: "stun:global.stun.twilio.com:3478" },
   ],
 };
+const MEDIA_PREF_KEY = "preptalk-media-preferences";
+
+function getStoredMediaPreferences() {
+  if (typeof window === "undefined") {
+    return { audioEnabled: true, videoEnabled: true };
+  }
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(MEDIA_PREF_KEY) || "{}");
+    return {
+      audioEnabled: parsed.audioEnabled ?? true,
+      videoEnabled: parsed.videoEnabled ?? true,
+    };
+  } catch {
+    return { audioEnabled: true, videoEnabled: true };
+  }
+}
+
+function storeMediaPreferences(nextPreferences) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(MEDIA_PREF_KEY, JSON.stringify(nextPreferences));
+}
+
+function syncLocalVideoElement(videoElement, mediaStream) {
+  if (videoElement) {
+    videoElement.srcObject = mediaStream;
+  }
+}
+
+function createEmptyMediaStream() {
+  if (typeof MediaStream === "undefined") {
+    return null;
+  }
+
+  return new MediaStream();
+}
 
 function requestUserMedia(constraints) {
   if (typeof navigator === "undefined") {
@@ -41,11 +77,12 @@ function requestUserMedia(constraints) {
 
 export default function VideoRoom({ sessionId, userEmail }) {
   const router = useRouter();
+  const initialMediaPreferences = getStoredMediaPreferences();
   const [peers, setPeers] = useState([]);
   const [stream, setStream] = useState(null);
   const [mediaError, setMediaError] = useState("");
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [videoEnabled, setVideoEnabled] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(initialMediaPreferences.audioEnabled);
+  const [videoEnabled, setVideoEnabled] = useState(initialMediaPreferences.videoEnabled);
   const [participants, setParticipants] = useState([{ socketId: "self", userEmail }]);
 
   const userVideo = useRef();
@@ -59,7 +96,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
   useEffect(() => {
     let isMounted = true;
     let didSetupRealtime = false;
-    const ably = new Ably.Realtime({ authUrl: "/api/ably/token" });
+    const ably = new Ably.Realtime({ authUrl: `/api/ably/token?sessionId=${encodeURIComponent(sessionId)}` });
     const channel = ably.channels.get(`video:${sessionId}`);
     ablyRef.current = ably;
     channelRef.current = channel;
@@ -155,8 +192,17 @@ export default function VideoRoom({ sessionId, userEmail }) {
       await syncPresence();
     };
 
-    requestUserMedia({ video: true, audio: true })
+    const initialMediaRequest = { video: videoEnabled, audio: audioEnabled };
+    const initialStreamPromise = videoEnabled || audioEnabled
+      ? requestUserMedia(initialMediaRequest)
+      : Promise.resolve(createEmptyMediaStream());
+
+    initialStreamPromise
       .then(currentStream => {
+        if (!currentStream) {
+          throw new Error("Unable to create a local media stream.");
+        }
+
         if (!isMounted) {
           currentStream.getTracks().forEach(track => track.stop());
           return;
@@ -164,9 +210,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
         streamRef.current = currentStream;
         setStream(currentStream);
-        if (userVideo.current) {
-          userVideo.current.srcObject = currentStream;
-        }
+        syncLocalVideoElement(userVideo.current, currentStream);
 
         setupRealtime().catch((error) => console.error("Unable to start video signaling:", error));
       })
@@ -252,15 +296,95 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
   const toggleAudio = () => {
     if (stream) {
-      stream.getAudioTracks().forEach(track => (track.enabled = !track.enabled));
-      setAudioEnabled(prev => !prev);
+      const nextAudioEnabled = !audioEnabled;
+
+      if (!nextAudioEnabled) {
+        const currentAudioTracks = stream.getAudioTracks();
+        currentAudioTracks.forEach((track) => {
+          peersRef.current.forEach(({ peer }) => {
+            try {
+              peer.removeTrack(track, stream);
+            } catch {
+              // Some peer states cannot renegotiate a removed track; stopping still releases hardware.
+            }
+          });
+          track.stop();
+          stream.removeTrack(track);
+        });
+        setAudioEnabled(false);
+        storeMediaPreferences({ audioEnabled: false, videoEnabled });
+        return;
+      }
+
+      requestUserMedia({ video: false, audio: true })
+        .then((audioStream) => {
+          const [audioTrack] = audioStream.getAudioTracks();
+          if (!audioTrack) return;
+
+          stream.addTrack(audioTrack);
+          peersRef.current.forEach(({ peer }) => {
+            try {
+              peer.addTrack(audioTrack, stream);
+            } catch {
+              // If renegotiation is unavailable for a peer, new joins will still receive the track.
+            }
+          });
+          setAudioEnabled(true);
+          setMediaError("");
+          storeMediaPreferences({ audioEnabled: true, videoEnabled });
+        })
+        .catch((error) => {
+          console.error("Unable to restart audio stream:", error);
+          setMediaError(error.message || "Unable to access microphone.");
+        });
     }
   };
 
   const toggleVideo = () => {
     if (stream) {
-      stream.getVideoTracks().forEach(track => (track.enabled = !track.enabled));
-      setVideoEnabled(prev => !prev);
+      const nextVideoEnabled = !videoEnabled;
+
+      if (!nextVideoEnabled) {
+        const currentVideoTracks = stream.getVideoTracks();
+        currentVideoTracks.forEach((track) => {
+          peersRef.current.forEach(({ peer }) => {
+            try {
+              peer.removeTrack(track, stream);
+            } catch {
+              // Some peer states cannot renegotiate a removed track; stopping still releases hardware.
+            }
+          });
+          track.stop();
+          stream.removeTrack(track);
+        });
+        syncLocalVideoElement(userVideo.current, stream);
+        setVideoEnabled(false);
+        storeMediaPreferences({ audioEnabled, videoEnabled: false });
+        return;
+      }
+
+      requestUserMedia({ video: true, audio: false })
+        .then((videoStream) => {
+          const [videoTrack] = videoStream.getVideoTracks();
+          if (!videoTrack) return;
+
+          stream.addTrack(videoTrack);
+          peersRef.current.forEach(({ peer }) => {
+            try {
+              peer.addTrack(videoTrack, stream);
+            } catch {
+              // If renegotiation is unavailable for a peer, new joins will still receive the track.
+            }
+          });
+          syncLocalVideoElement(userVideo.current, stream);
+          setVideoEnabled(true);
+          setMediaError("");
+          storeMediaPreferences({ audioEnabled, videoEnabled: true });
+        })
+        .catch((error) => {
+          console.error("Unable to restart video stream:", error);
+          setMediaError(error.message || "Unable to access camera.");
+        });
     }
   };
 
@@ -304,36 +428,36 @@ export default function VideoRoom({ sessionId, userEmail }) {
           <p className="text-sm font-bold text-white">{participants.length} participant{participants.length === 1 ? "" : "s"}</p>
           <p className="text-xs text-slate-400">Controls affect your local stream only.</p>
         </div>
-        <div className="flex flex-wrap gap-3">
-        <button
-          onClick={toggleAudio}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
-            audioEnabled
-              ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
-              : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
-          }`}
-        >
-          {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-          {audioEnabled ? "Mute Mic" : "Unmute Mic"}
-        </button>
-        <button
-          onClick={toggleVideo}
-            className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
-            videoEnabled
-              ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
-              : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
-          }`}
-        >
-          {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-          {videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
-        </button>
-        <button
-          onClick={leaveRoom}
-          className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-rose-500 to-red-400 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
-        >
-          <FaPhoneSlash />
-          Leave Room
-        </button>
+        <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+          <button
+            onClick={toggleAudio}
+            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
+              audioEnabled
+                ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
+                : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
+            }`}
+          >
+            {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
+            {audioEnabled ? "Mute Mic" : "Unmute Mic"}
+          </button>
+          <button
+            onClick={toggleVideo}
+            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-black transition ${
+              videoEnabled
+                ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/15"
+                : "border border-amber-300/25 bg-amber-400/15 text-amber-100 hover:bg-amber-400/20"
+            }`}
+          >
+            {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
+            {videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+          </button>
+          <button
+            onClick={leaveRoom}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-linear-to-r from-rose-500 to-red-400 px-4 py-2.5 text-sm font-black text-white shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          >
+            <FaPhoneSlash />
+            Leave Room
+          </button>
         </div>
       </div>
     </div>

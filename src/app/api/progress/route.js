@@ -27,18 +27,7 @@ export async function GET(req) {
       scoreKeys.map((key) => [key, reports.length ? Number((totals[key] / reports.length).toFixed(1)) : 0])
     );
 
-    const trend = reports.map((report) => ({
-      date: report.createdAt,
-      recommendation: report.recommendation,
-      average: Number(
-        (
-          scoreKeys.reduce((sum, key) => sum + Number(report.scores?.[key] || 0), 0) /
-          scoreKeys.length
-        ).toFixed(1)
-      ),
-    }));
-
-    return json({ totalReports: reports.length, averages, trend });
+    return json({ totalReports: reports.length, averages });
   } catch (error) {
     console.error("Progress fetch error:", error);
     return json({ message: "Failed to fetch progress", error: error.message }, 500);
