@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaClipboardCheck, FaListAlt, FaPlus, FaSignOutAlt, FaUserFriends } from "react-icons/fa";
+import { FaCode, FaSignOutAlt, FaUserFriends } from "react-icons/fa";
 import PrepTalkLogo from "./PrepTalkLogo";
 
 function getRoleHome(role) {
@@ -52,18 +52,14 @@ export default function Navbar() {
 
   if (["/login", "/register", "/"].includes(pathname)) return null;
 
-  const navItems = userRole === "Interviewer"
+  const interviewPath = userRole === "Interviewer" ? "/interviewer" : "/interviewee";
+  const isInterviewActive = ["/interviewer", "/interviewee", "/session"].some((path) => pathname.startsWith(path));
+  const navItems = ["Interviewer", "Interviewee"].includes(userRole)
     ? [
-        { icon: <FaPlus />, label: "Create", path: "/interviewer#create-session", isActive: false },
-        { icon: <FaListAlt />, label: "Sessions", path: "/interviewer#sessions", isActive: false },
-        { icon: <FaClipboardCheck />, label: "Reports", path: "/interviewer#reports", isActive: false },
+        { icon: <FaUserFriends />, label: "Interview", path: interviewPath, isActive: isInterviewActive },
+        { icon: <FaCode />, label: "Lab", path: "/lab", isActive: pathname === "/lab" },
       ]
-    : userRole === "Interviewee"
-      ? [
-          { icon: <FaUserFriends />, label: "Interviews", path: "/interviewee", isActive: pathname === "/interviewee" },
-          { icon: <FaClipboardCheck />, label: "Reports", path: "/interviewee#reports", isActive: false },
-        ]
-      : [];
+    : [];
 
   const navigateTo = (path) => {
     router.push(path);

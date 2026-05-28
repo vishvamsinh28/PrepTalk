@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FaArrowRight, FaClipboardCheck, FaListAlt, FaPlus, FaUserFriends, FaUserShield } from "react-icons/fa";
+import { FaArrowRight, FaClipboardCheck, FaCode, FaListAlt, FaPlus, FaUserFriends, FaUserShield } from "react-icons/fa";
 import ProgressDashboard from "./ProgressDashboard";
 
 export default function DashboardClient({ userData }) {
@@ -41,10 +41,12 @@ export default function DashboardClient({ userData }) {
     ? [
         { icon: <FaPlus />, label: "Create interview", href: "/interviewer" },
         { icon: <FaListAlt />, label: "Manage sessions", href: "/interviewer#sessions" },
+        { icon: <FaCode />, label: "Open Lab", href: "/lab" },
         { icon: <FaClipboardCheck />, label: "Review reports", href: "/interviewer#reports" },
       ]
     : [
         { icon: <FaListAlt />, label: "Join interviews", href: "/interviewee" },
+        { icon: <FaCode />, label: "Practice in Lab", href: "/lab" },
         { icon: <FaClipboardCheck />, label: "View feedback", href: "/interviewee#reports" },
       ];
 

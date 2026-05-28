@@ -3,6 +3,7 @@ import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { json } from "@/lib/api";
 import { normalizeEmailList, normalizeStringList, normalizeText } from "@/lib/validation";
+import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
 
 function parseAgenda(agenda) {
   if (Array.isArray(agenda)) {
@@ -60,6 +61,14 @@ export async function POST(req) {
     }
 
     await connectDB();
+    const cleanInterviewees = normalizeEmailList(interviewees, 25);
+    const missingInterviewees = await findMissingIntervieweeEmails(cleanInterviewees);
+
+    if (missingInterviewees.length > 0) {
+      return json({
+        message: `These candidates must register as Interviewees first: ${missingInterviewees.join(", ")}`,
+      }, 400);
+    }
 
     const newSession = new Session({
       title: cleanTitle,
@@ -69,7 +78,7 @@ export async function POST(req) {
       interviewType,
       skills: normalizeStringList(skills, 20, 80),
       createdBy: payload.email,
-      interviewees: normalizeEmailList(interviewees, 25),
+      interviewees: cleanInterviewees,
       scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
       durationMinutes: Number(durationMinutes) || 60,
       agenda: parseAgenda(agenda),

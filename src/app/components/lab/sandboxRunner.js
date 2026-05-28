@@ -1,0 +1,117 @@
+export function runUserCodeInWorker(code, input, timeoutMs = 900) {
+  return new Promise((resolve) => {
+    const workerSource = `
+      const emit = globalThis.postMessage.bind(globalThis);
+      const blocked = () => {
+        throw new Error("This API is unavailable in the PrepTalk Lab sandbox.");
+      };
+
+      for (const key of [
+        "fetch",
+        "XMLHttpRequest",
+        "WebSocket",
+        "EventSource",
+        "Worker",
+        "SharedWorker",
+        "importScripts",
+        "indexedDB",
+        "caches",
+        "localStorage",
+        "sessionStorage",
+        "postMessage"
+      ]) {
+        try {
+          Object.defineProperty(globalThis, key, {
+            value: blocked,
+            configurable: false,
+            writable: false
+          });
+        } catch (error) {}
+      }
+
+      globalThis.onmessage = async (event) => {
+        const started = Date.now();
+
+        try {
+          const solve = Function(
+            "window",
+            "document",
+            "fetch",
+            "XMLHttpRequest",
+            "WebSocket",
+            "EventSource",
+            "Worker",
+            "importScripts",
+            "postMessage",
+            "globalThis",
+            "\\"use strict\\";\\n" + event.data.code + "\\n; return solve;"
+          )(
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined
+          );
+
+          if (typeof solve !== "function") {
+            throw new Error("Expected a solve function.");
+          }
+
+          const output = await Promise.resolve(solve(event.data.input));
+          emit({
+            ok: true,
+            output,
+            duration: Math.max(1, Date.now() - started)
+          });
+        } catch (error) {
+          emit({
+            ok: false,
+            error: error?.message || "Runtime error",
+            duration: Math.max(1, Date.now() - started)
+          });
+        }
+      };
+    `;
+
+    const url = URL.createObjectURL(new Blob([workerSource], { type: "text/javascript" }));
+    const worker = new Worker(url);
+    let settled = false;
+
+    const finish = (result) => {
+      if (settled) return;
+      settled = true;
+      worker.terminate();
+      URL.revokeObjectURL(url);
+      resolve(result);
+    };
+
+    const timeout = window.setTimeout(() => {
+      finish({
+        ok: false,
+        error: `Execution timed out after ${timeoutMs}ms.`,
+        duration: timeoutMs,
+      });
+    }, timeoutMs);
+
+    worker.onmessage = (event) => {
+      window.clearTimeout(timeout);
+      finish(event.data);
+    };
+
+    worker.onerror = (error) => {
+      window.clearTimeout(timeout);
+      finish({
+        ok: false,
+        error: error?.message || "Sandbox error",
+        duration: null,
+      });
+    };
+
+    worker.postMessage({ code, input });
+  });
+}
