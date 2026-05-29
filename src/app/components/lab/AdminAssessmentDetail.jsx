@@ -1,0 +1,554 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { FaChevronRight, FaClock, FaDownload, FaEnvelope, FaPlus, FaShareAlt, FaTrash } from "react-icons/fa";
+import { SkillIcon } from "./AdminShared";
+import { formatDateTime, sanitizeWholeNumberInput, sectionName, toWholeNumber } from "./adminUtils";
+
+export default function AdminAssessmentDetail({ assessment, notice, onBack, onDelete, onUpdate }) {
+  const inviteLink = typeof window === "undefined" ? "" : `${window.location.origin}/lab?assessment=${assessment._id}`;
+  const candidates = assessment.candidates || [];
+  const coreSkills = assessment.coreSkills || [];
+  const submissions = assessment.submissions || [];
+  const [showReport, setShowReport] = useState(false);
+  const [settings, setSettings] = useState(() => ({
+    candidates: candidates.join(", "),
+    coreSkills: coreSkills.join(", "),
+    deadlineAt: toDateTimeLocalValue(assessment.deadlineAt),
+  }));
+  const [draftProblems, setDraftProblems] = useState(() => cloneAssessmentProblems(assessment.problems));
+  const inviteRecipients = parseRecipientList(settings.candidates);
+  const report = buildAssessmentReport(assessment);
+
+  useEffect(() => {
+    setSettings({
+      candidates: (assessment.candidates || []).join(", "),
+      coreSkills: (assessment.coreSkills || []).join(", "),
+      deadlineAt: toDateTimeLocalValue(assessment.deadlineAt),
+    });
+    setDraftProblems(cloneAssessmentProblems(assessment.problems));
+  }, [assessment]);
+
+  const updateProblem = (problemIndex, patch) => {
+    setDraftProblems((previous) => previous.map((problem, index) => (
+      index === problemIndex ? { ...problem, ...patch } : problem
+    )));
+  };
+
+  const updateTest = (problemIndex, testIndex, patch) => {
+    setDraftProblems((previous) => previous.map((problem, index) => (
+      index === problemIndex
+        ? {
+            ...problem,
+            tests: (problem.tests || []).map((test, currentTestIndex) => (
+              currentTestIndex === testIndex ? { ...test, ...patch } : test
+            )),
+          }
+        : problem
+    )));
+  };
+
+  const addTest = (problemIndex) => {
+    setDraftProblems((previous) => previous.map((problem, index) => (
+      index === problemIndex
+        ? {
+            ...problem,
+            tests: [
+              ...(problem.tests || []),
+              { name: `Test Case ${(problem.tests || []).length + 1}`, inputJson: "[]", expectedJson: "null", visible: true },
+            ],
+          }
+        : problem
+    )));
+  };
+
+  const removeTest = (problemIndex, testIndex) => {
+    setDraftProblems((previous) => previous.map((problem, index) => (
+      index === problemIndex
+        ? { ...problem, tests: (problem.tests || []).filter((_, currentTestIndex) => currentTestIndex !== testIndex) }
+        : problem
+    )));
+  };
+
+  const saveChanges = () => {
+    onUpdate(assessment._id, {
+      ...settings,
+      problems: draftProblems.map((problem) => ({
+        ...problem,
+        points: toWholeNumber(problem.points, 100),
+        timeLimitMinutes: toWholeNumber(problem.timeLimitMinutes, 30),
+      })),
+    });
+  };
+
+  const exportPdf = () => {
+    const blob = createReportPdf(report);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${slugify(assessment.title)}-lab-report.pdf`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <main className="relative z-10 mx-auto max-w-7xl">
+      <div>
+        <button onClick={onBack} className="mb-5 text-cyan-200">Assessments <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> {assessment.title}</button>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-4xl font-black text-white">{assessment.title}</h1>
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/8 px-6 py-3 font-black text-slate-100"><FaShareAlt /> Copy link</button>
+            <button
+              onClick={() => setShowReport(!showReport)}
+              aria-expanded={showReport}
+              className={`inline-flex items-center gap-2 rounded-lg border px-6 py-3 font-black transition ${showReport ? "border-cyan-300/40 bg-cyan-300/15 text-cyan-50 shadow-lg shadow-cyan-950/30" : "border-white/10 bg-white/8 text-slate-100 hover:border-white/20"}`}
+            >
+              <span className={`h-2.5 w-2.5 rounded-full ${showReport ? "bg-cyan-200" : "bg-slate-500"}`} />
+              {showReport ? "Hide report" : "View report"}
+            </button>
+            <button onClick={exportPdf} className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-6 py-3 font-black text-cyan-100"><FaDownload /> Export PDF</button>
+            <button onClick={onDelete} className="rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-rose-100"><FaTrash /></button>
+          </div>
+        </div>
+        {notice && (
+          <div className="mt-5 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-5 py-4 font-bold text-emerald-100">
+            {notice}
+          </div>
+        )}
+        <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="flex max-h-[52rem] flex-col rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
+            <div className="flex items-center justify-between border-b border-white/10 px-8 py-7">
+              <div>
+                <p><span className="text-lg font-black text-white">Duration:</span> <span className="ml-5 text-xl text-slate-300">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
+                <p className="mt-2 text-sm font-semibold text-slate-400">Deadline: {formatDateTime(assessment.deadlineAt)}</p>
+              </div>
+              <span className="inline-flex items-center gap-2 text-emerald-100"><span className="h-3 w-3 rounded-full bg-emerald-300" /> Active</span>
+            </div>
+            <div className="min-h-0 overflow-auto p-8">
+              <h2 className="mb-7 text-2xl font-black text-white">Sections ({draftProblems.length})</h2>
+              {draftProblems.map((problem, index) => (
+                <EditableSection
+                  key={index}
+                  problem={problem}
+                  problemIndex={index}
+                  onAddTest={() => addTest(index)}
+                  onRemoveTest={(testIndex) => removeTest(index, testIndex)}
+                  onUpdate={(patch) => updateProblem(index, patch)}
+                  onUpdateTest={(testIndex, patch) => updateTest(index, testIndex, patch)}
+                />
+              ))}
+            </div>
+          </div>
+          <aside className="glass-panel max-h-[52rem] overflow-auto rounded-xl p-7">
+            <h2 className="font-black text-white">Role</h2>
+            <p className="mt-3 text-slate-300">{assessment.title.replace(" Hiring Test", "")}</p>
+            <section className="mt-8 rounded-lg border border-white/10 bg-white/5 p-4">
+              <h2 className="font-black text-white">Assignment settings</h2>
+              <label className="field-group mt-4">
+                <span className="field-label">Candidate emails</span>
+                <textarea
+                  value={settings.candidates}
+                  onChange={(event) => setSettings({ ...settings, candidates: event.target.value })}
+                  className="field-surface field-control min-h-24"
+                />
+              </label>
+              <label className="field-group mt-4">
+                <span className="field-label">Deadline</span>
+                <input
+                  type="datetime-local"
+                  value={settings.deadlineAt}
+                  onChange={(event) => setSettings({ ...settings, deadlineAt: event.target.value })}
+                  className="field-surface field-control"
+                />
+              </label>
+              <label className="field-group mt-4">
+                <span className="field-label">Core skills</span>
+                <textarea
+                  value={settings.coreSkills}
+                  onChange={(event) => setSettings({ ...settings, coreSkills: event.target.value })}
+                  className="field-surface field-control min-h-20"
+                />
+              </label>
+              <button
+                onClick={saveChanges}
+                className="mt-4 w-full rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-black text-cyan-100"
+              >
+                Save changes
+              </button>
+              {inviteRecipients.length > 0 && (
+                <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
+                  <FaEnvelope /> Send invite to all
+                </a>
+              )}
+            </section>
+            <h2 className="mt-8 font-black text-white">Core skills</h2>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {coreSkills.map((skill) => <span key={skill} className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-sm font-semibold text-slate-200">{skill}</span>)}
+              {coreSkills.length === 0 && <span className="text-sm text-slate-400">No core skills added.</span>}
+            </div>
+            <h2 className="mt-8 font-black text-white">Candidates</h2>
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-5">
+              <div className="text-4xl font-black text-white">{candidates.length}</div>
+              <div className="mt-1 text-sm font-semibold text-slate-400">assigned candidate{candidates.length === 1 ? "" : "s"}</div>
+            </div>
+            <h2 className="mt-8 font-black text-white">Submissions</h2>
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-5">
+              <div className="text-4xl font-black text-white">{submissions.length}</div>
+              <div className="mt-1 text-sm font-semibold text-slate-400">submission{submissions.length === 1 ? "" : "s"} received</div>
+            </div>
+          </aside>
+        </section>
+        {showReport && <ReportViewer report={report} />}
+      </div>
+    </main>
+  );
+}
+
+function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpdate, onUpdateTest }) {
+  const [open, setOpen] = useState(problemIndex === 0);
+  const tests = problem.tests || [];
+
+  return (
+    <section className="border-b border-white/10 py-5">
+      <button onClick={() => setOpen(!open)} className="flex w-full min-w-0 items-center gap-5 text-left">
+        <FaChevronRight className={open ? "shrink-0 rotate-90 text-cyan-200 transition" : "shrink-0 text-slate-500 transition"} />
+        <SkillIcon index={problemIndex} />
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-lg font-semibold text-white">{sectionName(problem, problemIndex)}</span>
+          <span className="text-slate-400">{tests.length} test case{tests.length === 1 ? "" : "s"}</span>
+        </span>
+        <span className="hidden shrink-0 text-slate-300 sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
+      </button>
+      {open && (
+        <div className="mt-5 grid gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-5">
+          <div className="grid gap-4 md:grid-cols-3">
+            <label className="field-group md:col-span-2">
+              <span className="field-label">Section name</span>
+              <input value={problem.title || ""} onChange={(event) => onUpdate({ title: event.target.value })} className="field-surface field-control" />
+            </label>
+            <label className="field-group">
+              <span className="field-label">Minutes</span>
+              <input type="number" min="1" value={problem.timeLimitMinutes || ""} onChange={(event) => onUpdate({ timeLimitMinutes: sanitizeWholeNumberInput(event.target.value) })} className="field-surface field-control" />
+            </label>
+          </div>
+          <label className="field-group">
+            <span className="field-label">Problem statement</span>
+            <textarea value={problem.prompt || ""} onChange={(event) => onUpdate({ prompt: event.target.value })} className="field-surface field-control min-h-32" />
+          </label>
+          <label className="field-group">
+            <span className="field-label">Starter code</span>
+            <textarea value={problem.starterCode || ""} onChange={(event) => onUpdate({ starterCode: event.target.value })} className="field-surface field-control min-h-36 font-mono" />
+          </label>
+          <div className="flex items-center justify-between">
+            <h3 className="font-black text-white">Test cases</h3>
+            <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100"><FaPlus /> Add case</button>
+          </div>
+          <div className="max-h-96 overflow-auto pr-1">
+            <div className="grid gap-3">
+              {tests.map((test, testIndex) => (
+                <div key={testIndex} className="grid gap-3 rounded-lg border border-white/10 bg-white/5 p-4 xl:grid-cols-[1fr_1.2fr_1.2fr_auto_auto]">
+                  <label className="field-group">
+                    <span className="field-label">Case name</span>
+                    <input value={test.name || ""} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
+                  </label>
+                  <label className="field-group">
+                    <span className="field-label">Input JSON</span>
+                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-20 font-mono text-sm" />
+                  </label>
+                  <label className="field-group">
+                    <span className="field-label">Expected JSON</span>
+                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-20 font-mono text-sm" />
+                  </label>
+                  <label className="flex items-center gap-3 rounded-md border border-white/10 bg-slate-950/30 px-3 py-2 text-sm font-bold text-slate-200 xl:mt-6">
+                    <input type="checkbox" checked={Boolean(test.visible)} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
+                    Visible
+                  </label>
+                  {tests.length > 1 && (
+                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-12 w-12 place-items-center rounded-md border border-rose-300/20 bg-rose-400/10 text-rose-100 xl:mt-6" title="Delete test case">
+                      <FaTrash />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function ReportViewer({ report }) {
+  const [query, setQuery] = useState("");
+  const [selectedKey, setSelectedKey] = useState("");
+  const submissions = [...report.submissions].sort((left, right) => new Date(right.submittedAt) - new Date(left.submittedAt));
+  const filteredSubmissions = submissions.filter((submission) => {
+    const searchText = `${submission.candidateEmail} ${submission.resultStatus} submitted ${submission.score}/${submission.maxScore}`.toLowerCase();
+    return searchText.includes(query.trim().toLowerCase());
+  });
+  const selectedSubmission = filteredSubmissions.find((submission) => submissionKey(submission) === selectedKey) || filteredSubmissions[0] || null;
+
+  useEffect(() => {
+    if (!selectedSubmission) {
+      if (selectedKey) setSelectedKey("");
+      return;
+    }
+
+    const nextKey = submissionKey(selectedSubmission);
+    if (selectedKey !== nextKey) setSelectedKey(nextKey);
+  }, [selectedKey, selectedSubmission]);
+
+  return (
+    <section className="mt-6 flex h-[46rem] flex-col rounded-xl border border-white/10 bg-slate-950/45 p-6 shadow-xl shadow-black/20">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-black text-white">Submission report</h2>
+          <p className="mt-2 text-slate-400">{report.submissions.length} submission{report.submissions.length === 1 ? "" : "s"} captured. Select one report to inspect.</p>
+        </div>
+        <label className="min-w-72">
+          <span className="sr-only">Search reports</span>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search candidate or score"
+            className="field-surface field-control"
+          />
+        </label>
+      </div>
+      <div className="mt-5 grid min-h-0 flex-1 gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
+        <div className="min-h-0 rounded-lg border border-white/10 bg-white/5">
+          <div className="border-b border-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
+            Reports
+          </div>
+          <div className="h-[calc(100%-2.75rem)] overflow-auto p-2">
+            {filteredSubmissions.map((submission) => {
+              const key = submissionKey(submission);
+              const active = selectedSubmission && submissionKey(selectedSubmission) === key;
+
+              return (
+                <button
+                  key={key}
+                  onClick={() => setSelectedKey(key)}
+                  className={`mb-2 w-full rounded-md border px-4 py-3 text-left transition ${active ? "border-cyan-300/35 bg-cyan-300/12 text-cyan-50" : "border-white/10 bg-slate-950/35 text-slate-300 hover:border-white/20"}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="truncate font-black">{submission.candidateEmail}</span>
+                    <span className={`shrink-0 rounded-full border px-2 py-0.5 text-xs font-bold ${statusTone(submission.resultStatus)}`}>{submission.resultStatus}</span>
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-slate-400">
+                    Attempt {submission.attempts} · {submission.passedTests}/{submission.totalTests} tests · {formatDateTime(submission.submittedAt)}
+                  </div>
+                </button>
+              );
+            })}
+            {filteredSubmissions.length === 0 && (
+              <div className="rounded-md border border-white/10 bg-slate-950/35 p-4 text-sm text-slate-400">
+                No reports match your search.
+              </div>
+            )}
+          </div>
+        </div>
+
+        {selectedSubmission ? (
+          <article className="min-h-0 min-w-0 overflow-auto rounded-lg border border-white/10 bg-white/5 p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="font-black text-white">{selectedSubmission.candidateEmail}</h3>
+                <p className="mt-1 text-sm text-slate-400">Attempt {selectedSubmission.attempts} · Submitted · {selectedSubmission.score}/{selectedSubmission.maxScore} · {selectedSubmission.passedTests}/{selectedSubmission.totalTests} tests passed</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className={`rounded-full border px-3 py-1 text-sm font-bold ${statusTone(selectedSubmission.resultStatus)}`}>{selectedSubmission.resultStatus}</span>
+                <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-sm font-bold text-cyan-100">{formatDateTime(selectedSubmission.submittedAt)}</span>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-4">
+              {selectedSubmission.sections.map((section) => (
+                <section key={`${selectedSubmission.candidateEmail}-${section.problemIndex}`} className="rounded-lg border border-white/10 bg-slate-950/45 p-4">
+                  <div className="flex flex-wrap justify-between gap-3">
+                    <h4 className="font-black text-white">Q{section.problemIndex + 1}: {section.title}</h4>
+                    <span className="text-sm font-bold text-slate-300">{section.score}/{section.maxScore}</span>
+                  </div>
+                  <pre className="mt-3 max-h-56 overflow-auto rounded-md border border-white/10 bg-black/25 p-3 text-xs leading-5 text-cyan-50">{section.code || "No code submitted."}</pre>
+                  <div className="mt-3 grid gap-2">
+                    {section.tests.map((test) => (
+                      <div key={test.name} className={`rounded-md border px-3 py-2 text-sm ${test.passed ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100" : "border-rose-300/20 bg-rose-400/10 text-rose-100"}`}>
+                        <b>{test.name}</b> · {test.passed ? "Passed" : "Failed"}{test.error ? ` · ${test.error}` : ""}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          </article>
+        ) : (
+          <div className="rounded-lg border border-white/10 bg-white/5 p-5 text-slate-400">No submissions yet.</div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function submissionKey(submission) {
+  return `${submission.candidateEmail}-${submission.attempts}-${submission.submittedAt}`;
+}
+
+function submissionResultStatus(submission) {
+  if (!submission) return "Pending";
+  if (Number(submission.totalTests) > 0 && Number(submission.passedTests) === Number(submission.totalTests)) return "Passed";
+  return "Failed";
+}
+
+function statusTone(status) {
+  if (status === "Passed") return "border-emerald-300/25 bg-emerald-300/10 text-emerald-100";
+  if (status === "Failed") return "border-rose-300/25 bg-rose-400/10 text-rose-100";
+  return "border-amber-300/25 bg-amber-300/10 text-amber-100";
+}
+
+function buildAssessmentReport(assessment) {
+  return {
+    assessmentId: assessment._id,
+    title: assessment.title,
+    durationMinutes: assessment.durationMinutes,
+    candidates: assessment.candidates || [],
+    generatedAt: new Date().toISOString(),
+    submissions: (assessment.submissions || []).map((submission) => ({
+      candidateEmail: submission.candidateEmail,
+      attempts: submission.attempts,
+      resultStatus: submissionResultStatus(submission),
+      submittedAt: submission.submittedAt,
+      score: submission.score,
+      maxScore: submission.maxScore,
+      passedTests: submission.passedTests,
+      totalTests: submission.totalTests,
+      runtimeMs: submission.runtimeMs,
+      sections: (submission.problemResults || []).map((problem) => ({
+        problemIndex: problem.problemIndex,
+        title: problem.title,
+        score: problem.score,
+        maxScore: problem.maxScore,
+        code: problem.code || findSubmittedCode(submission.solutions, problem),
+        tests: (problem.tests || []).map((test, testIndex) => {
+          const sourceTest = assessment.problems?.[problem.problemIndex]?.tests?.[testIndex] || {};
+          return {
+            name: test.name,
+            visible: Boolean(test.visible),
+            passed: Boolean(test.passed),
+            duration: test.duration,
+            error: test.error || "",
+            inputJson: sourceTest.inputJson || "",
+            expectedJson: sourceTest.expectedJson || "",
+            output: test.output ?? null,
+          };
+        }),
+      })),
+    })),
+  };
+}
+
+function createReportPdf(report) {
+  const lines = reportLines(report).flatMap((line) => wrapLine(line, 92));
+  const pages = [];
+  for (let index = 0; index < lines.length; index += 45) {
+    pages.push(lines.slice(index, index + 45));
+  }
+  if (pages.length === 0) pages.push(["No submissions yet."]);
+
+  const objects = ["<< /Type /Catalog /Pages 2 0 R >>"];
+  const pageRefs = pages.map((_, index) => `${3 + index * 2} 0 R`).join(" ");
+  objects.push(`<< /Type /Pages /Kids [${pageRefs}] /Count ${pages.length} >>`);
+
+  pages.forEach((pageLines, pageIndex) => {
+    const pageObjectId = 3 + pageIndex * 2;
+    const contentObjectId = pageObjectId + 1;
+    objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Courier >> >> >> /Contents ${contentObjectId} 0 R >>`);
+    const content = `BT /F1 10 Tf 50 750 Td 14 TL ${pageLines.map((line) => `(${escapePdf(line)}) Tj T*`).join(" ")} ET`;
+    objects.push(`<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  });
+
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => {
+    pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+  });
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
+}
+
+function reportLines(report) {
+  const lines = [
+    `PrepTalk Lab Report`,
+    `Assessment: ${report.title}`,
+    `Assessment ID: ${report.assessmentId}`,
+    `Duration: ${report.durationMinutes} mins`,
+    `Generated: ${formatDateTime(report.generatedAt)}`,
+    "",
+  ];
+
+  for (const submission of report.submissions) {
+    lines.push(`Candidate: ${submission.candidateEmail}`);
+    lines.push(`Status: Submitted / ${submission.resultStatus}`);
+    lines.push(`Attempt: ${submission.attempts} | Score: ${submission.score}/${submission.maxScore} | Tests: ${submission.passedTests}/${submission.totalTests}`);
+    lines.push(`Submitted: ${formatDateTime(submission.submittedAt)}`);
+    for (const section of submission.sections) {
+      lines.push(`  Q${section.problemIndex + 1}: ${section.title} (${section.score}/${section.maxScore})`);
+      lines.push(`  Code:`);
+      String(section.code || "No code submitted.").split("\n").forEach((line) => lines.push(`    ${line}`));
+      section.tests.forEach((test) => {
+        lines.push(`  Test: ${test.name} | ${test.passed ? "Passed" : "Failed"} | visible=${test.visible}`);
+        if (test.error) lines.push(`    Error: ${test.error}`);
+      });
+    }
+    lines.push("");
+  }
+
+  return lines;
+}
+
+function wrapLine(line, maxLength) {
+  const text = String(line);
+  if (text.length <= maxLength) return [text];
+  const chunks = [];
+  for (let index = 0; index < text.length; index += maxLength) {
+    chunks.push(text.slice(index, index + maxLength));
+  }
+  return chunks;
+}
+
+function escapePdf(value) {
+  return String(value).replace(/[^\x20-\x7E]/g, "?").replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+}
+
+function findSubmittedCode(solutions, problem) {
+  const match = (solutions || []).find((solution) => solution.problemIndex === problem.problemIndex || solution.title === problem.title);
+  return match?.code || "";
+}
+
+function slugify(value) {
+  return String(value || "assessment").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "assessment";
+}
+
+function toDateTimeLocalValue(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  date.setSeconds(0, 0);
+  const offsetMs = date.getTimezoneOffset() * 60 * 1000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function parseRecipientList(value) {
+  return [...new Set(String(value || "").split(",").map((email) => email.trim()).filter(Boolean))];
+}
+
+function cloneAssessmentProblems(problems) {
+  return (problems || []).map((problem) => ({
+    ...problem,
+    tests: (problem.tests || []).map((test) => ({ ...test })),
+  }));
+}

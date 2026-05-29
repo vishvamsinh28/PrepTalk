@@ -3,10 +3,10 @@
 import LabAdminDashboard from "./lab/LabAdminDashboard";
 import LabCandidateDashboard from "./lab/LabCandidateDashboard";
 
-export default function LabClient({ userData }) {
+export default function LabClient({ initialAssessmentId = "", userData }) {
   if (userData?.role === "Interviewer") {
-    return <LabAdminDashboard />;
+    return <LabAdminDashboard initialAssessmentId={initialAssessmentId} />;
   }
 
-  return <LabCandidateDashboard />;
+  return <LabCandidateDashboard initialAssessmentId={initialAssessmentId} />;
 }

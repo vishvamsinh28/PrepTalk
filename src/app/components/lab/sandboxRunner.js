@@ -62,7 +62,7 @@ export function runUserCodeInWorker(code, input, timeoutMs = 900) {
             throw new Error("Expected a solve function.");
           }
 
-          const output = await Promise.resolve(solve(event.data.input));
+          const output = await Promise.resolve(Array.isArray(event.data.input) ? solve(...event.data.input) : solve(event.data.input));
           emit({
             ok: true,
             output,

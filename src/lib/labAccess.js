@@ -3,13 +3,19 @@ import { normalizeEmailList, normalizeText } from "@/lib/validation";
 export function userCanAccessAssessment(assessment, user) {
   if (!assessment || !user) return false;
   const userEmail = String(user.email || "").toLowerCase();
-  if (user.role === "Interviewer") return assessment.createdBy === userEmail;
-  if (user.role === "Interviewee") return (assessment.candidates || []).includes(userEmail);
+  if (user.role === "Interviewer") return String(assessment.createdBy || "").toLowerCase() === userEmail;
+  if (user.role === "Interviewee") return (assessment.candidates || []).map((email) => String(email).toLowerCase()).includes(userEmail);
   return false;
+}
+
+export function assessmentIsExpired(assessment, now = new Date()) {
+  const deadline = new Date(assessment?.deadlineAt || 0);
+  return Number.isFinite(deadline.getTime()) && deadline.getTime() <= now.getTime();
 }
 
 export function sanitizeAssessmentForUser(assessment, user) {
   const plain = typeof assessment.toObject === "function" ? assessment.toObject() : assessment;
+  const userEmail = String(user.email || "").toLowerCase();
 
   if (user.role === "Interviewer") return plain;
 
@@ -21,20 +27,37 @@ export function sanitizeAssessmentForUser(assessment, user) {
       ...problem,
       tests: (problem.tests || []).filter((test) => test.visible),
     })),
-    submissions: (plain.submissions || []).filter((submission) => submission.candidateEmail === user.email),
+    submissions: (plain.submissions || [])
+      .filter((submission) => String(submission.candidateEmail || "").toLowerCase() === userEmail)
+      .map((submission) => ({
+        attempts: submission.attempts,
+        candidateEmail: submission.candidateEmail,
+        maxScore: submission.maxScore,
+        passedTests: submission.passedTests,
+        score: submission.score,
+        status: submission.status,
+        submittedAt: submission.submittedAt,
+        totalTests: submission.totalTests,
+      })),
   };
 }
 
 export function normalizeLabAssessmentPayload(body, ownerEmail) {
-  const problems = Array.isArray(body.problems) ? body.problems : [];
+  const problems = (Array.isArray(body.problems) ? body.problems : [])
+    .map(normalizeProblem)
+    .filter((problem) => problem.title && problem.prompt)
+    .slice(0, 12);
+  const durationMinutes = problems.reduce((total, problem) => total + problem.timeLimitMinutes, 0);
 
   return {
     title: normalizeText(body.title, 140),
     description: normalizeText(body.description, 1200),
-    createdBy: ownerEmail,
+    createdBy: String(ownerEmail || "").toLowerCase(),
     candidates: [...new Set(normalizeEmailList(body.candidates, 50))],
-    durationMinutes: clampWholeNumber(body.durationMinutes, 45, 1, 120),
-    problems: problems.map(normalizeProblem).filter((problem) => problem.title && problem.prompt).slice(0, 12),
+    coreSkills: normalizeSkillList(body.coreSkills),
+    deadlineAt: normalizeDeadline(body.deadlineAt),
+    durationMinutes: clampWholeNumber(durationMinutes, 45, 1, 120),
+    problems,
   };
 }
 
@@ -65,4 +88,17 @@ function normalizeTest(test) {
     expectedJson: normalizeText(test.expectedJson, 2000),
     visible: Boolean(test.visible),
   };
+}
+
+function normalizeSkillList(value) {
+  const rawSkills = Array.isArray(value) ? value : String(value || "").split(",");
+  return [...new Set(rawSkills.map((skill) => normalizeText(skill, 80)).filter(Boolean))].slice(0, 12);
+}
+
+function normalizeDeadline(value) {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return parsed;
+  }
+  return parsed;
 }

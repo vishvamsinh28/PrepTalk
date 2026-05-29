@@ -4,8 +4,10 @@ import LabClient from "../components/LabClient";
 
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
-export default async function LabPage() {
+export default async function LabPage({ searchParams }) {
   const userData = await getCurrentUser();
+  const params = await searchParams;
+  const assessmentId = typeof params?.assessment === "string" ? params.assessment : "";
 
   if (!userData) {
     return <AuthState title="Invalid token." message="Please login again to continue." />;
@@ -15,5 +17,5 @@ export default async function LabPage() {
     return <AuthState title="Access denied." message="This page is restricted to PrepTalk users only." />;
   }
 
-  return <LabClient userData={userData} />;
+  return <LabClient initialAssessmentId={assessmentId} userData={userData} />;
 }

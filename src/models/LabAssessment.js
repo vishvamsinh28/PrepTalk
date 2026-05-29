@@ -34,6 +34,8 @@ const LabSubmissionSchema = new mongoose.Schema(
     attempts: { type: Number, min: 1, default: 1 },
     status: { type: String, enum: ["Submitted"], default: "Submitted" },
     submittedAt: { type: Date, default: Date.now },
+    solutions: { type: mongoose.Schema.Types.Mixed, default: [] },
+    problemResults: { type: mongoose.Schema.Types.Mixed, default: [] },
   },
   { _id: false }
 );
@@ -44,6 +46,8 @@ const LabAssessmentSchema = new mongoose.Schema(
     description: { type: String, trim: true, maxlength: 1200 },
     createdBy: { type: String, required: true, lowercase: true, trim: true },
     candidates: [{ type: String, lowercase: true, trim: true }],
+    coreSkills: [{ type: String, trim: true, maxlength: 80 }],
+    deadlineAt: { type: Date, required: true },
     durationMinutes: { type: Number, min: 1, max: 120, default: 45, set: Math.trunc },
     problems: [LabProblemSchema],
     submissions: [LabSubmissionSchema],

@@ -33,7 +33,7 @@ export function createAuthCookie(token) {
   return serialize(AUTH_COOKIE_NAME, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     maxAge: TOKEN_MAX_AGE_SECONDS,
     expires,
     path: "/",
@@ -44,7 +44,7 @@ export function clearAuthCookie() {
   return serialize(AUTH_COOKIE_NAME, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    sameSite: "strict",
     expires: new Date(0),
     path: "/",
   });

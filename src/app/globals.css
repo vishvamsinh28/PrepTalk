@@ -262,3 +262,33 @@ textarea.field-control {
   background-clip: text;
   color: transparent;
 }
+
+.lab-light .light-field .field-label {
+  color: #1f2937;
+}
+
+.lab-light .light-field .field-surface {
+  border-color: #d7dce8;
+  background: #ffffff;
+  color: #111827;
+  box-shadow: none;
+}
+
+.lab-light .light-field .field-surface::placeholder {
+  color: #8b93a3;
+}
+
+.lab-light .light-field .field-surface:focus {
+  border-color: #5b72e8;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(91, 114, 232, 0.12);
+}
+
+.lab-dark textarea {
+  color-scheme: dark;
+}
+
+.problem-copy ul {
+  margin-left: 1.5rem;
+  list-style: disc;
+}

@@ -2,7 +2,7 @@ import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
-import { userCanAccessAssessment } from "@/lib/labAccess";
+import { assessmentIsExpired, userCanAccessAssessment } from "@/lib/labAccess";
 import { isValidObjectId } from "@/lib/sessionAccess";
 import LabAssessment from "@/models/LabAssessment";
 
@@ -74,9 +74,10 @@ export async function POST(req) {
     if (!isValidObjectId(body.assessmentId)) return json({ message: "Valid assessmentId is required" }, 400);
 
     await connectDB();
-    const assessment = await LabAssessment.findById(body.assessmentId).select("createdBy candidates");
+    const assessment = await LabAssessment.findById(body.assessmentId).select("createdBy candidates deadlineAt");
     if (!assessment) return json({ message: "Assessment not found" }, 404);
     if (!userCanAccessAssessment(assessment, user)) return json({ message: "Forbidden" }, 403);
+    if (user.role === "Interviewee" && assessmentIsExpired(assessment)) return json({ message: "This assessment deadline has passed." }, 410);
 
     const failedCases = normalizeCases(body.failedCases);
 
@@ -95,6 +96,6 @@ export async function POST(req) {
     return json({ explanations: normalizeExplanations(result.explanations) });
   } catch (error) {
     console.error("Lab explanation error:", error);
-    return json({ message: "Failed to explain failed tests", error: error.message }, 500);
+    return json({ message: "Failed to explain failed tests" }, 500);
   }
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FaArrowLeft, FaClock, FaPlay, FaStop } from "react-icons/fa";
+import {
+  FaCheck,
+  FaClock,
+  FaListOl,
+  FaPlay,
+  FaTimes,
+} from "react-icons/fa";
 import { getJson, postJson } from "@/lib/clientApi";
 import CodeEditorPanel from "./CodeEditorPanel";
 import ProblemPanel from "./ProblemPanel";
@@ -9,19 +15,21 @@ import ResultsSidebar from "./ResultsSidebar";
 import { runUserCodeInWorker } from "./sandboxRunner";
 import { createResults, deepEqual, fallbackInsight, formatTime } from "./resultUtils";
 
-export default function LabCandidateDashboard() {
+export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
   const [assessments, setAssessments] = useState([]);
   const [activeAssessment, setActiveAssessment] = useState(null);
   const [activeProblemId, setActiveProblemId] = useState("");
   const [codeByProblem, setCodeByProblem] = useState({});
   const [resultsByProblem, setResultsByProblem] = useState({});
-  const [submittedProblems, setSubmittedProblems] = useState({});
   const [isRunning, setIsRunning] = useState(false);
   const [isExplaining, setIsExplaining] = useState(false);
   const [explanationError, setExplanationError] = useState("");
   const [submitMessage, setSubmitMessage] = useState("");
+  const [submissionError, setSubmissionError] = useState("");
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [problemPanelWidth, setProblemPanelWidth] = useState(560);
 
   useEffect(() => {
     loadAssessments();
@@ -31,6 +39,14 @@ export default function LabCandidateDashboard() {
     const data = await getJson("/api/lab/assessments");
     setAssessments(data.assessments || []);
   };
+  const sortedAssessments = useMemo(() => {
+    if (!initialAssessmentId) return assessments;
+    return [...assessments].sort((left, right) => {
+      if (left._id === initialAssessmentId) return -1;
+      if (right._id === initialAssessmentId) return 1;
+      return 0;
+    });
+  }, [assessments, initialAssessmentId]);
 
   const problems = useMemo(() => (
     activeAssessment ? activeAssessment.problems.map(toRunnableProblem) : []
@@ -38,12 +54,25 @@ export default function LabCandidateDashboard() {
   const activeProblem = problems.find((problem) => problem.id === activeProblemId) || problems[0];
   const currentCode = activeProblem ? codeByProblem[activeProblem.id] || activeProblem.starter : "";
   const currentResults = activeProblem ? resultsByProblem[activeProblem.id] || createResults(activeProblem) : [];
-  const visibleResults = activeProblem && submittedProblems[activeProblem.id]
-    ? currentResults
-    : currentResults.filter((result) => result.visible);
-  const currentPassed = currentResults.filter((result) => result.status === "passed").length;
+  const visibleResults = currentResults.filter((result) => result.visible);
   const failedResults = currentResults.filter((result) => result.status === "failed");
   const lineNumbers = currentCode.split("\n").map((_, index) => index + 1);
+
+  const startResize = (event) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = problemPanelWidth;
+    const onPointerMove = (moveEvent) => {
+      const nextWidth = Math.min(760, Math.max(360, startWidth + moveEvent.clientX - startX));
+      setProblemPanelWidth(nextWidth);
+    };
+    const onPointerUp = () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+  };
 
   const startAssessment = (assessment) => {
     const nextProblems = assessment.problems.map(toRunnableProblem);
@@ -51,10 +80,11 @@ export default function LabCandidateDashboard() {
     setActiveProblemId(nextProblems[0]?.id || "");
     setCodeByProblem(Object.fromEntries(nextProblems.map((problem) => [problem.id, problem.starter])));
     setResultsByProblem(Object.fromEntries(nextProblems.map((problem) => [problem.id, createResults(problem)])));
-    setSubmittedProblems({});
     setSecondsRemaining(Math.max(Number(assessment.durationMinutes) || 1, 1) * 60);
     setHasAutoSubmitted(false);
     setSubmitMessage("");
+    setSubmissionError("");
+    setShowResults(false);
   };
 
   const stopAssessment = () => {
@@ -62,11 +92,12 @@ export default function LabCandidateDashboard() {
     setActiveProblemId("");
     setCodeByProblem({});
     setResultsByProblem({});
-    setSubmittedProblems({});
     setSecondsRemaining(0);
     setHasAutoSubmitted(false);
     setSubmitMessage("");
+    setSubmissionError("");
     setExplanationError("");
+    setShowResults(false);
   };
 
   useEffect(() => {
@@ -114,16 +145,12 @@ export default function LabCandidateDashboard() {
     }
   };
 
-  const runTests = async (includeHidden = false) => {
+  const runTests = async () => {
     if (!activeProblem) return;
-
-    if (includeHidden) {
-      await submitFullAssessment();
-      return;
-    }
 
     setIsRunning(true);
     setExplanationError("");
+    setShowResults(true);
 
     try {
       const nextResults = [];
@@ -137,7 +164,6 @@ export default function LabCandidateDashboard() {
       }
       setResultsByProblem((previous) => ({ ...previous, [activeProblem.id]: nextResults }));
       await explainFailedTests(nextResults);
-
     } finally {
       setIsRunning(false);
     }
@@ -148,6 +174,7 @@ export default function LabCandidateDashboard() {
 
     setIsRunning(true);
     setExplanationError("");
+    setShowResults(true);
 
     try {
       const nextResultsByProblem = {};
@@ -164,29 +191,22 @@ export default function LabCandidateDashboard() {
         nextResultsByProblem[problem.id] = nextResults;
       }
 
-      setSubmittedProblems(Object.fromEntries(problems.map((problem) => [problem.id, true])));
       setResultsByProblem(nextResultsByProblem);
-      await submitAssessment(nextResultsByProblem, successMessage);
+      await submitAssessment(successMessage);
+    } catch (error) {
+      setSubmissionError(error.message || "Could not submit this assessment.");
     } finally {
       setIsRunning(false);
     }
   };
 
-  const submitAssessment = async (nextResultsByProblem, successMessage = "Lab assessment submitted") => {
-    const allResults = Object.values(nextResultsByProblem).flat();
-    const maxScore = problems.reduce((total, problem) => total + problem.points, 0);
-    const score = problems.reduce((total, problem) => {
-      const results = nextResultsByProblem[problem.id] || [];
-      const passed = results.filter((result) => result.status === "passed").length;
-      return total + Math.round((passed / problem.tests.length) * problem.points);
-    }, 0);
-
+  const submitAssessment = async (successMessage = "Lab assessment submitted") => {
     const response = await postJson(`/api/lab/assessments/${activeAssessment._id}/submit`, {
-      score,
-      maxScore,
-      passedTests: allResults.filter((result) => result.status === "passed").length,
-      totalTests: allResults.length,
-      runtimeMs: allResults.reduce((total, result) => total + (Number(result.duration) || 0), 0),
+      solutions: problems.map((problem) => ({
+        problemIndex: problem.index,
+        title: problem.title,
+        code: codeByProblem[problem.id] || problem.starter,
+      })),
     });
     setSubmitMessage(successMessage || response.message || "Submitted");
     await loadAssessments();
@@ -194,146 +214,160 @@ export default function LabCandidateDashboard() {
     setActiveProblemId("");
     setCodeByProblem({});
     setResultsByProblem({});
-    setSubmittedProblems({});
     setSecondsRemaining(0);
   };
 
   if (activeAssessment && activeProblem) {
     return (
-      <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
-        <div className="soft-grid absolute inset-0 z-0 opacity-60" />
-        <div className="relative z-10 mx-auto max-w-7xl">
-          <div className="mb-5 rounded-xl border border-white/10 bg-slate-950/55 p-4 shadow-xl shadow-black/20">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Active assessment</p>
-                <h1 className="mt-1 text-2xl font-black text-white">{activeAssessment.title}</h1>
-              </div>
-              <div className="inline-flex items-center gap-3 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 font-bold text-cyan-100">
-                <FaClock />
-                Assessment timer: <span className="font-mono text-white">{formatTime(secondsRemaining)}</span>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button onClick={() => setActiveAssessment(null)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/8 px-4 py-2 font-bold text-white">
-                <FaArrowLeft />
-                Back to assigned labs
-              </button>
-              <button onClick={stopAssessment} className="inline-flex items-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-2 font-bold text-rose-100">
-                <FaStop />
-                Stop assessment
-              </button>
-            </div>
+      <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-5 pt-24 text-slate-50">
+        <div className="soft-grid absolute inset-0 opacity-60" />
+        {submissionError && (
+          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-lg border border-rose-300/25 bg-rose-400/10 px-5 py-3 font-bold text-rose-100">
+            {submissionError}
           </div>
-          {submitMessage && <p className="mb-4 rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-3 text-sm text-emerald-100">{submitMessage}</p>}
-          <div className="grid gap-4 lg:grid-cols-[17rem_minmax(0,1fr)]">
-            <ProblemSwitcher activeAssessment={activeAssessment} problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1.08fr)_23rem]">
-              <main className="grid gap-4">
-                <ProblemPanel problem={activeProblem} />
-                <CodeEditorPanel activeProblemId={activeProblem.id} code={currentCode} isRunning={isRunning} lineNumbers={lineNumbers} runTests={runTests} setCodeByProblem={setCodeByProblem} />
-              </main>
-              <ResultsSidebar activeProblem={activeProblem} currentPassed={currentPassed} explanationError={explanationError} failedResults={failedResults} isExplaining={isExplaining} submittedProblems={submittedProblems} visibleResults={visibleResults} />
-            </div>
-          </div>
+        )}
+        <div className="relative z-10 mx-auto grid h-[calc(100vh-7rem)] max-w-[96rem] overflow-hidden rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20 lg:grid-cols-[5.75rem_1fr]">
+          <ProblemRail problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
+          <main
+            className="grid min-h-0 min-w-0 lg:grid-cols-[var(--problem-panel-width)_0.5rem_minmax(0,1fr)]"
+            style={{ "--problem-panel-width": `${problemPanelWidth}px` }}
+          >
+            <ProblemPanel problem={activeProblem} panelWidth={problemPanelWidth} />
+            <button
+              onPointerDown={startResize}
+              className="hidden cursor-col-resize border-x border-white/10 bg-slate-950/60 transition hover:bg-cyan-300/20 lg:block"
+              aria-label="Resize problem and editor panels"
+              title="Drag to resize panels"
+            />
+            <section className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+              <CodeEditorPanel
+                activeProblemId={activeProblem.id}
+                code={currentCode}
+                formattedTime={formatTime(secondsRemaining)}
+                isRunning={isRunning}
+                lineNumbers={lineNumbers}
+                onExit={stopAssessment}
+                onSubmit={() => submitFullAssessment()}
+                runTests={runTests}
+                setCodeByProblem={setCodeByProblem}
+              />
+              <ResultsSidebar
+                activeProblem={activeProblem}
+                explanationError={explanationError}
+                failedResults={failedResults}
+                isExplaining={isExplaining}
+                isOpen={showResults}
+                onToggle={() => setShowResults(!showResults)}
+                visibleResults={visibleResults}
+              />
+            </section>
+          </main>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
-      <div className="soft-grid absolute inset-0 z-0 opacity-60" />
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <header className="mb-8 rounded-xl border border-white/10 bg-slate-950/45 p-6 shadow-xl shadow-black/20">
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">PrepTalk Lab</p>
-          <h1 className="text-4xl font-black tracking-tight gradient-text sm:text-5xl">Assigned assessments</h1>
-          <p className="mt-3 max-w-2xl text-slate-300">{assessments.length} assessments assigned.</p>
-        </header>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {assessments.map((assessment) => (
-            <article key={assessment._id} className="rounded-xl border border-white/10 bg-slate-950/50 p-5 shadow-xl shadow-black/20 transition hover:border-cyan-300/35 hover:bg-slate-950/65">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-200">{assessment.durationMinutes} min</p>
-                <span className="rounded-md bg-cyan-300/10 px-2 py-1 text-xs font-bold text-cyan-100">{assessment.problems?.length || 0} problems</span>
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24 text-slate-50">
+      <div className="soft-grid absolute inset-0 opacity-60" />
+      <main className="relative z-10 mx-auto max-w-6xl">
+        <section className="glass-panel rounded-xl p-6">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">PrepTalk Lab</p>
+          <h1 className="mt-2 text-4xl font-black gradient-text">Assigned assessments</h1>
+          <p className="mt-3 text-slate-300">Start an assigned coding assessment when you are ready.</p>
+        </section>
+        {submitMessage && <p className="mt-5 rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-4 text-emerald-100">{submitMessage}</p>}
+        <div className="mt-8 max-h-[calc(100vh-22rem)] min-h-[18rem] overflow-auto pr-2">
+          <div className="grid gap-5">
+          {initialAssessmentId && !assessments.some((assessment) => assessment._id === initialAssessmentId) && (
+            <div className="rounded-xl border border-amber-300/25 bg-amber-300/10 p-5 font-semibold text-amber-100">
+              The invited assessment was not found for this account. Make sure you are logged in with the assigned candidate email.
+            </div>
+          )}
+          {sortedAssessments.map((assessment) => (
+            <article key={assessment._id} className="rounded-xl border border-white/10 bg-slate-950/45 p-6 shadow-xl shadow-black/20">
+              <div className="flex flex-wrap items-center justify-between gap-5">
+                <div>
+                  <p className="font-black text-emerald-100"><FaClock className="mr-2 inline" />{assessment.durationMinutes} mins</p>
+                  <h2 className="mt-3 text-2xl font-black text-white">{assessment.title}</h2>
+                  <p className="mt-2 text-slate-400">{assessment.problems?.length || 0} sections · {assessment.submissions?.length || 0} completed attempts · Due {formatCandidateDeadline(assessment.deadlineAt)}</p>
+                  <CandidateStatus assessment={assessment} />
+                </div>
+                <button onClick={() => startAssessment(assessment)} className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 font-black text-slate-950">
+                  <FaPlay />
+                  {(assessment.submissions?.length || 0) > 0 ? "Retry assessment" : "Start assessment"}
+                </button>
               </div>
-              <h2 className="mt-2 text-2xl font-black text-white">{assessment.title}</h2>
-              {assessment.description && <p className="mt-2 min-h-12 text-sm text-slate-300">{assessment.description}</p>}
-              <p className="mt-4 text-sm font-bold text-cyan-100">{assessment.submissions?.length || 0} completed attempts</p>
-              <button onClick={() => startAssessment(assessment)} className="mt-5 inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 font-black text-slate-950">
-                <FaPlay />
-                Start assessment
-              </button>
             </article>
           ))}
-          {assessments.length === 0 && <div className="rounded-xl border border-white/10 bg-slate-950/50 p-5 text-slate-300 shadow-xl shadow-black/20">No assigned assessments.</div>}
+          {assessments.length === 0 && <div className="rounded-xl border border-white/10 bg-slate-950/45 p-6 text-slate-400">No assigned assessments.</div>}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
 
-function ProblemSwitcher({ activeAssessment, problems, activeProblemId, onSelect, resultsByProblem }) {
-  const attempts = activeAssessment?.submissions?.length || 0;
-  const submissions = activeAssessment?.submissions || [];
+function CandidateStatus({ assessment }) {
+  const latest = [...(assessment.submissions || [])].sort((left, right) => new Date(right.submittedAt) - new Date(left.submittedAt))[0];
+
+  if (!latest) {
+    return <span className="mt-4 inline-flex rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-sm font-bold text-amber-100">Pending</span>;
+  }
+
+  const passed = Number(latest.passedTests) || 0;
+  const total = Number(latest.totalTests) || 0;
+  const allPassed = total > 0 && passed === total;
 
   return (
-    <aside className="rounded-xl border border-white/10 bg-slate-950/50 p-3 shadow-xl shadow-black/20 lg:sticky lg:top-24 lg:self-start">
-      <p className="mb-3 px-2 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Problems</p>
-      <div className="grid gap-2">
+    <span className={`mt-4 inline-flex rounded-full border px-3 py-1 text-sm font-bold ${allPassed ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-100" : "border-rose-300/25 bg-rose-400/10 text-rose-100"}`}>
+      Submitted · {passed}/{total} tests passed
+    </span>
+  );
+}
+
+function formatCandidateDeadline(value) {
+  if (!value) return "no deadline";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "no deadline";
+  return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
+}
+
+function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) {
+  return (
+    <aside className="hidden border-r border-white/10 bg-slate-950/55 lg:grid lg:grid-rows-[4.25rem_1fr]">
+      <div className="grid place-items-center border-b border-white/10 px-4">
+        <span className="grid h-10 w-10 place-items-center rounded-md border border-cyan-300/25 bg-cyan-300/10 text-cyan-100" title="Questions">
+          <FaListOl />
+        </span>
+      </div>
+      <div className="grid content-start gap-3 px-3 py-5 text-center">
         {problems.map((problem, index) => {
-          const passed = (resultsByProblem[problem.id] || []).filter((result) => result.status === "passed").length;
+          const results = resultsByProblem[problem.id] || [];
+          const failed = results.some((result) => result.status === "failed");
+          const passed = results.length > 0 && results.every((result) => result.status === "passed");
           return (
-            <button key={problem.id} onClick={() => onSelect(problem.id)} className={`rounded-lg border p-3 text-left transition ${problem.id === activeProblemId ? "border-cyan-300/45 bg-cyan-300/10" : "border-white/10 bg-slate-950/30 hover:border-white/20 hover:bg-white/8"}`}>
-              <p className="text-xs font-black text-cyan-100">0{index + 1}</p>
-              <h2 className="mt-2 font-black text-white">{problem.title}</h2>
-              <p className="mt-2 text-xs font-bold text-slate-300">{problem.level} · {problem.points} pts · {passed}/{problem.tests.length}</p>
-            </button>
+            <div key={problem.id}>
+              <button
+                onClick={() => onSelect(problem.id)}
+                className={`grid h-12 w-full place-items-center rounded-md border text-sm font-black ${
+                  activeProblemId === problem.id ? "border-cyan-300/60 bg-cyan-300/10 text-white" : "border-transparent text-slate-300 hover:border-white/10 hover:bg-white/5"
+                }`}
+              >
+                {passed ? <FaCheck className="text-emerald-200" /> : failed ? <FaTimes className="text-rose-200" /> : `Q${index + 1}`}
+              </button>
+            </div>
           );
         })}
       </div>
-      <div className="mt-3 rounded-lg border border-white/10 bg-slate-950/45 p-3">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Assessment</p>
-        <div className="grid gap-2 text-sm">
-          <Row label="Duration" value={`${activeAssessment?.durationMinutes || 0} min`} />
-          <Row label="Attempts" value={attempts} />
-        </div>
-      </div>
-      <div className="mt-3 rounded-lg border border-white/10 bg-slate-950/45 p-3">
-        <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Submission history</p>
-        <div className="grid gap-2">
-          {submissions.slice(-4).reverse().map((submission) => (
-            <div key={`${submission.candidateEmail}-${submission.submittedAt}`} className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs text-slate-300">
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-black text-white">{submission.score}/{submission.maxScore}</span>
-                <span className="font-bold text-cyan-100">Attempt {submission.attempts}</span>
-              </div>
-              <p className="mt-1 text-slate-400">{formatSubmissionDate(submission.submittedAt)}</p>
-            </div>
-          ))}
-          {submissions.length === 0 && (
-            <p className="rounded-md border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-400">
-              No submissions yet.
-            </p>
-          )}
-        </div>
-      </div>
     </aside>
-  );
-}
-
-function Row({ label, value }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-md border border-white/10 bg-white/5 px-3 py-2">
-      <span className="font-semibold text-slate-400">{label}</span>
-      <span className="font-black text-white">{value}</span>
-    </div>
   );
 }
 
 function toRunnableProblem(problem, index) {
   return {
     id: problem._id || `${problem.title}-${index}`,
+    index,
     title: problem.title,
     level: problem.difficulty,
     points: problem.points,
@@ -347,18 +381,6 @@ function toRunnableProblem(problem, index) {
       visible: test.visible,
     })),
   };
-}
-
-function formatSubmissionDate(value) {
-  if (!value) return "No timestamp";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Invalid timestamp";
-  return date.toLocaleString([], {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-  });
 }
 
 function parseJsonValue(value) {

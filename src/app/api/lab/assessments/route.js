@@ -2,18 +2,22 @@ import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
-import { normalizeLabAssessmentPayload, sanitizeAssessmentForUser } from "@/lib/labAccess";
+import { assessmentIsExpired, normalizeLabAssessmentPayload, sanitizeAssessmentForUser } from "@/lib/labAccess";
 import LabAssessment from "@/models/LabAssessment";
+
+const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);
     if (!user) return json({ message: "Unauthorized" }, 401);
+    if (!LAB_ROLES.has(user.role)) return json({ message: "Forbidden" }, 403);
 
     await connectDB();
+    const userEmail = String(user.email || "").toLowerCase();
     const query = user.role === "Interviewer"
-      ? { createdBy: user.email }
-      : { candidates: user.email };
+      ? { createdBy: userEmail }
+      : { candidates: userEmail, deadlineAt: { $gt: new Date() } };
     const assessments = await LabAssessment.find(query).sort({ createdAt: -1 });
 
     return json({
@@ -21,7 +25,7 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error("Lab assessment list error:", error);
-    return json({ message: "Failed to fetch Lab assessments", error: error.message }, 500);
+    return json({ message: "Failed to fetch Lab assessments" }, 500);
   }
 }
 
@@ -35,17 +39,19 @@ export async function POST(req) {
     if (!payload.title) return json({ message: "Assessment title is required" }, 400);
     if (payload.candidates.length === 0) return json({ message: "Assign at least one candidate email" }, 400);
     if (payload.problems.length === 0) return json({ message: "Add at least one problem" }, 400);
+    if (Number.isNaN(new Date(payload.deadlineAt).getTime())) return json({ message: "Valid deadline is required" }, 400);
+    if (assessmentIsExpired(payload)) return json({ message: "Deadline must be in the future" }, 400);
 
     const totalProblemMinutes = payload.problems.reduce(
       (total, problem) => total + problem.timeLimitMinutes,
       0
     );
 
-    if (totalProblemMinutes !== payload.durationMinutes) {
-      return json({
-        message: `Problem timers must add up to the assessment timer. Current total is ${totalProblemMinutes} minutes, assessment timer is ${payload.durationMinutes} minutes.`,
-      }, 400);
+    if (totalProblemMinutes < 1 || totalProblemMinutes > 120) {
+      return json({ message: "Total section duration must be between 1 and 120 minutes" }, 400);
     }
+
+    payload.durationMinutes = totalProblemMinutes;
 
     const invalidTest = findInvalidTest(payload.problems);
     if (invalidTest) {
@@ -66,7 +72,7 @@ export async function POST(req) {
     return json({ message: "Lab assessment created", assessment }, 201);
   } catch (error) {
     console.error("Lab assessment create error:", error);
-    return json({ message: "Failed to create Lab assessment", error: error.message }, 500);
+    return json({ message: "Failed to create Lab assessment" }, 500);
   }
 }
 
