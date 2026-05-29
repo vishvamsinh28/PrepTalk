@@ -22,11 +22,11 @@ export default function AdminTestBuilder({
   const totalTests = form.problems.reduce((total, problem) => total + problem.tests.length, 0);
 
   return (
-    <main className="relative z-10 mx-auto max-w-7xl">
+    <main className="relative z-10 mx-auto w-full max-w-7xl">
       <BuilderHeader title={form.title} onBack={onBack} onCreate={onCreate} isSubmitting={isSubmitting} />
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_26rem]">
-        <div className="rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-8 py-7">
+        <div className="min-w-0 rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
+          <div className="flex flex-col gap-4 border-b border-white/10 px-4 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8 sm:py-7">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-lg font-black text-white">Assessment duration:</span>
               <span className="rounded-md border border-emerald-300/20 bg-emerald-300/10 px-4 py-2 font-black text-emerald-100">
@@ -36,10 +36,10 @@ export default function AdminTestBuilder({
             <span className="inline-flex items-center gap-2 text-slate-300"><span className="h-3 w-3 rounded-full bg-amber-300" /> Draft</span>
           </div>
 
-          <div className="p-8">
-            <div className="mb-7 flex items-center justify-between">
+          <div className="p-4 sm:p-8">
+            <div className="mb-7 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h2 className="text-2xl font-black text-white">Sections ({form.problems.length})</h2>
-              <button onClick={onAddProblem} className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 font-bold text-cyan-100"><FaPlus /> Add section</button>
+              <button onClick={onAddProblem} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 font-bold text-cyan-100 sm:w-auto"><FaPlus /> Add section</button>
             </div>
             <div className="grid gap-2">
               {form.problems.map((problem, problemIndex) => (
@@ -59,7 +59,7 @@ export default function AdminTestBuilder({
           </div>
         </div>
 
-        <aside className="glass-panel self-start rounded-xl p-7">
+        <aside className="glass-panel min-w-0 self-start rounded-xl p-4 sm:p-7">
           <label className="field-group">
             <span className="field-label">Role</span>
             <input value={form.title.replace(" Hiring Test", "")} onChange={(event) => onSetForm({ ...form, title: `${event.target.value} Hiring Test` })} className="field-surface field-control" />
@@ -96,7 +96,7 @@ export default function AdminTestBuilder({
               ))}
             </div>
           )}
-          <div className="mt-7 grid grid-cols-3 gap-2 text-center text-sm">
+          <div className="mt-7 grid gap-2 text-center text-sm sm:grid-cols-3">
             <Metric label="Questions" value={form.problems.length} />
             <Metric label="Tests" value={totalTests} />
             <Metric label="Minutes" value={totalProblemMinutes} />
@@ -111,10 +111,10 @@ function BuilderHeader({ title, onBack, onCreate, isSubmitting }) {
   return (
     <div className="mb-8">
       <button onClick={onBack} className="mb-5 text-cyan-200">Templates <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> Builder</button>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-4xl font-black text-white">{title}</h1>
-        <div className="flex items-center gap-3">
-          <button onClick={onCreate} disabled={isSubmitting} className="rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-3 font-black text-slate-950 disabled:opacity-60">
+      <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <h1 className="max-w-full text-3xl font-black leading-tight text-white sm:text-4xl">{title}</h1>
+        <div className="flex w-full items-center gap-3 sm:w-auto">
+          <button onClick={onCreate} disabled={isSubmitting} className="w-full rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 font-black text-slate-950 disabled:opacity-60 sm:w-auto sm:px-7">
             {isSubmitting ? "Creating..." : "Create assessment"}
           </button>
         </div>
@@ -128,12 +128,12 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
 
   return (
     <section className="border-b border-white/10 py-5">
-      <div className="flex w-full items-center gap-4">
-        <button onClick={() => setOpen(!open)} className="flex min-w-0 flex-1 items-center gap-5 text-left">
+      <div className="flex w-full min-w-0 items-start gap-3 sm:items-center sm:gap-4">
+        <button onClick={() => setOpen(!open)} className="flex min-w-0 flex-1 items-start gap-3 text-left sm:items-center sm:gap-5">
           <FaChevronRight className={open ? "shrink-0 rotate-90 text-cyan-200 transition" : "shrink-0 text-slate-500 transition"} />
           <SkillIcon index={problemIndex} />
           <span className="min-w-0 flex-1">
-            <span className="block truncate text-lg font-semibold text-white">{sectionName(problem, problemIndex)}</span>
+            <span className="block text-lg font-semibold leading-snug text-white sm:truncate">{sectionName(problem, problemIndex)}</span>
             <span className="text-slate-400">{problem.tests.length} test cases configured</span>
           </span>
           <span className="hidden shrink-0 text-slate-300 sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
@@ -145,7 +145,7 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
         )}
       </div>
       {open && (
-        <div className="mt-5 grid gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-5">
+        <div className="mt-5 grid min-w-0 gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-4 sm:p-5">
           <div className="grid gap-4 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -164,7 +164,7 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
             <span className="field-label">Starter code</span>
             <textarea value={problem.starterCode} onChange={(event) => onUpdate({ starterCode: event.target.value })} className="field-surface field-control min-h-32 font-mono" />
           </label>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-black text-white">Test cases</h3>
             <button onClick={onAddTest} className="inline-flex items-center gap-2 font-bold text-cyan-100"><FaPlus /> Add case</button>
           </div>
