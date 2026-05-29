@@ -92,41 +92,41 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
   };
 
   return (
-    <main className="relative z-10 mx-auto w-full max-w-7xl min-w-0">
+    <main className="relative z-10 mx-auto w-full max-w-7xl min-w-0 overflow-x-hidden text-sm [&_.field-control]:min-h-10 [&_.field-control]:px-3 [&_.field-control]:py-2 [&_textarea.field-control]:min-h-20">
       <div>
-        <button onClick={onBack} className="mb-4 text-sm text-cyan-200 sm:mb-5 sm:text-base">Assessments <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> {assessment.title}</button>
+        <button onClick={onBack} className="mb-4 text-sm text-cyan-200">Assessments <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> {assessment.title}</button>
         <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <h1 className="max-w-4xl text-3xl font-black leading-tight text-white sm:text-4xl">{assessment.title}</h1>
-          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end">
-            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/8 px-3 py-2.5 text-sm font-black text-slate-100 sm:px-5 sm:py-3 sm:text-base"><FaShareAlt /> Copy link</button>
+          <h1 className="max-w-4xl text-2xl font-black leading-tight text-white sm:text-3xl lg:text-4xl">{assessment.title}</h1>
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-2 lg:justify-end">
+            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/8 px-3 py-2 text-sm font-black text-slate-100"><FaShareAlt /> Copy link</button>
             <button
               onClick={() => setShowReport(!showReport)}
               aria-expanded={showReport}
-              className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-black transition sm:px-5 sm:py-3 sm:text-base ${showReport ? "border-cyan-300/40 bg-cyan-300/15 text-cyan-50 shadow-lg shadow-cyan-950/30" : "border-white/10 bg-white/8 text-slate-100 hover:border-white/20"}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-black transition ${showReport ? "border-cyan-300/40 bg-cyan-300/15 text-cyan-50 shadow-lg shadow-cyan-950/30" : "border-white/10 bg-white/8 text-slate-100 hover:border-white/20"}`}
             >
               <span className={`h-2.5 w-2.5 rounded-full ${showReport ? "bg-cyan-200" : "bg-slate-500"}`} />
               {showReport ? "Hide report" : "View report"}
             </button>
-            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2.5 text-sm font-black text-cyan-100 sm:px-5 sm:py-3 sm:text-base"><FaDownload /> Export PDF</button>
-            <button onClick={onDelete} className="grid place-items-center rounded-lg border border-rose-300/25 bg-rose-400/10 px-3 py-2.5 text-rose-100 sm:px-4 sm:py-3"><FaTrash /></button>
+            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-black text-cyan-100"><FaDownload /> Export PDF</button>
+            <button onClick={onDelete} className="grid place-items-center rounded-lg border border-rose-300/25 bg-rose-400/10 px-3 py-2 text-rose-100"><FaTrash /></button>
           </div>
         </div>
         {notice && (
-          <div className="mt-5 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-5 py-4 font-bold text-emerald-100">
+          <div className="mt-4 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-4 py-3 font-bold text-emerald-100">
             {notice}
           </div>
         )}
-        <section className="mt-6 grid items-start gap-5 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_24rem] xl:grid-cols-[minmax(0,1fr)_26rem]">
-          <div className="flex min-w-0 flex-col rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
-            <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 lg:py-7">
+        <section className="mt-5 grid min-w-0 items-start gap-4 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="flex min-w-0 flex-col rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+            <div className="shrink-0 flex flex-col gap-3 border-b border-white/10 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
               <div>
-                <p><span className="font-black text-white sm:text-lg">Duration:</span> <span className="ml-3 text-lg text-slate-300 sm:ml-5 sm:text-xl">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
-                <p className="mt-2 text-sm font-semibold text-slate-400">Deadline: {formatDateTime(assessment.deadlineAt)}</p>
+                <p><span className="font-black text-white">Duration:</span> <span className="ml-3 text-base text-slate-300">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
+                <p className="mt-1.5 text-xs font-semibold text-slate-400 sm:text-sm">Deadline: {formatDateTime(assessment.deadlineAt)}</p>
               </div>
               <span className="inline-flex items-center gap-2 text-emerald-100"><span className="h-3 w-3 rounded-full bg-emerald-300" /> Active</span>
             </div>
-            <div className="min-h-0 overflow-auto p-4 sm:p-6 lg:p-8">
-              <h2 className="mb-5 text-xl font-black text-white sm:mb-7 sm:text-2xl">Sections ({draftProblems.length})</h2>
+            <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
+              <h2 className="mb-4 text-xl font-black text-white sm:text-2xl">Sections ({draftProblems.length})</h2>
               {draftProblems.map((problem, index) => (
                 <EditableSection
                   key={index}
@@ -140,17 +140,17 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               ))}
             </div>
           </div>
-          <aside className="glass-panel overflow-auto rounded-xl p-4 sm:p-6 lg:max-h-[52rem] lg:p-7">
+          <aside className="glass-panel min-w-0 overflow-auto rounded-xl p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
             <h2 className="font-black text-white">Role</h2>
-            <p className="mt-3 text-slate-300">{assessment.title.replace(" Hiring Test", "")}</p>
-            <section className="mt-8 rounded-lg border border-white/10 bg-white/5 p-4">
+            <p className="mt-2 text-slate-300">{assessment.title.replace(" Hiring Test", "")}</p>
+            <section className="mt-5 rounded-lg border border-white/10 bg-white/5 p-3 sm:p-4">
               <h2 className="font-black text-white">Assignment settings</h2>
               <label className="field-group mt-4">
                 <span className="field-label">Candidate emails</span>
                 <textarea
                   value={settings.candidates}
                   onChange={(event) => setSettings({ ...settings, candidates: event.target.value })}
-                  className="field-surface field-control min-h-24"
+                  className="field-surface field-control min-h-20"
                 />
               </label>
               <label className="field-group mt-4">
@@ -172,29 +172,29 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               </label>
               <button
                 onClick={saveChanges}
-                className="mt-4 w-full rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-black text-cyan-100"
+                className="mt-4 w-full rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 font-black text-cyan-100"
               >
                 Save changes
               </button>
               {inviteRecipients.length > 0 && (
-                <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
+                <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-2.5 font-black text-slate-950">
                   <FaEnvelope /> Send invite to all
                 </a>
               )}
             </section>
-            <h2 className="mt-8 font-black text-white">Core skills</h2>
+            <h2 className="mt-5 font-black text-white">Core skills</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              {coreSkills.map((skill) => <span key={skill} className="rounded-full border border-white/10 bg-white/8 px-3 py-1 text-sm font-semibold text-slate-200">{skill}</span>)}
+              {coreSkills.map((skill) => <span key={skill} className="rounded-full border border-white/10 bg-white/8 px-2.5 py-1 text-xs font-semibold text-slate-200">{skill}</span>)}
               {coreSkills.length === 0 && <span className="text-sm text-slate-400">No core skills added.</span>}
             </div>
-            <h2 className="mt-8 font-black text-white">Candidates</h2>
-            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-5">
-              <div className="text-4xl font-black text-white">{candidates.length}</div>
+            <h2 className="mt-5 font-black text-white">Candidates</h2>
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-3xl font-black text-white">{candidates.length}</div>
               <div className="mt-1 text-sm font-semibold text-slate-400">assigned candidate{candidates.length === 1 ? "" : "s"}</div>
             </div>
-            <h2 className="mt-8 font-black text-white">Submissions</h2>
-            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-5">
-              <div className="text-4xl font-black text-white">{submissions.length}</div>
+            <h2 className="mt-5 font-black text-white">Submissions</h2>
+            <div className="mt-3 rounded-lg border border-white/10 bg-white/5 px-4 py-4">
+              <div className="text-3xl font-black text-white">{submissions.length}</div>
               <div className="mt-1 text-sm font-semibold text-slate-400">submission{submissions.length === 1 ? "" : "s"} received</div>
             </div>
           </aside>
@@ -210,19 +210,19 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
   const tests = problem.tests || [];
 
   return (
-    <section className="border-b border-white/10 py-4 sm:py-5">
-      <button onClick={() => setOpen(!open)} className="flex w-full min-w-0 items-center gap-3 text-left sm:gap-5">
+    <section className="min-w-0 border-b border-white/10 py-3">
+      <button onClick={() => setOpen(!open)} className="flex w-full min-w-0 items-center gap-3 text-left sm:gap-4">
         <FaChevronRight className={open ? "shrink-0 rotate-90 text-cyan-200 transition" : "shrink-0 text-slate-500 transition"} />
         <SkillIcon index={problemIndex} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-base font-semibold text-white sm:text-lg">{sectionName(problem, problemIndex)}</span>
-          <span className="text-slate-400">{tests.length} test case{tests.length === 1 ? "" : "s"}</span>
+          <span className="block truncate text-base font-semibold text-white">{sectionName(problem, problemIndex)}</span>
+          <span className="text-sm text-slate-400">{tests.length} test case{tests.length === 1 ? "" : "s"}</span>
         </span>
         <span className="hidden shrink-0 text-slate-300 sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
       </button>
       {open && (
-        <div className="mt-5 grid gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-3 sm:p-5">
-          <div className="grid gap-4 md:grid-cols-3">
+        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-lg border border-white/10 bg-slate-950/35 p-3 sm:p-4">
+          <div className="grid min-w-0 gap-3 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
               <input value={problem.title || ""} onChange={(event) => onUpdate({ title: event.target.value })} className="field-surface field-control" />
@@ -234,38 +234,38 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
           </div>
           <label className="field-group">
             <span className="field-label">Problem statement</span>
-            <textarea value={problem.prompt || ""} onChange={(event) => onUpdate({ prompt: event.target.value })} className="field-surface field-control min-h-32" />
+            <textarea value={problem.prompt || ""} onChange={(event) => onUpdate({ prompt: event.target.value })} className="field-surface field-control min-h-20" />
           </label>
           <label className="field-group">
             <span className="field-label">Starter code</span>
-            <textarea value={problem.starterCode || ""} onChange={(event) => onUpdate({ starterCode: event.target.value })} className="field-surface field-control min-h-36 font-mono" />
+            <textarea value={problem.starterCode || ""} onChange={(event) => onUpdate({ starterCode: event.target.value })} className="field-surface field-control min-h-24 font-mono" />
           </label>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-black text-white">Test cases</h3>
             <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100"><FaPlus /> Add case</button>
           </div>
-          <div className="max-h-[28rem] overflow-auto pr-1">
-            <div className="grid gap-3">
+          <div className="max-h-[24rem] overflow-auto pr-1">
+            <div className="grid min-w-0 gap-2">
               {tests.map((test, testIndex) => (
-                <div key={testIndex} className="grid min-w-0 gap-3 rounded-lg border border-white/10 bg-white/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
+                <div key={testIndex} className="grid min-w-0 gap-2 rounded-lg border border-white/10 bg-white/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
                   <label className="field-group min-w-0">
                     <span className="field-label">Case name</span>
                     <input value={test.name || ""} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
                   </label>
                   <label className="field-group min-w-0">
                     <span className="field-label">Input JSON</span>
-                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-16 font-mono text-sm" />
+                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-14 font-mono text-sm" />
                   </label>
                   <label className="field-group min-w-0">
                     <span className="field-label">Expected JSON</span>
-                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-16 font-mono text-sm" />
+                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-14 font-mono text-sm" />
                   </label>
-                  <label className="flex items-center gap-3 rounded-md border border-white/10 bg-slate-950/30 px-3 py-2 text-sm font-bold text-slate-200 xl:mt-6 xl:min-h-12">
+                  <label className="flex items-center gap-3 rounded-md border border-white/10 bg-slate-950/30 px-3 py-2 text-xs font-bold text-slate-200 xl:mt-6">
                     <input type="checkbox" checked={Boolean(test.visible)} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
                     Visible
                   </label>
                   {tests.length > 1 && (
-                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-11 w-11 place-items-center rounded-md border border-rose-300/20 bg-rose-400/10 text-rose-100 xl:mt-6 xl:h-12 xl:w-12" title="Delete test case">
+                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-10 w-10 place-items-center rounded-md border border-rose-300/20 bg-rose-400/10 text-rose-100 xl:mt-6" title="Delete test case">
                       <FaTrash />
                     </button>
                   )}
