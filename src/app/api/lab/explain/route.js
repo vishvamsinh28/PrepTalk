@@ -5,6 +5,7 @@ import { generateGeminiJson } from "@/lib/gemini";
 import { assessmentIsExpired, userCanAccessAssessment } from "@/lib/labAccess";
 import { isValidObjectId } from "@/lib/sessionAccess";
 import LabAssessment from "@/models/LabAssessment";
+import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 const MAX_FAILED_CASES = 8;
 const MAX_CODE_CHARS = 6000;
@@ -69,6 +70,12 @@ export async function POST(req) {
     const user = await getAuthPayloadFromRequest(req);
     if (!user) return json({ message: "Unauthorized" }, 401);
     if (!LAB_ROLES.has(user.role)) return json({ message: "Forbidden" }, 403);
+    const limiter = rateLimit({
+      key: `lab-explain:${user.email}:${getClientIp(req)}`,
+      limit: 20,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (limiter.limited) return rateLimitResponse();
 
     const body = await req.json();
     if (!isValidObjectId(body.assessmentId)) return json({ message: "Valid assessmentId is required" }, 400);

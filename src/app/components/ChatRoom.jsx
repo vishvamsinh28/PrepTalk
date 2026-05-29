@@ -7,15 +7,13 @@ import { FaPaperPlane, FaUsers } from "react-icons/fa";
 import { getJson, postJson } from "@/lib/clientApi";
 
 function uniqueUsers(members) {
-  return [...new Set(members.map((member) => member.data?.userEmail).filter(Boolean))];
+  return [...new Set(members.map((member) => member.clientId).filter(Boolean))];
 }
 
 export default function ChatRoom({ sessionId, userEmail }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
-  const channelRef = useRef(null);
-  const ablyRef = useRef(null);
 
   const messagesEndRef = useRef(null);
 
@@ -23,8 +21,6 @@ export default function ChatRoom({ sessionId, userEmail }) {
     let isMounted = true;
     const ably = new Ably.Realtime({ authUrl: `/api/ably/token?sessionId=${encodeURIComponent(sessionId)}` });
     const channel = ably.channels.get(`chat:${sessionId}`);
-    ablyRef.current = ably;
-    channelRef.current = channel;
 
     getJson(`/api/messages?sessionId=${encodeURIComponent(sessionId)}`)
       .then((data) => {
@@ -71,7 +67,9 @@ export default function ChatRoom({ sessionId, userEmail }) {
 
     try {
       const saved = await postJson("/api/messages", { sessionId, message: text });
-      await channelRef.current?.publish("message", saved.message);
+      setMessages((prev) => (
+        prev.some((msg) => msg._id === saved.message._id) ? prev : [...prev, saved.message]
+      ));
     } catch (error) {
       console.error("Error sending message:", error);
     }
@@ -99,7 +97,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div
-              key={index}
+            key={msg._id || index}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}

@@ -1,9 +1,10 @@
 import { connectDB } from "@/lib/db";
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import Message from "@/models/Message";
 import { findSessionForUser } from "@/lib/sessionAccess";
 import { normalizeText } from "@/lib/validation";
+import { getAblyRestClient } from "@/lib/ably";
 
 export async function GET(req) {
   try {
@@ -29,7 +30,7 @@ export async function GET(req) {
     return json({ messages });
   } catch (error) {
     console.error("Message history error:", error);
-    return json({ message: "Failed to fetch messages", error: error.message }, 500);
+    return serverError("Failed to fetch messages");
   }
 }
 
@@ -57,10 +58,12 @@ export async function POST(req) {
       message: cleanMessage,
       sender: user.email,
     });
+    const ably = getAblyRestClient();
+    await ably.channels.get(`chat:${sessionId}`).publish("message", newMessage);
 
     return json({ message: newMessage }, 201);
   } catch (error) {
     console.error("Message save error:", error);
-    return json({ message: "Failed to save message", error: error.message }, 500);
+    return serverError("Failed to save message");
   }
 }

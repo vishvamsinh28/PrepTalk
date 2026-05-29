@@ -1,7 +1,7 @@
 import { getAblyRestClient } from "@/lib/ably";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { findSessionForUser } from "@/lib/sessionAccess";
 
 export async function GET(req) {
@@ -27,7 +27,7 @@ export async function GET(req) {
     const tokenRequest = await ably.auth.createTokenRequest({
       clientId: user.email,
       capability: JSON.stringify({
-        [`chat:${sessionId}`]: ["publish", "subscribe", "presence"],
+        [`chat:${sessionId}`]: ["subscribe", "presence"],
         [`video:${sessionId}`]: ["publish", "subscribe", "presence"],
         [`workspace:${sessionId}`]: ["publish", "subscribe"],
       }),
@@ -36,6 +36,6 @@ export async function GET(req) {
     return json(tokenRequest);
   } catch (error) {
     console.error("Ably token error:", error);
-    return json({ message: "Unable to create Ably token", error: error.message }, 500);
+    return serverError("Unable to create Ably token");
   }
 }

@@ -68,14 +68,10 @@ const WORKER_SOURCE = `
 
 export async function gradeLabAssessment(assessment, solutions = []) {
   const solutionByIndex = new Map();
-  const solutionByTitle = new Map();
 
   for (const solution of solutions) {
     if (Number.isInteger(solution.problemIndex)) {
       solutionByIndex.set(solution.problemIndex, String(solution.code || ""));
-    }
-    if (solution.title) {
-      solutionByTitle.set(String(solution.title), String(solution.code || ""));
     }
   }
   const problemResults = [];
@@ -84,7 +80,7 @@ export async function gradeLabAssessment(assessment, solutions = []) {
   let runtimeMs = 0;
 
   for (const [problemIndex, problem] of (assessment.problems || []).entries()) {
-    const code = solutionByIndex.get(problemIndex) ?? solutionByTitle.get(problem.title) ?? "";
+    const code = solutionByIndex.get(problemIndex) ?? "";
     const tests = [];
 
     for (const test of problem.tests || []) {

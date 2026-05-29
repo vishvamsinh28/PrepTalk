@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { findOwnedSession } from "@/lib/sessionAccess";
@@ -26,6 +26,6 @@ export async function DELETE(req, props) {
     return json({ message: "Session deleted" });
   } catch (error) {
     console.error("Session delete error:", error);
-    return json({ message: "Failed to delete session", error: error.message }, 500);
+    return serverError("Failed to delete session");
   }
 }

@@ -1,9 +1,12 @@
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { normalizeEmailList, normalizeStringList, normalizeText } from "@/lib/validation";
 import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
+
+const LEVELS = new Set(["Entry", "Mid", "Senior"]);
+const INTERVIEW_TYPES = new Set(["Technical", "Behavioral", "Mixed"]);
 
 function parseAgenda(agenda) {
   if (Array.isArray(agenda)) {
@@ -59,6 +62,18 @@ export async function POST(req) {
     if (!cleanTitle || !cleanRole) {
       return json({ message: "Session title and target role are required" }, 400);
     }
+    if (level && !LEVELS.has(level)) return json({ message: "Invalid level" }, 400);
+    if (interviewType && !INTERVIEW_TYPES.has(interviewType)) return json({ message: "Invalid interview type" }, 400);
+
+    const cleanDuration = Number.parseInt(durationMinutes, 10);
+    if (durationMinutes && (!Number.isFinite(cleanDuration) || cleanDuration < 15 || cleanDuration > 480)) {
+      return json({ message: "Duration must be between 15 and 480 minutes" }, 400);
+    }
+
+    const cleanScheduledAt = scheduledAt ? new Date(scheduledAt) : undefined;
+    if (scheduledAt && Number.isNaN(cleanScheduledAt.getTime())) {
+      return json({ message: "Invalid scheduled date" }, 400);
+    }
 
     await connectDB();
     const cleanInterviewees = normalizeEmailList(interviewees, 25);
@@ -74,13 +89,13 @@ export async function POST(req) {
       title: cleanTitle,
       description: normalizeText(description, 1200),
       role: cleanRole,
-      level,
-      interviewType,
+      level: level || "Entry",
+      interviewType: interviewType || "Technical",
       skills: normalizeStringList(skills, 20, 80),
       createdBy: payload.email,
       interviewees: cleanInterviewees,
-      scheduledAt: scheduledAt ? new Date(scheduledAt) : undefined,
-      durationMinutes: Number(durationMinutes) || 60,
+      scheduledAt: cleanScheduledAt,
+      durationMinutes: cleanDuration || 60,
       agenda: parseAgenda(agenda),
     });
 
@@ -89,6 +104,6 @@ export async function POST(req) {
     return json({ message: "Session created successfully", session: newSession }, 201);
   } catch (error) {
     console.error(error);
-    return json({ message: "Session creation failed", error: error.message }, 500);
+    return serverError("Session creation failed");
   }
 }

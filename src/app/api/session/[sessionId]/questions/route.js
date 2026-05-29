@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
@@ -74,7 +74,7 @@ export async function POST(req, props) {
     return json({ questions: questionBank, prepGuide });
   } catch (error) {
     console.error("Question generation error:", error);
-    return json({ message: "Failed to generate questions", error: error.message }, 500);
+    return serverError("Failed to generate questions");
   }
 }
 
@@ -95,6 +95,6 @@ export async function DELETE(req, props) {
     return json({ questions: [] });
   } catch (error) {
     console.error("Question clear error:", error);
-    return json({ message: "Failed to clear questions", error: error.message }, 500);
+    return serverError("Failed to clear questions");
   }
 }

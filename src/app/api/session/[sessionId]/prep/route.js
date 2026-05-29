@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
@@ -40,7 +40,7 @@ export async function POST(req, props) {
     return json({ prepGuide });
   } catch (error) {
     console.error("Prep guide generation error:", error);
-    return json({ message: "Failed to generate prep guide", error: error.message }, 500);
+    return serverError("Failed to generate prep guide");
   }
 }
 
@@ -61,6 +61,6 @@ export async function DELETE(req, props) {
     return json({ prepGuide: "" });
   } catch (error) {
     console.error("Prep guide clear error:", error);
-    return json({ message: "Failed to clear prep guide", error: error.message }, 500);
+    return serverError("Failed to clear prep guide");
   }
 }

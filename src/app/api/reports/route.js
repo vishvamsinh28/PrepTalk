@@ -1,10 +1,23 @@
 import { connectDB } from "@/lib/db";
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import InterviewReport from "@/models/InterviewReport";
 import Session from "@/models/Session";
 import { isValidObjectId } from "@/lib/sessionAccess";
-import { normalizeEmail, normalizeText } from "@/lib/validation";
+import { isValidEmail, normalizeEmail, normalizeText } from "@/lib/validation";
+
+const RECOMMENDATIONS = new Set(["Strong hire", "Hire", "Needs more practice", "No hire"]);
+const SCORE_KEYS = ["communication", "technicalDepth", "problemSolving", "confidence", "roleFit"];
+
+function normalizeScores(value) {
+  const normalized = {};
+  for (const key of SCORE_KEYS) {
+    const score = Number(value?.[key]);
+    if (!Number.isFinite(score) || score < 1 || score > 5) return null;
+    normalized[key] = Math.round(score);
+  }
+  return normalized;
+}
 
 export async function GET(req) {
   try {
@@ -21,7 +34,7 @@ export async function GET(req) {
     return json({ reports, canDeleteReports: user.role === "Interviewer" });
   } catch (error) {
     console.error("Report fetch error:", error);
-    return json({ message: "Failed to fetch reports", error: error.message }, 500);
+    return serverError("Failed to fetch reports");
   }
 }
 
@@ -36,10 +49,14 @@ export async function POST(req) {
     const body = await req.json();
     const { sessionId, intervieweeEmail, recommendation, scores, strengths, improvements, notes } = body;
     const cleanIntervieweeEmail = normalizeEmail(intervieweeEmail);
+    const cleanScores = normalizeScores(scores);
 
     if (!isValidObjectId(sessionId)) {
       return json({ message: "Invalid sessionId" }, 400);
     }
+    if (!isValidEmail(cleanIntervieweeEmail)) return json({ message: "Valid interviewee email is required" }, 400);
+    if (!RECOMMENDATIONS.has(recommendation)) return json({ message: "Invalid recommendation" }, 400);
+    if (!cleanScores) return json({ message: "Scores must be between 1 and 5" }, 400);
 
     await connectDB();
     const session = await Session.findById(sessionId);
@@ -59,7 +76,7 @@ export async function POST(req) {
         intervieweeEmail: cleanIntervieweeEmail,
         interviewerEmail: user.email,
         recommendation,
-        scores,
+        scores: cleanScores,
         strengths: normalizeText(strengths, 2000),
         improvements: normalizeText(improvements, 2000),
         notes: normalizeText(notes, 3000),
@@ -70,7 +87,7 @@ export async function POST(req) {
     return json({ report }, 201);
   } catch (error) {
     console.error("Report save error:", error);
-    return json({ message: "Failed to save report", error: error.message }, 500);
+    return serverError("Failed to save report");
   }
 }
 
@@ -99,6 +116,6 @@ export async function DELETE(req) {
     return json({ message: "Report deleted" });
   } catch (error) {
     console.error("Report delete error:", error);
-    return json({ message: "Failed to delete report", error: error.message }, 500);
+    return serverError("Failed to delete report");
   }
 }

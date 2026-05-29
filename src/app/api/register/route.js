@@ -1,8 +1,9 @@
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import { json } from "@/lib/api";
-import { normalizeEmail, normalizeText } from "@/lib/validation";
+import { json, serverError } from "@/lib/api";
+import { isValidEmail, normalizeEmail, normalizeText } from "@/lib/validation";
+import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 const allowedRoles = new Set(["Interviewer", "Interviewee"]);
 
@@ -12,8 +13,14 @@ export async function POST(req) {
     const cleanUsername = normalizeText(username, 80);
     const cleanEmail = normalizeEmail(email);
     const cleanRole = allowedRoles.has(role) ? role : "Interviewee";
+    const limiter = rateLimit({
+      key: `register:${getClientIp(req)}:${cleanEmail || "unknown"}`,
+      limit: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (limiter.limited) return rateLimitResponse();
 
-    if (!cleanUsername || !cleanEmail || !password) {
+    if (!cleanUsername || !isValidEmail(cleanEmail) || !password) {
       return json({ message: "Username, email, and password are required" }, 400);
     }
 
@@ -41,6 +48,6 @@ export async function POST(req) {
     return json({ message: "User registered successfully" }, 201);
   } catch (error) {
     console.error(error);
-    return json({ message: "Registration failed", error: error.message }, 500);
+    return serverError("Registration failed");
   }
 }

@@ -2,15 +2,22 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { createAuthCookie, signAuthToken } from "@/lib/auth";
-import { json } from "@/lib/api";
-import { normalizeEmail } from "@/lib/validation";
+import { json, serverError } from "@/lib/api";
+import { isValidEmail, normalizeEmail } from "@/lib/validation";
+import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 export async function POST(req) {
   try {
     const { email, password } = await req.json();
     const cleanEmail = normalizeEmail(email);
+    const limiter = rateLimit({
+      key: `login:${getClientIp(req)}:${cleanEmail || "unknown"}`,
+      limit: 8,
+      windowMs: 15 * 60 * 1000,
+    });
+    if (limiter.limited) return rateLimitResponse();
 
-    if (!cleanEmail || !password) {
+    if (!isValidEmail(cleanEmail) || !password) {
       return json({ message: "Email and password are required" }, 400);
     }
 
@@ -34,6 +41,6 @@ export async function POST(req) {
     });
   } catch (error) {
     console.error(error);
-    return json({ message: "Login failed", error: error.message }, 500);
+    return serverError("Login failed");
   }
 }

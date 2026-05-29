@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { generateGeminiJson } from "@/lib/gemini";
@@ -52,6 +52,6 @@ export async function POST(req) {
     return json({ report });
   } catch (error) {
     console.error("Report summary error:", error);
-    return json({ message: "Failed to generate report summary", error: error.message }, 500);
+    return serverError("Failed to generate report summary");
   }
 }

@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import InterviewReport from "@/models/InterviewReport";
@@ -30,6 +30,6 @@ export async function GET(req) {
     return json({ totalReports: reports.length, averages });
   } catch (error) {
     console.error("Progress fetch error:", error);
-    return json({ message: "Failed to fetch progress", error: error.message }, 500);
+    return serverError("Failed to fetch progress");
   }
 }

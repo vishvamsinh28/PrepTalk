@@ -1,4 +1,4 @@
-import { json } from "@/lib/api";
+import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { findSessionForUser } from "@/lib/sessionAccess";
@@ -17,7 +17,7 @@ export async function GET(req, props) {
     return json({ workspace: session.workspace || { notes: "", code: "" } });
   } catch (error) {
     console.error("Workspace fetch error:", error);
-    return json({ message: "Failed to fetch workspace", error: error.message }, 500);
+    return serverError("Failed to fetch workspace");
   }
 }
 
@@ -42,6 +42,6 @@ export async function PATCH(req, props) {
     return json({ workspace });
   } catch (error) {
     console.error("Workspace save error:", error);
-    return json({ message: "Failed to save workspace", error: error.message }, 500);
+    return serverError("Failed to save workspace");
   }
 }

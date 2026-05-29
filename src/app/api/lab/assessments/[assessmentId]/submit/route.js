@@ -5,6 +5,7 @@ import { gradeLabAssessment } from "@/lib/labServerRunner";
 import { assessmentIsExpired, userCanAccessAssessment } from "@/lib/labAccess";
 import { isValidObjectId } from "@/lib/sessionAccess";
 import LabAssessment from "@/models/LabAssessment";
+import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 export async function POST(req, props) {
   try {
@@ -12,6 +13,12 @@ export async function POST(req, props) {
     if (!user) return json({ message: "Unauthorized" }, 401);
     if (user.role !== "Interviewee") return json({ message: "Only interviewees can submit Lab assessments" }, 403);
     const userEmail = String(user.email || "").toLowerCase();
+    const limiter = rateLimit({
+      key: `lab-submit:${userEmail}:${getClientIp(req)}`,
+      limit: 12,
+      windowMs: 60 * 60 * 1000,
+    });
+    if (limiter.limited) return rateLimitResponse();
 
     const { assessmentId } = await props.params;
     if (!isValidObjectId(assessmentId)) return json({ message: "Invalid assessmentId" }, 400);
@@ -45,8 +52,29 @@ export async function POST(req, props) {
       problemResults: grade.problemResults,
     };
 
-    assessment.submissions.push(submission);
-    await assessment.save();
+    const updated = await LabAssessment.findOneAndUpdate(
+      {
+        _id: assessmentId,
+        $expr: {
+          $lt: [
+            {
+              $size: {
+                $filter: {
+                  input: "$submissions",
+                  as: "submission",
+                  cond: { $eq: [{ $toLower: "$$submission.candidateEmail" }, userEmail] },
+                },
+              },
+            },
+            20,
+          ],
+        },
+      },
+      { $push: { submissions: submission } },
+      { new: true }
+    );
+
+    if (!updated) return json({ message: "Submission limit reached for this assessment" }, 429);
 
     return json({
       message: "Lab assessment submitted",
