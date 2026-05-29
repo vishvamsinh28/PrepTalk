@@ -26,9 +26,9 @@ export default function CodeEditorPanel({
   };
 
   return (
-    <section className="grid h-full min-h-0 min-w-0 grid-rows-[4.25rem_minmax(0,1fr)] overflow-hidden bg-[#07101d]">
-      <div className="flex min-w-0 items-center justify-between gap-4 border-b border-white/10 bg-[#08111f] px-6">
-        <div className="flex min-w-0 items-center gap-4">
+    <section className="grid h-[34rem] min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-[#07101d] lg:h-full lg:grid-rows-[4rem_minmax(0,1fr)]">
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-[#08111f] px-3 py-3 sm:px-4 lg:flex-nowrap lg:px-5 lg:py-0">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <span className="inline-flex items-center gap-2 font-black text-white"><FaCode className="text-cyan-200" /> Editor</span>
           <span className="hidden rounded-lg border border-white/10 bg-white/8 px-4 py-2 text-sm font-bold text-slate-200 sm:inline-flex">
             JavaScript
@@ -37,24 +37,24 @@ export default function CodeEditorPanel({
             Keep the function name <code className="text-cyan-100">solve</code>.
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-3">
-          <span className="inline-flex items-center gap-2 rounded-md border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 font-mono text-sm font-black text-emerald-100">
+        <div className="flex min-w-0 flex-1 shrink-0 items-center justify-end gap-2 sm:flex-none">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-300/25 bg-emerald-300/10 px-2.5 py-2 font-mono text-xs font-black text-emerald-100 sm:text-sm">
             <FaClock /> {formattedTime}
           </span>
-          <button onClick={onExit} className="rounded-md border border-rose-300/25 bg-rose-400/10 px-4 py-2 text-sm font-bold text-rose-100">
+          <button onClick={onExit} className="rounded-md border border-rose-300/25 bg-rose-400/10 px-3 py-2 text-xs font-bold text-rose-100 sm:text-sm">
             Exit
           </button>
-          <button onClick={onSubmit} disabled={isRunning} className="rounded-md bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-2 text-sm font-black text-slate-950 disabled:opacity-60">
+          <button onClick={onSubmit} disabled={isRunning} className="rounded-md bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-3 py-2 text-xs font-black text-slate-950 disabled:opacity-60 sm:text-sm">
             Submit
           </button>
         </div>
       </div>
 
       <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-        <div className="grid min-h-0 min-w-0 grid-cols-[4rem_minmax(0,1fr)] overflow-hidden">
-          <div ref={lineRef} className="min-h-0 select-none overflow-hidden border-r border-white/10 bg-[#08111f] py-4 text-right font-mono text-sm leading-7 text-slate-500">
+        <div className="grid min-h-0 min-w-0 grid-cols-[3rem_minmax(0,1fr)] overflow-hidden lg:grid-cols-[3.5rem_minmax(0,1fr)]">
+          <div ref={lineRef} className="min-h-0 select-none overflow-hidden border-r border-white/10 bg-[#08111f] py-3 text-right font-mono text-xs leading-6 text-slate-500 sm:text-sm lg:leading-7">
             {lineNumbers.map((line) => (
-              <div key={line} className="px-3">
+              <div key={line} className="px-2 sm:px-3">
                 {line}
               </div>
             ))}
@@ -63,7 +63,7 @@ export default function CodeEditorPanel({
             <pre
               ref={highlightRef}
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre p-4 font-mono text-base leading-7"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre p-3 font-mono text-sm leading-6 sm:text-base lg:leading-7"
             >
               <code>{highlightJavaScript(code)}</code>
             </pre>
@@ -78,20 +78,20 @@ export default function CodeEditorPanel({
               onScroll={syncScroll}
               spellCheck={false}
               wrap="off"
-              className="relative h-full min-h-0 w-full resize-none overflow-auto whitespace-pre bg-transparent p-4 font-mono text-base leading-7 text-transparent caret-cyan-100 outline-none selection:bg-cyan-300/25"
+              className="relative h-full min-h-0 w-full resize-none overflow-auto whitespace-pre bg-transparent p-3 font-mono text-sm leading-6 text-transparent caret-cyan-100 outline-none selection:bg-cyan-300/25 sm:text-base lg:leading-7"
               aria-label="Code editor"
             />
           </div>
         </div>
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#08111f] px-6 py-3">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-6 gap-y-2 text-sm font-semibold text-slate-400">
+        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#08111f] px-3 py-3 sm:px-4 lg:px-5">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-slate-400 sm:text-sm">
             <span>{lineNumbers.length} lines</span>
             <span>Visible tests run locally. Final score is graded on the server. Do not rename <code className="text-cyan-100">solve</code>.</span>
           </div>
           <button
             onClick={() => runTests(false)}
             disabled={isRunning}
-            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-emerald-300/35 bg-emerald-300/10 px-5 py-2 font-black text-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-emerald-300/35 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FaPlay />
             {isRunning ? "Running..." : "Run Code"}

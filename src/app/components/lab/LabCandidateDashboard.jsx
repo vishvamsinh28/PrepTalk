@@ -219,14 +219,14 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
 
   if (activeAssessment && activeProblem) {
     return (
-      <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-5 pt-24 text-slate-50">
+      <div className="app-shell relative min-h-screen overflow-x-hidden px-3 pb-5 pt-24 text-slate-50 sm:px-5 lg:overflow-hidden">
         <div className="soft-grid absolute inset-0 opacity-60" />
         {submissionError && (
           <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-lg border border-rose-300/25 bg-rose-400/10 px-5 py-3 font-bold text-rose-100">
             {submissionError}
           </div>
         )}
-        <div className="relative z-10 mx-auto grid h-[calc(100vh-7rem)] max-w-[96rem] overflow-hidden rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20 lg:grid-cols-[5.75rem_1fr]">
+        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20 lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
           <ProblemRail problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
           <main
             className="grid min-h-0 min-w-0 lg:grid-cols-[var(--problem-panel-width)_0.5rem_minmax(0,1fr)]"
@@ -239,7 +239,7 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
               aria-label="Resize problem and editor panels"
               title="Drag to resize panels"
             />
-            <section className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
+            <section className="grid min-h-0 min-w-0 grid-rows-[auto_auto] overflow-visible lg:grid-rows-[minmax(0,1fr)_auto] lg:overflow-hidden">
               <CodeEditorPanel
                 activeProblemId={activeProblem.id}
                 code={currentCode}
@@ -335,13 +335,13 @@ function formatCandidateDeadline(value) {
 
 function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) {
   return (
-    <aside className="hidden border-r border-white/10 bg-slate-950/55 lg:grid lg:grid-rows-[4.25rem_1fr]">
-      <div className="grid place-items-center border-b border-white/10 px-4">
+    <aside className="border-b border-white/10 bg-slate-950/55 lg:grid lg:grid-rows-[4rem_1fr] lg:border-b-0 lg:border-r">
+      <div className="hidden place-items-center border-b border-white/10 px-4 lg:grid">
         <span className="grid h-10 w-10 place-items-center rounded-md border border-cyan-300/25 bg-cyan-300/10 text-cyan-100" title="Questions">
           <FaListOl />
         </span>
       </div>
-      <div className="grid content-start gap-3 px-3 py-5 text-center">
+      <div className="flex gap-2 overflow-x-auto px-3 py-3 text-center lg:grid lg:content-start lg:gap-3 lg:overflow-visible lg:py-5">
         {problems.map((problem, index) => {
           const results = resultsByProblem[problem.id] || [];
           const failed = results.some((result) => result.status === "failed");
@@ -350,7 +350,7 @@ function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) 
             <div key={problem.id}>
               <button
                 onClick={() => onSelect(problem.id)}
-                className={`grid h-12 w-full place-items-center rounded-md border text-sm font-black ${
+                className={`grid h-10 min-w-14 place-items-center rounded-md border px-3 text-sm font-black lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
                   activeProblemId === problem.id ? "border-cyan-300/60 bg-cyan-300/10 text-white" : "border-transparent text-slate-300 hover:border-white/10 hover:bg-white/5"
                 }`}
               >
