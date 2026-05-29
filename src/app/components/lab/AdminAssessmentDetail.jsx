@@ -92,23 +92,23 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
   };
 
   return (
-    <main className="relative z-10 mx-auto max-w-7xl">
+    <main className="relative z-10 mx-auto w-full max-w-7xl min-w-0">
       <div>
-        <button onClick={onBack} className="mb-5 text-cyan-200">Assessments <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> {assessment.title}</button>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <h1 className="text-4xl font-black text-white">{assessment.title}</h1>
-          <div className="flex items-center gap-3">
-            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/8 px-6 py-3 font-black text-slate-100"><FaShareAlt /> Copy link</button>
+        <button onClick={onBack} className="mb-4 text-sm text-cyan-200 sm:mb-5 sm:text-base">Assessments <FaChevronRight className="mx-2 inline text-xs text-slate-500" /> {assessment.title}</button>
+        <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <h1 className="max-w-4xl text-3xl font-black leading-tight text-white sm:text-4xl">{assessment.title}</h1>
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3 lg:justify-end">
+            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/8 px-3 py-2.5 text-sm font-black text-slate-100 sm:px-5 sm:py-3 sm:text-base"><FaShareAlt /> Copy link</button>
             <button
               onClick={() => setShowReport(!showReport)}
               aria-expanded={showReport}
-              className={`inline-flex items-center gap-2 rounded-lg border px-6 py-3 font-black transition ${showReport ? "border-cyan-300/40 bg-cyan-300/15 text-cyan-50 shadow-lg shadow-cyan-950/30" : "border-white/10 bg-white/8 text-slate-100 hover:border-white/20"}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-black transition sm:px-5 sm:py-3 sm:text-base ${showReport ? "border-cyan-300/40 bg-cyan-300/15 text-cyan-50 shadow-lg shadow-cyan-950/30" : "border-white/10 bg-white/8 text-slate-100 hover:border-white/20"}`}
             >
               <span className={`h-2.5 w-2.5 rounded-full ${showReport ? "bg-cyan-200" : "bg-slate-500"}`} />
               {showReport ? "Hide report" : "View report"}
             </button>
-            <button onClick={exportPdf} className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-6 py-3 font-black text-cyan-100"><FaDownload /> Export PDF</button>
-            <button onClick={onDelete} className="rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-rose-100"><FaTrash /></button>
+            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2.5 text-sm font-black text-cyan-100 sm:px-5 sm:py-3 sm:text-base"><FaDownload /> Export PDF</button>
+            <button onClick={onDelete} className="grid place-items-center rounded-lg border border-rose-300/25 bg-rose-400/10 px-3 py-2.5 text-rose-100 sm:px-4 sm:py-3"><FaTrash /></button>
           </div>
         </div>
         {notice && (
@@ -116,17 +116,17 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
             {notice}
           </div>
         )}
-        <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_26rem]">
-          <div className="flex max-h-[52rem] flex-col rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
-            <div className="flex items-center justify-between border-b border-white/10 px-8 py-7">
+        <section className="mt-6 grid items-start gap-5 lg:mt-8 lg:grid-cols-[minmax(0,1fr)_24rem] xl:grid-cols-[minmax(0,1fr)_26rem]">
+          <div className="flex min-w-0 flex-col rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20">
+            <div className="flex flex-col gap-3 border-b border-white/10 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8 lg:py-7">
               <div>
-                <p><span className="text-lg font-black text-white">Duration:</span> <span className="ml-5 text-xl text-slate-300">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
+                <p><span className="font-black text-white sm:text-lg">Duration:</span> <span className="ml-3 text-lg text-slate-300 sm:ml-5 sm:text-xl">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
                 <p className="mt-2 text-sm font-semibold text-slate-400">Deadline: {formatDateTime(assessment.deadlineAt)}</p>
               </div>
               <span className="inline-flex items-center gap-2 text-emerald-100"><span className="h-3 w-3 rounded-full bg-emerald-300" /> Active</span>
             </div>
-            <div className="min-h-0 overflow-auto p-8">
-              <h2 className="mb-7 text-2xl font-black text-white">Sections ({draftProblems.length})</h2>
+            <div className="min-h-0 overflow-auto p-4 sm:p-6 lg:p-8">
+              <h2 className="mb-5 text-xl font-black text-white sm:mb-7 sm:text-2xl">Sections ({draftProblems.length})</h2>
               {draftProblems.map((problem, index) => (
                 <EditableSection
                   key={index}
@@ -140,7 +140,7 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               ))}
             </div>
           </div>
-          <aside className="glass-panel max-h-[52rem] overflow-auto rounded-xl p-7">
+          <aside className="glass-panel overflow-auto rounded-xl p-4 sm:p-6 lg:max-h-[52rem] lg:p-7">
             <h2 className="font-black text-white">Role</h2>
             <p className="mt-3 text-slate-300">{assessment.title.replace(" Hiring Test", "")}</p>
             <section className="mt-8 rounded-lg border border-white/10 bg-white/5 p-4">
@@ -210,18 +210,18 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
   const tests = problem.tests || [];
 
   return (
-    <section className="border-b border-white/10 py-5">
-      <button onClick={() => setOpen(!open)} className="flex w-full min-w-0 items-center gap-5 text-left">
+    <section className="border-b border-white/10 py-4 sm:py-5">
+      <button onClick={() => setOpen(!open)} className="flex w-full min-w-0 items-center gap-3 text-left sm:gap-5">
         <FaChevronRight className={open ? "shrink-0 rotate-90 text-cyan-200 transition" : "shrink-0 text-slate-500 transition"} />
         <SkillIcon index={problemIndex} />
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-lg font-semibold text-white">{sectionName(problem, problemIndex)}</span>
+          <span className="block truncate text-base font-semibold text-white sm:text-lg">{sectionName(problem, problemIndex)}</span>
           <span className="text-slate-400">{tests.length} test case{tests.length === 1 ? "" : "s"}</span>
         </span>
         <span className="hidden shrink-0 text-slate-300 sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
       </button>
       {open && (
-        <div className="mt-5 grid gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-5">
+        <div className="mt-5 grid gap-4 rounded-lg border border-white/10 bg-slate-950/35 p-3 sm:p-5">
           <div className="grid gap-4 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -240,32 +240,32 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
             <span className="field-label">Starter code</span>
             <textarea value={problem.starterCode || ""} onChange={(event) => onUpdate({ starterCode: event.target.value })} className="field-surface field-control min-h-36 font-mono" />
           </label>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-black text-white">Test cases</h3>
             <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-md border border-cyan-300/20 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100"><FaPlus /> Add case</button>
           </div>
-          <div className="max-h-96 overflow-auto pr-1">
+          <div className="max-h-[28rem] overflow-auto pr-1">
             <div className="grid gap-3">
               {tests.map((test, testIndex) => (
-                <div key={testIndex} className="grid gap-3 rounded-lg border border-white/10 bg-white/5 p-4 xl:grid-cols-[1fr_1.2fr_1.2fr_auto_auto]">
-                  <label className="field-group">
+                <div key={testIndex} className="grid min-w-0 gap-3 rounded-lg border border-white/10 bg-white/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
+                  <label className="field-group min-w-0">
                     <span className="field-label">Case name</span>
                     <input value={test.name || ""} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
                   </label>
-                  <label className="field-group">
+                  <label className="field-group min-w-0">
                     <span className="field-label">Input JSON</span>
-                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-20 font-mono text-sm" />
+                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-16 font-mono text-sm" />
                   </label>
-                  <label className="field-group">
+                  <label className="field-group min-w-0">
                     <span className="field-label">Expected JSON</span>
-                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-20 font-mono text-sm" />
+                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-16 font-mono text-sm" />
                   </label>
-                  <label className="flex items-center gap-3 rounded-md border border-white/10 bg-slate-950/30 px-3 py-2 text-sm font-bold text-slate-200 xl:mt-6">
+                  <label className="flex items-center gap-3 rounded-md border border-white/10 bg-slate-950/30 px-3 py-2 text-sm font-bold text-slate-200 xl:mt-6 xl:min-h-12">
                     <input type="checkbox" checked={Boolean(test.visible)} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
                     Visible
                   </label>
                   {tests.length > 1 && (
-                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-12 w-12 place-items-center rounded-md border border-rose-300/20 bg-rose-400/10 text-rose-100 xl:mt-6" title="Delete test case">
+                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-11 w-11 place-items-center rounded-md border border-rose-300/20 bg-rose-400/10 text-rose-100 xl:mt-6 xl:h-12 xl:w-12" title="Delete test case">
                       <FaTrash />
                     </button>
                   )}
@@ -300,13 +300,13 @@ function ReportViewer({ report }) {
   }, [selectedKey, selectedSubmission]);
 
   return (
-    <section className="mt-6 flex h-[46rem] flex-col rounded-xl border border-white/10 bg-slate-950/45 p-6 shadow-xl shadow-black/20">
+    <section className="mt-6 flex min-w-0 flex-col rounded-xl border border-white/10 bg-slate-950/45 p-3 shadow-xl shadow-black/20 sm:p-6 lg:h-[46rem]">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-white">Submission report</h2>
           <p className="mt-2 text-slate-400">{report.submissions.length} submission{report.submissions.length === 1 ? "" : "s"} captured. Select one report to inspect.</p>
         </div>
-        <label className="min-w-72">
+        <label className="w-full sm:min-w-72 sm:w-auto">
           <span className="sr-only">Search reports</span>
           <input
             value={query}
@@ -316,8 +316,8 @@ function ReportViewer({ report }) {
           />
         </label>
       </div>
-      <div className="mt-5 grid min-h-0 flex-1 gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <div className="min-h-0 rounded-lg border border-white/10 bg-white/5">
+      <div className="mt-5 grid min-h-0 min-w-0 flex-1 gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
+        <div className="min-h-0 min-w-0 rounded-lg border border-white/10 bg-white/5">
           <div className="border-b border-white/10 px-4 py-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400">
             Reports
           </div>
@@ -351,28 +351,28 @@ function ReportViewer({ report }) {
         </div>
 
         {selectedSubmission ? (
-          <article className="min-h-0 min-w-0 overflow-auto rounded-lg border border-white/10 bg-white/5 p-5">
+          <article className="min-h-0 min-w-0 overflow-auto rounded-lg border border-white/10 bg-white/5 p-3 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 className="font-black text-white">{selectedSubmission.candidateEmail}</h3>
+              <div className="min-w-0">
+                <h3 className="break-all font-black text-white">{selectedSubmission.candidateEmail}</h3>
                 <p className="mt-1 text-sm text-slate-400">Attempt {selectedSubmission.attempts} · Submitted · {selectedSubmission.score}/{selectedSubmission.maxScore} · {selectedSubmission.passedTests}/{selectedSubmission.totalTests} tests passed</p>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <span className={`rounded-full border px-3 py-1 text-sm font-bold ${statusTone(selectedSubmission.resultStatus)}`}>{selectedSubmission.resultStatus}</span>
-                <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-sm font-bold text-cyan-100">{formatDateTime(selectedSubmission.submittedAt)}</span>
+                <span className="max-w-full rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-sm font-bold text-cyan-100">{formatDateTime(selectedSubmission.submittedAt)}</span>
               </div>
             </div>
-            <div className="mt-5 grid gap-4">
+            <div className="mt-5 grid min-w-0 gap-4">
               {selectedSubmission.sections.map((section) => (
-                <section key={`${selectedSubmission.candidateEmail}-${section.problemIndex}`} className="rounded-lg border border-white/10 bg-slate-950/45 p-4">
+                <section key={`${selectedSubmission.candidateEmail}-${section.problemIndex}`} className="min-w-0 rounded-lg border border-white/10 bg-slate-950/45 p-3 sm:p-4">
                   <div className="flex flex-wrap justify-between gap-3">
-                    <h4 className="font-black text-white">Q{section.problemIndex + 1}: {section.title}</h4>
+                    <h4 className="min-w-0 break-words font-black text-white">Q{section.problemIndex + 1}: {section.title}</h4>
                     <span className="text-sm font-bold text-slate-300">{section.score}/{section.maxScore}</span>
                   </div>
-                  <pre className="mt-3 max-h-56 overflow-auto rounded-md border border-white/10 bg-black/25 p-3 text-xs leading-5 text-cyan-50">{section.code || "No code submitted."}</pre>
+                  <pre className="mt-3 max-h-56 min-w-0 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-white/10 bg-black/25 p-3 text-xs leading-5 text-cyan-50 sm:whitespace-pre">{section.code || "No code submitted."}</pre>
                   <div className="mt-3 grid gap-2">
                     {section.tests.map((test) => (
-                      <div key={test.name} className={`rounded-md border px-3 py-2 text-sm ${test.passed ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100" : "border-rose-300/20 bg-rose-400/10 text-rose-100"}`}>
+                      <div key={test.name} className={`min-w-0 break-words rounded-md border px-3 py-2 text-sm ${test.passed ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100" : "border-rose-300/20 bg-rose-400/10 text-rose-100"}`}>
                         <b>{test.name}</b> · {test.passed ? "Passed" : "Failed"}{test.error ? ` · ${test.error}` : ""}
                       </div>
                     ))}

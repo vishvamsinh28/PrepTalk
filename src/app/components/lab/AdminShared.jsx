@@ -14,7 +14,7 @@ export function Toast({ tone, text }) {
 export function SkillIcon({ index }) {
   const icons = [<FaPuzzlePiece key="p" />, <FaCode key="c" />, <FaDatabase key="d" />];
   return (
-    <span className="grid h-14 w-14 place-items-center rounded-xl border border-cyan-300/25 bg-cyan-300/10 text-cyan-100">
+    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 sm:h-14 sm:w-14">
       {icons[index % icons.length]}
     </span>
   );
