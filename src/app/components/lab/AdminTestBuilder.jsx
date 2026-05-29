@@ -41,7 +41,7 @@ export default function AdminTestBuilder({
               <h2 className="text-xl font-black text-white sm:text-2xl">Sections ({form.problems.length})</h2>
               <button onClick={onAddProblem} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100 sm:w-auto"><FaPlus /> Add section</button>
             </div>
-            <div className="grid min-h-0 flex-1 content-start gap-2 overflow-y-auto overscroll-contain pr-1 sm:pr-2">
+            <div className="grid min-h-0 flex-1 content-start gap-2 pr-1 sm:pr-2 lg:overflow-y-auto lg:overscroll-contain">
               {form.problems.map((problem, problemIndex) => (
                 <ProblemBuilder
                   key={problemIndex}
