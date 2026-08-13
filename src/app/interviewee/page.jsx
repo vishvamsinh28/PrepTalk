@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/serverAuth";
 import IntervieweeSessionList from "../components/IntervieweeSessionList";
 import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
+import PageHeader, { SignedInAs, SectionHeading } from "../components/ui/PageHeader";
 
 export default async function IntervieweePage() {
   const userData = await getCurrentUser();
@@ -15,35 +16,22 @@ export default async function IntervieweePage() {
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-20 pt-28">
-      <div className="soft-grid absolute inset-0 z-0 opacity-60"></div>
+    <div className="app-shell min-h-screen px-8 pb-24 pt-28">
+      <div className="mx-auto max-w-[84rem]">
+        <PageHeader
+          eyebrow="Interviewee workspace"
+          title="Your practice room"
+          description="Join the sessions assigned to you, read the prep material, and track what changed between rounds."
+          meta={<SignedInAs email={userData.email} />}
+        />
 
-      <div className="relative z-10 mx-auto max-w-7xl">
-        <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
-          <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">Interviewee workspace</p>
-            <h1 className="text-5xl font-semibold tracking-tight gradient-text">Your practice room</h1>
-            <p className="mt-3 max-w-2xl text-ink-soft">Join assigned sessions, review prep guidance, and track your feedback history.</p>
-          </div>
-          <div className="glass-panel rounded-2xl p-4 text-sm text-ink-soft">
-            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Signed in as</span>
-            <span className="mt-1 block break-all text-ink">{userData.email}</span>
-          </div>
-        </div>
-
-        <section>
-          <div className="mb-5">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Assigned</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-ink">Your Sessions</h2>
-          </div>
+        <section className="mt-14">
+          <SectionHeading eyebrow="Assigned" title="Your sessions" />
           <IntervieweeSessionList />
         </section>
 
-        <section className="mt-14">
-          <div className="mb-5">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Feedback</p>
-            <h2 className="text-3xl font-semibold tracking-tight text-ink">Your Reports</h2>
-          </div>
+        <section className="mt-20 border-t border-rule pt-14">
+          <SectionHeading eyebrow="Feedback" title="Your reports" />
           <ReportList />
         </section>
       </div>

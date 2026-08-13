@@ -222,11 +222,11 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
       <div className="app-shell relative min-h-screen overflow-x-hidden px-3 pb-5 pt-24 text-ink sm:px-5 lg:overflow-hidden">
         <div className="soft-grid absolute inset-0 opacity-60" />
         {submissionError && (
-          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-lg border border-rose-600/40 bg-rose-50 px-5 py-3 font-bold text-rose-700">
+          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-[4px] border border-rose-600/40 bg-rose-50 px-5 py-3 font-bold text-rose-700">
             {submissionError}
           </div>
         )}
-        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-xl border border-[#2b2620] bg-[#151311] shadow-lg lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
+        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-[4px] border border-[#2b2620] bg-[#151311] shadow-lg lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
           <ProblemRail problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
           <main
             className="grid min-h-0 min-w-0 lg:grid-cols-[var(--problem-panel-width)_0.5rem_minmax(0,1fr)]"
@@ -271,36 +271,36 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
     <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24 text-ink">
       <div className="soft-grid absolute inset-0 opacity-60" />
       <main className="relative z-10 mx-auto max-w-6xl">
-        <section className="glass-panel rounded-xl p-6">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-accent">PrepTalk Lab</p>
-          <h1 className="mt-2 text-4xl font-semibold gradient-text">Assigned assessments</h1>
+        <section className="panel rounded-[4px] p-6">
+          <p className="app-eyebrow">PrepTalk Lab</p>
+          <h1 className="app-title mt-3">Assigned assessments</h1>
           <p className="mt-3 text-ink-soft">Start an assigned coding assessment when you are ready.</p>
         </section>
-        {submitMessage && <p className="mt-5 rounded-lg border border-emerald-600/40 bg-emerald-50 p-4 text-emerald-700">{submitMessage}</p>}
+        {submitMessage && <p className="mt-5 rounded-[4px] border border-emerald-600/40 bg-emerald-50 p-4 text-emerald-700">{submitMessage}</p>}
         <div className="mt-8 max-h-[calc(100vh-22rem)] min-h-[18rem] overflow-auto pr-2">
           <div className="grid gap-5">
           {initialAssessmentId && !assessments.some((assessment) => assessment._id === initialAssessmentId) && (
-            <div className="rounded-xl border border-amber-600/40 bg-amber-50 p-5 font-semibold text-amber-700">
+            <div className="rounded-[4px] border border-amber-600/40 bg-amber-50 p-5 font-semibold text-amber-700">
               The invited assessment was not found for this account. Make sure you are logged in with the assigned candidate email.
             </div>
           )}
           {sortedAssessments.map((assessment) => (
-            <article key={assessment._id} className="rounded-xl border border-rule bg-white p-6 shadow-xl">
+            <article key={assessment._id} className="rounded-[4px] border border-rule bg-white p-6 shadow-xl">
               <div className="flex flex-wrap items-center justify-between gap-5">
                 <div>
                   <p className="font-semibold text-emerald-700"><FaClock className="mr-2 inline" />{assessment.durationMinutes} mins</p>
-                  <h2 className="mt-3 text-2xl font-semibold text-ink">{assessment.title}</h2>
+                  <h2 className="app-h2 mt-3">{assessment.title}</h2>
                   <p className="mt-2 text-ink-soft">{assessment.problems?.length || 0} sections · {assessment.submissions?.length || 0} completed attempts · Due {formatCandidateDeadline(assessment.deadlineAt)}</p>
                   <CandidateStatus assessment={assessment} />
                 </div>
-                <button onClick={() => startAssessment(assessment)} className="inline-flex items-center gap-2 rounded-lg bg-ink px-5 py-3 font-semibold text-canvas">
+                <button onClick={() => startAssessment(assessment)} className="inline-flex items-center gap-2 rounded-[4px] bg-ink px-5 py-3 font-semibold text-canvas">
                   <FaPlay />
                   {(assessment.submissions?.length || 0) > 0 ? "Retry assessment" : "Start assessment"}
                 </button>
               </div>
             </article>
           ))}
-          {assessments.length === 0 && <div className="rounded-xl border border-rule bg-white p-6 text-ink-soft">No assigned assessments.</div>}
+          {assessments.length === 0 && <div className="rounded-[4px] border border-rule bg-white p-6 text-ink-soft">No assigned assessments.</div>}
           </div>
         </div>
       </main>
@@ -337,7 +337,7 @@ function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) 
   return (
     <aside className="border-b border-white/10 bg-[#1e1a17] lg:grid lg:grid-rows-[4rem_1fr] lg:border-b-0 lg:border-r">
       <div className="hidden place-items-center border-b border-white/10 px-4 lg:grid">
-        <span className="grid h-10 w-10 place-items-center rounded-md border border-accent bg-accent/20 text-[#e4633f]" title="Questions">
+        <span className="grid h-10 w-10 place-items-center rounded-[3px] border border-accent bg-accent/20 text-[#e4633f]" title="Questions">
           <FaListOl />
         </span>
       </div>
@@ -350,7 +350,7 @@ function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) 
             <div key={problem.id}>
               <button
                 onClick={() => onSelect(problem.id)}
-                className={`grid h-10 min-w-14 place-items-center rounded-md border px-3 text-sm font-semibold lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
+                className={`grid h-10 min-w-14 place-items-center rounded-[3px] border px-3 text-sm font-semibold lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
                   activeProblemId === problem.id ? "border-accent bg-accent/20 text-white" : "border-transparent text-white/60 hover:border-white/20 hover:bg-white/5"
                 }`}
               >

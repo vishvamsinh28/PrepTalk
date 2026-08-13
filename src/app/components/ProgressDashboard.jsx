@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
-import { FaChartLine, FaSpinner } from "react-icons/fa";
+import { SectionHeading } from "./ui/PageHeader";
 
 const labels = {
   communication: "Communication",
-  technicalDepth: "Technical",
+  technicalDepth: "Technical depth",
   problemSolving: "Problem solving",
   confidence: "Confidence",
   roleFit: "Role fit",
@@ -24,40 +24,44 @@ export default function ProgressDashboard() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="glass-panel rounded-2xl p-6 text-accent">
-        <FaSpinner className="mr-2 inline animate-spin" />
-        Loading progress...
-      </div>
-    );
+    return <p className="app-eyebrow py-8">Loading progress…</p>;
   }
 
   const averages = progress?.averages || {};
+  const total = progress?.totalReports || 0;
 
   return (
-    <section className="glass-panel rounded-2xl p-6">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Progress</p>
-          <h2 className="mt-1 text-2xl font-semibold text-ink">Score averages</h2>
-        </div>
-        <div className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-canvas">
-          <FaChartLine />
-        </div>
-      </div>
+    <section>
+      <SectionHeading
+        eyebrow="Progress"
+        title="Score averages"
+        action={
+          <p className="text-sm text-ink-soft">
+            Across {total} report{total === 1 ? "" : "s"}
+          </p>
+        }
+      />
 
-      <div className="grid gap-3 sm:grid-cols-5">
-        {Object.entries(labels).map(([key, label]) => (
-          <div key={key} className="rounded-2xl border border-rule bg-white p-3">
-            <p className="text-xs text-ink-soft">{label}</p>
-            <p className="mt-1 text-3xl font-semibold gradient-text">{averages[key] || 0}</p>
-          </div>
-        ))}
-      </div>
-
-      <p className="mt-4 text-sm text-ink-soft">
-        Based on {progress?.totalReports || 0} submitted report{progress?.totalReports === 1 ? "" : "s"}.
-      </p>
+      {total === 0 ? (
+        <div className="border-y border-rule py-14 text-center">
+          <p className="app-h3">No scored sessions yet.</p>
+          <p className="mt-2 text-sm text-ink-soft">
+            Averages appear here once an interviewer submits a scorecard.
+          </p>
+        </div>
+      ) : (
+        <dl className="grid grid-cols-2 border-t border-rule sm:grid-cols-5">
+          {Object.entries(labels).map(([key, label]) => (
+            <div key={key} className="border-b border-r border-rule px-5 py-6 last:border-r-0">
+              <dt className="app-eyebrow">{label}</dt>
+              <dd className="landing-serif mt-3 text-[2.5rem] leading-none text-ink">
+                {averages[key] ?? 0}
+                <span className="ml-1 align-baseline text-base text-ink-soft">/5</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
     </section>
   );
 }

@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { deleteJson, getJson } from "@/lib/clientApi";
-import { FaClipboardCheck, FaSpinner, FaTrash } from "react-icons/fa";
 
 const scoreLabels = {
   communication: "Communication",
-  technicalDepth: "Technical",
+  technicalDepth: "Technical depth",
   problemSolving: "Problem solving",
   confidence: "Confidence",
   roleFit: "Role fit",
@@ -49,84 +48,97 @@ export default function ReportList() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center gap-2 text-accent">
-        <FaSpinner className="animate-spin" />
-        <span>Loading reports...</span>
-      </div>
-    );
+    return <p className="app-eyebrow py-8">Loading reports…</p>;
   }
 
   if (reports.length === 0) {
     return (
-      <div className="glass-panel rounded-2xl p-8 text-center">
-        <FaClipboardCheck className="mx-auto mb-3 text-4xl text-accent" />
-        <p className="text-lg font-bold text-ink">No reports yet.</p>
-        <p className="text-sm text-ink-soft">Completed interview scorecards will appear here.</p>
+      <div className="border-y border-rule py-14 text-center">
+        <p className="app-h3">No reports yet.</p>
+        <p className="mt-2 text-sm text-ink-soft">
+          Completed interview scorecards will appear here.
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <ul>
       {reports.map((report) => (
-        <article key={report._id} className="glass-panel rounded-2xl p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-semibold text-ink">{report.recommendation}</h3>
-              <p className="text-sm text-ink-soft">{report.intervieweeEmail}</p>
+        <li key={report._id} className="row-hair px-1 py-7">
+          <div className="flex flex-wrap items-baseline justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="app-h3">
+                {report.recommendation}
+                <span className="ml-3 text-sm font-normal text-ink-soft">
+                  {report.intervieweeEmail}
+                </span>
+              </h3>
             </div>
-            <div className="flex flex-wrap items-center gap-2 md:justify-end">
-              <p className="text-xs text-ink-soft">
+            <div className="flex items-center gap-5 text-[13px]">
+              <time className="text-ink-soft">
                 {new Date(report.createdAt).toLocaleDateString()}
-              </p>
+              </time>
               {canDeleteReports && (
                 <button
                   type="button"
                   onClick={() => deleteReport(report)}
                   disabled={deletingId === report._id}
-                  className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-rose-600/40 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 disabled:opacity-60"
+                  className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent disabled:opacity-50"
                 >
-                  <FaTrash />
-                  {deletingId === report._id ? "Deleting..." : "Delete"}
+                  {deletingId === report._id ? "Deleting…" : "Delete"}
                 </button>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
+          <dl className="mt-5 grid grid-cols-2 border-t border-rule sm:grid-cols-5">
             {Object.entries(report.scores || {}).map(([name, score]) => (
-              <div key={name} className="rounded-2xl border border-rule bg-white p-3">
-                <p className="text-xs text-ink-soft">{scoreLabels[name] || name}</p>
-                <p className="text-2xl font-semibold gradient-text">{score}</p>
+              <div key={name} className="border-b border-r border-rule py-3 pr-4 last:border-r-0">
+                <dt className="app-eyebrow">{scoreLabels[name] || name}</dt>
+                <dd className="landing-serif mt-1.5 text-2xl leading-none text-ink">
+                  {score}
+                  <span className="ml-0.5 text-sm text-ink-soft">/5</span>
+                </dd>
               </div>
             ))}
-          </div>
+          </dl>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div className="mt-5 grid gap-6 text-sm md:grid-cols-2">
             <div>
-              <p className="mb-1 font-bold text-ink">Strengths</p>
-              <p className="whitespace-pre-wrap text-ink-soft">{report.strengths}</p>
+              <p className="app-eyebrow">Strengths</p>
+              <p className="mt-2 whitespace-pre-wrap leading-[1.7] text-ink-soft">
+                {report.strengths}
+              </p>
             </div>
             <div>
-              <p className="mb-1 font-bold text-ink">Next improvements</p>
-              <p className="whitespace-pre-wrap text-ink-soft">{report.improvements}</p>
+              <p className="app-eyebrow">Next improvements</p>
+              <p className="mt-2 whitespace-pre-wrap leading-[1.7] text-ink-soft">
+                {report.improvements}
+              </p>
             </div>
           </div>
 
           {report.aiSummary && (
-            <div className="mt-5 rounded-2xl border border-accent bg-accent/10 p-4">
-              <p className="mb-2 font-semibold text-accent">AI summary</p>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-ink">{report.aiSummary}</p>
+            <div className="mt-5 border-l-2 border-accent pl-4">
+              <p className="app-eyebrow">Summary</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-[1.7] text-ink">
+                {report.aiSummary}
+              </p>
               {report.actionItems?.length > 0 && (
-                <ul className="mt-3 space-y-1 text-sm text-ink">
-                  {report.actionItems.map((item) => <li key={item}>- {item}</li>)}
+                <ul className="mt-3 space-y-1.5 text-sm text-ink-soft">
+                  {report.actionItems.map((item) => (
+                    <li key={item} className="flex gap-3">
+                      <span className="mt-2.5 h-px w-3 shrink-0 bg-accent" />
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
           )}
-        </article>
+        </li>
       ))}
-    </div>
+    </ul>
   );
 }

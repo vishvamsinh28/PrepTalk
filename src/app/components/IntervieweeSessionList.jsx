@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaSignInAlt } from "react-icons/fa";
 
 export default function IntervieweeSessionList() {
   const [sessions, setSessions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -17,73 +16,63 @@ export default function IntervieweeSessionList() {
         setSessions(response.sessions || []);
       } catch (error) {
         console.error("Error fetching sessions:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchSessions();
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
+  if (isLoading) {
+    return <p className="app-eyebrow py-8">Loading sessions…</p>;
+  }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  if (sessions.length === 0) {
+    return (
+      <div className="border-y border-rule py-14 text-center">
+        <p className="app-h3">No sessions assigned yet.</p>
+        <p className="mt-2 text-sm text-ink-soft">
+          Your interviewer will send one through when it&rsquo;s scheduled.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="text-ink">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="max-w-4xl mx-auto"
-      >
-        {sessions.length === 0 ? (
-          <motion.div variants={itemVariants} className="glass-panel rounded-2xl p-8 text-center">
-            <p className="text-lg font-bold text-ink">No sessions assigned yet.</p>
-            <p className="text-sm text-ink-soft">Please check back later.</p>
-          </motion.div>
-        ) : (
-          <motion.div className="grid max-h-168 gap-5 overflow-y-auto pr-1" variants={containerVariants}>
-            <AnimatePresence>
-              {sessions.map((session) => (
-                <motion.div
-                  key={session._id}
-                  variants={itemVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="hidden"
-                  className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-accent"
-                >
-                  <h3 className="mb-2 text-2xl font-semibold text-ink">{session.title}</h3>
-                  <p className="mb-4 text-sm leading-6 text-ink-soft">{session.description}</p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="rounded-xl border border-accent bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{session.role}</span>
-                    <span className="rounded-xl border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.level}</span>
-                    <span className="rounded-xl border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.interviewType}</span>
-                    {session.skills?.map((skill) => (
-                      <span key={skill} className="rounded-xl border border-rule bg-white px-3 py-1 text-xs text-ink-soft">{skill}</span>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => router.push(`/session/${session._id}`)}
-                    className="flex items-center gap-2 rounded-xl bg-ink px-6 py-3 font-semibold text-canvas transition hover:-translate-y-0.5"
-                  >
-                    <FaSignInAlt />
-                    Join Session
-                  </button>
-                </motion.div>
+    <ul>
+      {sessions.map((session) => (
+        <li
+          key={session._id}
+          className="row-hair flex flex-wrap items-start justify-between gap-x-10 gap-y-4 px-1 py-6"
+        >
+          <div className="min-w-0 max-w-[52rem]">
+            <h3 className="app-h3">{session.title}</h3>
+            {session.description && (
+              <p className="mt-2 max-w-[62ch] text-sm leading-[1.7] text-ink-soft">
+                {session.description}
+              </p>
+            )}
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="chip chip-accent">{session.role}</span>
+              <span className="chip">{session.level}</span>
+              <span className="chip">{session.interviewType}</span>
+              {session.skills?.map((skill) => (
+                <span key={skill} className="chip">
+                  {skill}
+                </span>
               ))}
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </motion.div>
-    </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => router.push(`/session/${session._id}`)}
+            className="btn-ink shrink-0"
+          >
+            Join session
+          </button>
+        </li>
+      ))}
+    </ul>
   );
 }

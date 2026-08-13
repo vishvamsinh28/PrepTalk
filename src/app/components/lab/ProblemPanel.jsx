@@ -20,7 +20,7 @@ export default function ProblemPanel({ problem, panelWidth = 560 }) {
       </div>
       <div className="mt-5 max-w-[42rem] lg:mt-7">
         <h2 className="mb-2 text-lg font-semibold">Example</h2>
-        <div className="rounded-lg border border-white/10 bg-white/5 p-3 text-white/70 sm:p-4">
+        <div className="rounded-[4px] border border-white/10 bg-white/5 p-3 text-white/70 sm:p-4">
           <p className="font-mono text-xs leading-5 sm:leading-6">Array input is passed as <b>solve(...input)</b>, so <b>[1, {"{"}x: 2{"}"}]</b> calls <b>solve(1, {"{"}x: 2{"}"})</b>. Other input is passed as <b>solve(input)</b>. Do not rename <b>solve</b>.</p>
           <p className="mt-2 text-xs leading-5 text-white/50 sm:leading-6">Run code to check visible test cases before submitting.</p>
         </div>

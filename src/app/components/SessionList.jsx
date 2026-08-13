@@ -3,8 +3,6 @@
 import { useEffect, useState } from "react";
 import { deleteJson, getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { FaCalendarAlt, FaEnvelope, FaLink, FaSpinner, FaExclamationCircle, FaSignInAlt, FaTrash } from "react-icons/fa";
 
 export default function SessionList({ compact = false }) {
   const router = useRouter();
@@ -31,81 +29,50 @@ export default function SessionList({ compact = false }) {
     };
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1 }
-    }
-  };
+  if (loading) {
+    return <p className="app-eyebrow py-8">Loading sessions…</p>;
+  }
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
+  if (sessions.length === 0) {
+    return (
+      <div className="border-y border-rule py-14 text-center">
+        <p className="app-h3">No sessions yet.</p>
+        <p className="mt-2 text-sm text-ink-soft">
+          Create one on the left and it will show up here.
+        </p>
+      </div>
+    );
+  }
 
   return (
-    <div className="text-ink">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className={compact ? "mx-auto w-full" : "mx-auto max-w-6xl"}
-      >
-        {loading && (
-          <motion.div
-            variants={itemVariants}
-            className="flex items-center justify-center space-x-2 text-accent"
-          >
-            <FaSpinner className="animate-spin text-xl" />
-            <span>Loading sessions...</span>
-          </motion.div>
-        )}
-
-        {!loading && sessions.length === 0 && (
-          <motion.div
-            variants={itemVariants}
-            className="glass-panel rounded-2xl p-8 text-center"
-          >
-            <FaExclamationCircle className="mx-auto mb-3 text-4xl text-accent" />
-            <p className="text-lg font-bold text-ink">No sessions found.</p>
-            <p className="text-sm text-ink-soft">Create a new session to get started.</p>
-          </motion.div>
-        )}
-
-        {!loading && sessions.length > 0 && (
-          <motion.div
-            className={compact ? "grid max-h-[34rem] gap-4 overflow-y-auto pr-1" : "grid max-h-[46rem] gap-5 overflow-y-auto pr-1 lg:grid-cols-2"}
-            variants={containerVariants}
-          >
-            <AnimatePresence>
-              {sessions.map((session) => (
-                <SessionCard
-                  key={session._id}
-                  session={session}
-                  router={router}
-                  variants={itemVariants}
-                  compact={compact}
-                  onDeleted={(sessionId) => setSessions((current) => current.filter((item) => item._id !== sessionId))}
-                />
-              ))}
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </motion.div>
-    </div>
+    <ul className={compact ? "max-h-[42rem] overflow-y-auto" : ""}>
+      {sessions.map((session) => (
+        <SessionRow
+          key={session._id}
+          session={session}
+          router={router}
+          onDeleted={(sessionId) =>
+            setSessions((current) => current.filter((item) => item._id !== sessionId))
+          }
+        />
+      ))}
+    </ul>
   );
 }
 
-function SessionCard({ session, router, variants, compact, onDeleted }) {
+function SessionRow({ session, router, onDeleted }) {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
+
   const inviteUrl = origin ? `${origin}/session/${session._id}` : "";
-  const mailtoHref = `mailto:${(session.interviewees || []).join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(`Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role}\n${session.scheduledAt ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n` : ""}${inviteUrl ? `Join link: ${inviteUrl}\n` : ""}\n\nSee you there.`)}`;
+  const interviewees = session.interviewees || [];
+  const mailtoHref = `mailto:${interviewees.join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(`Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role}\n${session.scheduledAt ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n` : ""}${inviteUrl ? `Join link: ${inviteUrl}\n` : ""}\n\nSee you there.`)}`;
+
   const deleteSession = async () => {
     if (!window.confirm(`Delete "${session.title}" and its saved chat/reports?`)) return;
 
@@ -118,6 +85,7 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
       setDeleting(false);
     }
   };
+
   const copyLink = async () => {
     if (!inviteUrl) return;
     await navigator.clipboard?.writeText(inviteUrl);
@@ -126,74 +94,73 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
   };
 
   return (
-    <motion.div
-      variants={variants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      className="glass-panel h-full rounded-xl p-5 transition hover:-translate-y-1 hover:border-accent"
-    >
-      <div className="flex flex-col gap-3">
-        <div>
-          <h3 className={compact ? "mb-2 text-xl font-semibold text-ink" : "mb-2 text-2xl font-semibold text-ink"}>{session.title}</h3>
-          <p className="mb-3 line-clamp-3 text-sm leading-6 text-ink-soft">{session.description}</p>
+    <li className="row-hair px-1 py-6">
+      <div className="flex items-start justify-between gap-6">
+        <div className="min-w-0">
+          <h3 className="app-h3">{session.title}</h3>
+          {session.description && (
+            <p className="mt-1.5 line-clamp-2 max-w-[60ch] text-sm leading-[1.65] text-ink-soft">
+              {session.description}
+            </p>
+          )}
         </div>
-        {session.scheduledAt && (
-          <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-600/40 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">
-            <FaCalendarAlt />
-            {new Date(session.scheduledAt).toLocaleString()}
-          </span>
-        )}
+        <button onClick={() => router.push(`/session/${session._id}`)} className="btn-ink shrink-0">
+          Join
+        </button>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-4">
-        <span className="rounded-lg border border-accent bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{session.role || "General"}</span>
-        <span className="rounded-lg border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.level || "Entry"}</span>
-        <span className="rounded-lg border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.interviewType || "Mixed"}</span>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <span className="chip chip-accent">{session.role || "General"}</span>
+        <span className="chip">{session.level || "Entry"}</span>
+        <span className="chip">{session.interviewType || "Mixed"}</span>
         {session.skills?.map((skill) => (
-          <span key={skill} className="rounded-lg border border-rule bg-white px-3 py-1 text-xs text-ink-soft">{skill}</span>
+          <span key={skill} className="chip">
+            {skill}
+          </span>
         ))}
       </div>
 
-      <p className="mb-5 text-xs text-ink-soft">Interviewees: <span className="text-ink">{session.interviewees?.join(", ") || "None assigned"}</span></p>
-      {copied && (
-        <p className="mb-3 rounded-lg border border-emerald-600/40 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
-          Link copied
-        </p>
-      )}
+      <dl className="mt-4 space-y-1 text-[13px]">
+        {session.scheduledAt && (
+          <div className="flex gap-2">
+            <dt className="text-ink-soft">Scheduled</dt>
+            <dd className="text-ink">{new Date(session.scheduledAt).toLocaleString()}</dd>
+          </div>
+        )}
+        <div className="flex min-w-0 gap-2">
+          <dt className="shrink-0 text-ink-soft">Interviewees</dt>
+          <dd className="min-w-0 truncate text-ink">
+            {interviewees.join(", ") || "None assigned"}
+          </dd>
+        </div>
+      </dl>
 
-      <div className="grid gap-2 sm:grid-cols-2">
-        <button
-          onClick={() => router.push(`/session/${session._id}`)}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-ink px-5 py-2.5 font-semibold text-canvas transition hover:-translate-y-0.5"
-        >
-          <FaSignInAlt />
-          Join Session
-        </button>
+      {/* Secondary actions stay as quiet text so only "Join" reads as a button */}
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]">
         {inviteUrl && (
           <button
             onClick={copyLink}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-accent bg-accent/10 px-4 py-2.5 font-bold text-accent"
+            className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
           >
-            <FaLink />
-            Copy Link
+            {copied ? "Link copied" : "Copy invite link"}
           </button>
         )}
-        {(session.interviewees || []).length > 0 && (
-          <a href={mailtoHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rule bg-black/5 px-4 py-2.5 font-bold text-ink">
-            <FaEnvelope />
-            Email Invite
+        {interviewees.length > 0 && (
+          <a
+            href={mailtoHref}
+            className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+          >
+            Email invite
           </a>
         )}
         <button
           onClick={deleteSession}
           disabled={deleting}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-600/40 bg-rose-50 px-4 py-2.5 font-bold text-rose-700 disabled:opacity-60"
+          className="ml-auto text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent disabled:opacity-50"
         >
-          <FaTrash />
-          {deleting ? "Deleting..." : "Delete"}
+          {deleting ? "Deleting…" : "Delete"}
         </button>
       </div>
-    </motion.div>
+    </li>
   );
 }

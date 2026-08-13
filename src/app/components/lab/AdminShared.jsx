@@ -1,30 +1,35 @@
 "use client";
 
-import { FaCode, FaDatabase, FaPuzzlePiece } from "react-icons/fa";
-
 export function Toast({ tone, text }) {
-  const classes = tone === "success" ? "border-[#b7e4c7] bg-[#edf9f1] text-[#1f7a3b]" : "border-[#f1b6b6] bg-[#fff1f1] text-[#b42318]";
+  const classes =
+    tone === "success"
+      ? "border-emerald-700 bg-emerald-50 text-emerald-700"
+      : "border-accent bg-accent/5 text-accent";
   return (
-    <div className={`min-h-12 w-full max-w-sm rounded-lg border px-4 py-3 text-sm font-bold shadow-lg ${classes}`} role="status">
+    <div
+      className={`min-h-12 w-full max-w-sm border-l-2 px-4 py-3 text-sm shadow-sm ${classes}`}
+      role="status"
+    >
       {text}
     </div>
   );
 }
 
+/* Was a rotating puzzle/code/database icon chosen by array position — decoration
+   that implied a meaning it never had. A section number is honest and readable. */
 export function SkillIcon({ index }) {
-  const icons = [<FaPuzzlePiece key="p" />, <FaCode key="c" />, <FaDatabase key="d" />];
   return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-accent bg-accent/10 text-accent sm:h-12 sm:w-12">
-      {icons[index % icons.length]}
+    <span className="app-eyebrow mt-1 shrink-0 tabular-nums text-accent">
+      {String(index + 1).padStart(2, "0")}
     </span>
   );
 }
 
 export function Metric({ label, value }) {
   return (
-    <div className="rounded-lg border border-rule bg-white p-2.5">
-      <p className="text-[0.68rem] font-bold uppercase text-ink-soft">{label}</p>
-      <p className="mt-0.5 text-lg font-semibold text-ink">{value}</p>
+    <div className="border-r border-rule px-4 py-3 last:border-r-0">
+      <p className="app-eyebrow">{label}</p>
+      <p className="landing-serif mt-1.5 text-2xl leading-none text-ink">{value}</p>
     </div>
   );
 }

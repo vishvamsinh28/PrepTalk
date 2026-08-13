@@ -398,7 +398,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
   return (
     <div className="space-y-5">
       {mediaError && (
-        <div className="rounded-xl border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-700">
+        <div className="rounded-[4px] border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-700">
           {mediaError}
         </div>
       )}
@@ -423,40 +423,48 @@ export default function VideoRoom({ sessionId, userEmail }) {
         ))}
       </div>
 
-      <div className="flex flex-col justify-between gap-3 rounded-xl border border-rule bg-white p-3 sm:flex-row sm:items-center">
-        <div className="px-2">
-          <p className="text-sm font-bold text-ink">{participants.length} participant{participants.length === 1 ? "" : "s"}</p>
-          <p className="text-xs text-ink-soft">Controls affect your local stream only.</p>
+      <div className="flex flex-col justify-between gap-4 border-t border-rule pt-4 sm:flex-row sm:items-center">
+        <div>
+          <p className="text-sm text-ink">
+            {participants.length} participant{participants.length === 1 ? "" : "s"}
+          </p>
+          <p className="mt-0.5 text-[13px] text-ink-soft">
+            Controls affect your local stream only.
+          </p>
         </div>
-        <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+
+        {/* Muted / camera-off are the states worth flagging, so only those take the accent */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={toggleAudio}
-            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+            aria-pressed={!audioEnabled}
+            className={`inline-flex min-h-10 items-center gap-2 rounded-[4px] border px-4 text-sm transition-colors ${
               audioEnabled
-                ? "border border-accent bg-accent/10 text-accent hover:bg-accent/10"
-                : "border border-amber-600/40 bg-amber-50 text-amber-700 hover:bg-amber-50"
+                ? "border-rule bg-white text-ink hover:border-ink/30"
+                : "border-accent bg-accent/5 text-accent"
             }`}
           >
             {audioEnabled ? <FaMicrophone /> : <FaMicrophoneSlash />}
-            {audioEnabled ? "Mute Mic" : "Unmute Mic"}
+            {audioEnabled ? "Mute" : "Unmute"}
           </button>
           <button
             onClick={toggleVideo}
-            className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition ${
+            aria-pressed={!videoEnabled}
+            className={`inline-flex min-h-10 items-center gap-2 rounded-[4px] border px-4 text-sm transition-colors ${
               videoEnabled
-                ? "border border-accent bg-accent/10 text-accent hover:bg-accent/10"
-                : "border border-amber-600/40 bg-amber-50 text-amber-700 hover:bg-amber-50"
+                ? "border-rule bg-white text-ink hover:border-ink/30"
+                : "border-accent bg-accent/5 text-accent"
             }`}
           >
             {videoEnabled ? <FaVideo /> : <FaVideoSlash />}
-            {videoEnabled ? "Turn Off Camera" : "Turn On Camera"}
+            {videoEnabled ? "Stop video" : "Start video"}
           </button>
           <button
             onClick={leaveRoom}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-rose-700 px-4 py-2.5 text-sm font-semibold text-ink shadow-lg transition hover:-translate-y-0.5"
+            className="ml-2 inline-flex min-h-10 items-center gap-2 rounded-[4px] bg-accent px-4 text-sm font-medium text-white transition-opacity hover:opacity-85"
           >
             <FaPhoneSlash />
-            Leave Room
+            Leave
           </button>
         </div>
       </div>
@@ -466,7 +474,7 @@ export default function VideoRoom({ sessionId, userEmail }) {
 
 function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
   return (
-    <div className="group relative min-h-64 overflow-hidden rounded-xl border border-rule bg-[#151311] shadow-sm">
+    <div className="group relative min-h-64 overflow-hidden rounded-[4px] border border-rule bg-[#151311] shadow-sm">
       <video
         className="h-full min-h-64 w-full object-cover"
         ref={videoRef}
@@ -479,7 +487,7 @@ function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
           <p className="max-w-[15rem] truncate text-sm font-semibold text-white">{userEmail}</p>
           <p className="text-xs text-white/70">{isSelf ? "You" : "Participant"} {!streamReady && "· Connecting"}</p>
         </div>
-        <span className="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
+        <span className="rounded-[4px] border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold text-white">
           {isSelf ? "Local" : "Remote"}
         </span>
       </div>
@@ -503,7 +511,7 @@ function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   }, [peer, peerId, streamsRef]);
 
   return (
-    <div className="relative min-h-64 overflow-hidden rounded-xl border border-rule bg-[#151311] shadow-sm">
+    <div className="relative min-h-64 overflow-hidden rounded-[4px] border border-rule bg-[#151311] shadow-sm">
       <video
         className="h-full min-h-64 w-full object-cover"
         ref={ref}

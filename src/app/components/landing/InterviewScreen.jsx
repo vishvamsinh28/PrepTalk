@@ -21,7 +21,7 @@ export default function InterviewScreen() {
   return (
     <div
       aria-hidden="true"
-      className="select-none overflow-hidden rounded-md bg-[#151311] shadow-2xl shadow-black/40 ring-1 ring-white/10"
+      className="select-none overflow-hidden rounded-[3px] bg-[#151311] shadow-2xl shadow-black/40 ring-1 ring-white/10"
     >
       <div className="flex items-center gap-3 border-b border-white/10 bg-[#1e1a17] px-4 py-2.5">
         <span className="flex gap-1.5">
@@ -47,7 +47,7 @@ export default function InterviewScreen() {
             ].map(([name, role, tone]) => (
               <div
                 key={name}
-                className={`relative aspect-4/3 overflow-hidden rounded-lg bg-linear-to-br ${tone} ring-1 ring-white/10`}
+                className={`relative aspect-4/3 overflow-hidden rounded-[4px] bg-linear-to-br ${tone} ring-1 ring-white/10`}
               >
                 <div className="absolute bottom-2 left-2">
                   <p className="text-[11px] font-bold text-white">{name}</p>
@@ -57,7 +57,7 @@ export default function InterviewScreen() {
             ))}
           </div>
 
-          <div className="mt-3 rounded-lg border border-white/10 bg-[#1e1a17] p-3">
+          <div className="mt-3 rounded-[4px] border border-white/10 bg-[#1e1a17] p-3">
             <p className="font-mono text-[10px] uppercase tracking-wider text-white/40">
               Shared workspace
             </p>

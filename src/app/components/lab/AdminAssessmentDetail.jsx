@@ -98,26 +98,26 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
         <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-ink sm:text-3xl lg:text-4xl">{assessment.title}</h1>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-2 lg:justify-end">
-            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-lg border border-rule bg-black/5 px-3 py-2 text-sm font-semibold text-ink"><FaShareAlt /> Copy link</button>
+            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-[4px] border border-rule bg-black/5 px-3 py-2 text-sm font-semibold text-ink"><FaShareAlt /> Copy link</button>
             <button
               onClick={() => setShowReport(!showReport)}
               aria-expanded={showReport}
-              className={`inline-flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition ${showReport ? "border-accent bg-accent/10 text-accent" : "border-rule bg-black/5 text-ink hover:border-rule"}`}
+              className={`inline-flex items-center justify-center gap-2 rounded-[4px] border px-3 py-2 text-sm font-semibold transition ${showReport ? "border-accent bg-accent/10 text-accent" : "border-rule bg-black/5 text-ink hover:border-rule"}`}
             >
               <span className={`h-2.5 w-2.5 rounded-full ${showReport ? "bg-cyan-200" : "bg-slate-500"}`} />
               {showReport ? "Hide report" : "View report"}
             </button>
-            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-semibold text-accent"><FaDownload /> Export PDF</button>
-            <button onClick={onDelete} className="grid place-items-center rounded-lg border border-rose-600/40 bg-rose-50 px-3 py-2 text-rose-700"><FaTrash /></button>
+            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-[4px] border border-accent bg-accent/10 px-3 py-2 text-sm font-semibold text-accent"><FaDownload /> Export PDF</button>
+            <button onClick={onDelete} className="grid place-items-center rounded-[4px] border border-rose-600/40 bg-rose-50 px-3 py-2 text-rose-700"><FaTrash /></button>
           </div>
         </div>
         {notice && (
-          <div className="mt-4 rounded-lg border border-emerald-600/40 bg-emerald-50 px-4 py-3 font-bold text-emerald-700">
+          <div className="mt-4 rounded-[4px] border border-emerald-600/40 bg-emerald-50 px-4 py-3 font-bold text-emerald-700">
             {notice}
           </div>
         )}
         <section className="mt-5 grid min-w-0 items-start gap-4 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-          <div className="flex min-w-0 flex-col rounded-xl border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+          <div className="flex min-w-0 flex-col rounded-[4px] border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
             <div className="shrink-0 flex flex-col gap-3 border-b border-rule px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
               <div>
                 <p><span className="font-semibold text-ink">Duration:</span> <span className="ml-3 text-base text-ink-soft">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
@@ -140,10 +140,10 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               ))}
             </div>
           </div>
-          <aside className="glass-panel min-w-0 overflow-auto rounded-xl p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+          <aside className="panel min-w-0 overflow-auto rounded-[4px] p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
             <h2 className="font-semibold text-ink">Role</h2>
             <p className="mt-2 text-ink-soft">{assessment.title.replace(" Hiring Test", "")}</p>
-            <section className="mt-5 rounded-lg border border-rule bg-black/5 p-3 sm:p-4">
+            <section className="mt-5 rounded-[4px] border border-rule bg-black/5 p-3 sm:p-4">
               <h2 className="font-semibold text-ink">Assignment settings</h2>
               <label className="field-group mt-4">
                 <span className="field-label">Candidate emails</span>
@@ -172,12 +172,12 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               </label>
               <button
                 onClick={saveChanges}
-                className="mt-4 w-full rounded-lg border border-accent bg-accent/10 px-4 py-2.5 font-semibold text-accent"
+                className="mt-4 w-full rounded-[4px] border border-accent bg-accent/10 px-4 py-2.5 font-semibold text-accent"
               >
                 Save changes
               </button>
               {inviteRecipients.length > 0 && (
-                <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-4 py-2.5 font-semibold text-canvas">
+                <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] bg-ink px-4 py-2.5 font-semibold text-canvas">
                   <FaEnvelope /> Send invite to all
                 </a>
               )}
@@ -188,12 +188,12 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               {coreSkills.length === 0 && <span className="text-sm text-ink-soft">No core skills added.</span>}
             </div>
             <h2 className="mt-5 font-semibold text-ink">Candidates</h2>
-            <div className="mt-3 rounded-lg border border-rule bg-black/5 px-4 py-4">
+            <div className="mt-3 rounded-[4px] border border-rule bg-black/5 px-4 py-4">
               <div className="text-3xl font-semibold text-ink">{candidates.length}</div>
               <div className="mt-1 text-sm font-semibold text-ink-soft">assigned candidate{candidates.length === 1 ? "" : "s"}</div>
             </div>
             <h2 className="mt-5 font-semibold text-ink">Submissions</h2>
-            <div className="mt-3 rounded-lg border border-rule bg-black/5 px-4 py-4">
+            <div className="mt-3 rounded-[4px] border border-rule bg-black/5 px-4 py-4">
               <div className="text-3xl font-semibold text-ink">{submissions.length}</div>
               <div className="mt-1 text-sm font-semibold text-ink-soft">submission{submissions.length === 1 ? "" : "s"} received</div>
             </div>
@@ -221,7 +221,7 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
         <span className="hidden shrink-0 text-ink-soft sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
       </button>
       {open && (
-        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-lg border border-rule bg-white p-3 sm:p-4">
+        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-[4px] border border-rule bg-white p-3 sm:p-4">
           <div className="grid min-w-0 gap-3 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -242,12 +242,12 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
           </label>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-semibold text-ink">Test cases</h3>
-            <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-md border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent"><FaPlus /> Add case</button>
+            <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-[3px] border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent"><FaPlus /> Add case</button>
           </div>
           <div className="max-h-[24rem] overflow-auto pr-1">
             <div className="grid min-w-0 gap-2">
               {tests.map((test, testIndex) => (
-                <div key={testIndex} className="grid min-w-0 gap-2 rounded-lg border border-rule bg-black/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
+                <div key={testIndex} className="grid min-w-0 gap-2 rounded-[4px] border border-rule bg-black/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
                   <label className="field-group min-w-0">
                     <span className="field-label">Case name</span>
                     <input value={test.name || ""} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
@@ -260,12 +260,12 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
                     <span className="field-label">Expected JSON</span>
                     <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-14 font-mono text-sm" />
                   </label>
-                  <label className="flex items-center gap-3 rounded-md border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
+                  <label className="flex items-center gap-3 rounded-[3px] border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
                     <input type="checkbox" checked={Boolean(test.visible)} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
                     Visible
                   </label>
                   {tests.length > 1 && (
-                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-10 w-10 place-items-center rounded-md border border-rose-600/40 bg-rose-50 text-rose-700 xl:mt-6" title="Delete test case">
+                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-10 w-10 place-items-center rounded-[3px] border border-rose-600/40 bg-rose-50 text-rose-700 xl:mt-6" title="Delete test case">
                       <FaTrash />
                     </button>
                   )}
@@ -300,7 +300,7 @@ function ReportViewer({ report }) {
   }, [selectedKey, selectedSubmission]);
 
   return (
-    <section className="mt-6 flex min-w-0 flex-col rounded-xl border border-rule bg-white p-3 shadow-xl sm:p-6 lg:h-[46rem]">
+    <section className="mt-6 flex min-w-0 flex-col rounded-[4px] border border-rule bg-white p-3 shadow-xl sm:p-6 lg:h-[46rem]">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-ink">Submission report</h2>
@@ -317,8 +317,8 @@ function ReportViewer({ report }) {
         </label>
       </div>
       <div className="mt-5 grid min-h-0 min-w-0 flex-1 gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
-        <div className="min-h-0 min-w-0 rounded-lg border border-rule bg-black/5">
-          <div className="border-b border-rule px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-ink-soft">
+        <div className="min-h-0 min-w-0 rounded-[4px] border border-rule bg-black/5">
+          <div className="border-b border-rule px-4 py-3 app-eyebrow">
             Reports
           </div>
           <div className="h-[calc(100%-2.75rem)] overflow-auto p-2">
@@ -330,7 +330,7 @@ function ReportViewer({ report }) {
                 <button
                   key={key}
                   onClick={() => setSelectedKey(key)}
-                  className={`mb-2 w-full rounded-md border px-4 py-3 text-left transition ${active ? "border-accent bg-accent/10 text-accent" : "border-rule bg-white text-ink-soft hover:border-rule"}`}
+                  className={`mb-2 w-full rounded-[3px] border px-4 py-3 text-left transition ${active ? "border-accent bg-accent/10 text-accent" : "border-rule bg-white text-ink-soft hover:border-rule"}`}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <span className="truncate font-semibold">{submission.candidateEmail}</span>
@@ -343,7 +343,7 @@ function ReportViewer({ report }) {
               );
             })}
             {filteredSubmissions.length === 0 && (
-              <div className="rounded-md border border-rule bg-white p-4 text-sm text-ink-soft">
+              <div className="rounded-[3px] border border-rule bg-white p-4 text-sm text-ink-soft">
                 No reports match your search.
               </div>
             )}
@@ -351,7 +351,7 @@ function ReportViewer({ report }) {
         </div>
 
         {selectedSubmission ? (
-          <article className="min-h-0 min-w-0 overflow-auto rounded-lg border border-rule bg-black/5 p-3 sm:p-5">
+          <article className="min-h-0 min-w-0 overflow-auto rounded-[4px] border border-rule bg-black/5 p-3 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="min-w-0">
                 <h3 className="break-all font-semibold text-ink">{selectedSubmission.candidateEmail}</h3>
@@ -364,15 +364,15 @@ function ReportViewer({ report }) {
             </div>
             <div className="mt-5 grid min-w-0 gap-4">
               {selectedSubmission.sections.map((section) => (
-                <section key={`${selectedSubmission.candidateEmail}-${section.problemIndex}`} className="min-w-0 rounded-lg border border-rule bg-white p-3 sm:p-4">
+                <section key={`${selectedSubmission.candidateEmail}-${section.problemIndex}`} className="min-w-0 rounded-[4px] border border-rule bg-white p-3 sm:p-4">
                   <div className="flex flex-wrap justify-between gap-3">
                     <h4 className="min-w-0 break-words font-semibold text-ink">Q{section.problemIndex + 1}: {section.title}</h4>
                     <span className="text-sm font-bold text-ink-soft">{section.score}/{section.maxScore}</span>
                   </div>
-                  <pre className="mt-3 max-h-56 min-w-0 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-md border border-rule bg-black/5 p-3 text-xs leading-5 text-accent sm:whitespace-pre">{section.code || "No code submitted."}</pre>
+                  <pre className="mt-3 max-h-56 min-w-0 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-[3px] border border-rule bg-black/5 p-3 text-xs leading-5 text-accent sm:whitespace-pre">{section.code || "No code submitted."}</pre>
                   <div className="mt-3 grid gap-2">
                     {section.tests.map((test) => (
-                      <div key={test.name} className={`min-w-0 break-words rounded-md border px-3 py-2 text-sm ${test.passed ? "border-emerald-600/40 bg-emerald-50 text-emerald-700" : "border-rose-600/40 bg-rose-50 text-rose-700"}`}>
+                      <div key={test.name} className={`min-w-0 break-words rounded-[3px] border px-3 py-2 text-sm ${test.passed ? "border-emerald-600/40 bg-emerald-50 text-emerald-700" : "border-rose-600/40 bg-rose-50 text-rose-700"}`}>
                         <b>{test.name}</b> · {test.passed ? "Passed" : "Failed"}{test.error ? ` · ${test.error}` : ""}
                       </div>
                     ))}
@@ -382,7 +382,7 @@ function ReportViewer({ report }) {
             </div>
           </article>
         ) : (
-          <div className="rounded-lg border border-rule bg-black/5 p-5 text-ink-soft">No submissions yet.</div>
+          <div className="rounded-[4px] border border-rule bg-black/5 p-5 text-ink-soft">No submissions yet.</div>
         )}
       </div>
     </section>

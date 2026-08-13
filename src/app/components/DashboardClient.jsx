@@ -1,118 +1,104 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { FaArrowRight, FaClipboardCheck, FaCode, FaListAlt, FaPlus, FaUserFriends, FaUserShield } from "react-icons/fa";
 import ProgressDashboard from "./ProgressDashboard";
+import PageHeader, { SignedInAs, SectionHeading } from "./ui/PageHeader";
+
+const roleCopy = {
+  Interviewer: {
+    description:
+      "Create sessions, run live interviews, and submit structured reports on what you saw.",
+    href: "/interviewer",
+    label: "Open interviewer workspace",
+  },
+  Interviewee: {
+    description:
+      "Join the interviews assigned to you and read the report after each session.",
+    href: "/interviewee",
+    label: "Open interviewee workspace",
+  },
+};
 
 export default function DashboardClient({ userData }) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.2, delayChildren: 0.3 }
-    }
-  };
+  const role = userData?.role;
+  const copy = roleCopy[role];
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
-  const roleDescriptions = {
-    Interviewer: "As an Interviewer, you can create sessions, run live interviews, and submit structured reports.",
-    Interviewee: "As an Interviewee, you can join assigned interviews and review your reports after each session."
-  };
-  const roleActions = {
-    Interviewer: {
-      href: "/interviewer",
-      icon: <FaUserShield />,
-      label: "Open Interviewer Panel",
-    },
-    Interviewee: {
-      href: "/interviewee",
-      icon: <FaUserFriends />,
-      label: "Open Interviewee Panel",
-    },
-  };
-  const action = roleActions[userData?.role];
-  const quickActions = userData?.role === "Interviewer"
-    ? [
-        { icon: <FaPlus />, label: "Create interview", href: "/interviewer" },
-        { icon: <FaListAlt />, label: "Manage sessions", href: "/interviewer#sessions" },
-        { icon: <FaCode />, label: "Open Lab", href: "/lab" },
-        { icon: <FaClipboardCheck />, label: "Review reports", href: "/interviewer#reports" },
-      ]
-    : [
-        { icon: <FaListAlt />, label: "Join interviews", href: "/interviewee" },
-        { icon: <FaCode />, label: "Practice in Lab", href: "/lab" },
-        { icon: <FaClipboardCheck />, label: "View feedback", href: "/interviewee#reports" },
-      ];
+  const shortcuts =
+    role === "Interviewer"
+      ? [
+          ["Create an interview", "Set the role, level, and agenda", "/interviewer#create-session"],
+          ["Manage sessions", "Invites, prep material, and links", "/interviewer#sessions"],
+          ["Open the Lab", "Build and assign coding screens", "/lab"],
+          ["Review reports", "Scorecards you've submitted", "/interviewer#reports"],
+        ]
+      : [
+          ["Join an interview", "Sessions assigned to you", "/interviewee"],
+          ["Practice in the Lab", "Timed coding assessments", "/lab"],
+          ["View feedback", "Reports from past rounds", "/interviewee#reports"],
+        ];
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24">
-      <div className="soft-grid absolute inset-0 opacity-60"></div>
+    <div className="app-shell min-h-screen px-8 pb-24 pt-28">
+      <div className="mx-auto max-w-[84rem]">
+        <PageHeader
+          eyebrow={role ? `${role} account` : "Dashboard"}
+          title="Welcome back."
+          description={
+            copy?.description ||
+            "Get set up and start running practice sessions that behave like the real thing."
+          }
+          meta={<SignedInAs email={userData?.email} />}
+        />
 
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="relative z-10 mx-auto grid w-full max-w-6xl gap-5 lg:grid-cols-[1.15fr_0.85fr]"
-      >
-        <motion.section variants={itemVariants} className="glass-panel rounded-xl p-6 sm:p-8">
-          <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-accent">Dashboard</p>
-          <h1 className="max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-            Welcome back to <span className="gradient-text">PrepTalk.</span>
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-ink-soft">
-            {roleDescriptions[userData?.role] || "Get ready to explore PrepTalk and enhance your skills!"}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="rounded-lg border border-rule bg-black/5 px-3 py-2 text-sm text-ink">
-              {userData?.email}
-            </span>
-            <span className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent">
-              {userData?.role}
-            </span>
-          </div>
-          {action && (
-            <motion.a
-              variants={itemVariants}
-              href={action.href}
-              className="mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-ink px-6 py-3.5 font-semibold text-canvas transition hover:opacity-85"
-            >
-              {action.icon}
-              {action.label}
-              <FaArrowRight />
-            </motion.a>
-          )}
-        </motion.section>
-
-        <motion.aside variants={itemVariants} className="grid gap-5">
-          <div className="glass-panel rounded-xl p-5">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-700">Next steps</p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">Useful shortcuts</h2>
-            <div className="mt-5 grid gap-3">
-              {quickActions.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-rule bg-white px-4 py-3 text-ink transition hover:border-accent hover:bg-accent/10 hover:text-ink"
-                >
-                  <span className="inline-flex items-center gap-3 font-bold">
-                    <span className="text-accent">{item.icon}</span>
-                    {item.label}
-                  </span>
-                  <FaArrowRight className="text-sm text-ink-soft" />
-                </a>
+        <div className="mt-14 grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.55fr)] lg:gap-12">
+          <section>
+            <SectionHeading eyebrow="Shortcuts" title="Jump back in" />
+            <ul>
+              {shortcuts.map(([label, hint, href]) => (
+                <li key={href} className="row-hair">
+                  <a
+                    href={href}
+                    className="flex items-baseline justify-between gap-6 px-1 py-5"
+                  >
+                    <span>
+                      <span className="app-h3 block">{label}</span>
+                      <span className="mt-1 block text-sm text-ink-soft">{hint}</span>
+                    </span>
+                    <span aria-hidden="true" className="text-accent">
+                      &rarr;
+                    </span>
+                  </a>
+                </li>
               ))}
-            </div>
-          </div>
-        </motion.aside>
+            </ul>
 
-        <motion.div variants={itemVariants} className="lg:col-span-2">
+            {copy && (
+              <a href={copy.href} className="btn-ink mt-8">
+                {copy.label}
+              </a>
+            )}
+          </section>
+
+          <aside>
+            <SectionHeading eyebrow="Account" title="Details" />
+            <dl className="text-sm">
+              <div className="row-hair flex items-baseline justify-between gap-4 px-1 py-4">
+                <dt className="text-ink-soft">Email</dt>
+                <dd className="min-w-0 truncate text-ink">{userData?.email}</dd>
+              </div>
+              <div className="row-hair flex items-baseline justify-between gap-4 px-1 py-4">
+                <dt className="text-ink-soft">Role</dt>
+                <dd>
+                  <span className="chip chip-accent">{role}</span>
+                </dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
+
+        <section className="mt-20 border-t border-rule pt-14">
           <ProgressDashboard />
-        </motion.div>
-      </motion.div>
+        </section>
+      </div>
     </div>
   );
 }

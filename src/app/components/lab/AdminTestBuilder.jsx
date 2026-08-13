@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaChevronRight, FaClock, FaPlus, FaTrash } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
 import { Metric, SkillIcon } from "./AdminShared";
 import { sanitizeWholeNumberInput, sectionName, toWholeNumber } from "./adminUtils";
 
@@ -25,21 +25,26 @@ export default function AdminTestBuilder({
     <main className="relative z-10 mx-auto w-full max-w-7xl overflow-x-hidden text-sm [&_.field-control]:min-h-10 [&_.field-control]:px-3 [&_.field-control]:py-2 [&_textarea.field-control]:min-h-20">
       <BuilderHeader title={form.title} onBack={onBack} onCreate={onCreate} isSubmitting={isSubmitting} />
       <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
-        <div className="flex min-w-0 flex-col rounded-xl border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+        <div className="flex min-w-0 flex-col rounded-[4px] border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
           <div className="shrink-0 flex flex-col gap-3 border-b border-rule px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8 sm:py-5">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-base font-semibold text-ink">Assessment duration:</span>
-              <span className="rounded-md border border-emerald-600/40 bg-emerald-50 px-3 py-1.5 text-sm font-semibold text-emerald-700 sm:text-base">
-                {totalProblemMinutes} mins
-              </span>
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span className="app-eyebrow">Duration</span>
+              <span className="text-sm text-ink">{totalProblemMinutes} minutes</span>
             </div>
-            <span className="inline-flex items-center gap-2 text-ink-soft"><span className="h-3 w-3 rounded-full bg-amber-300" /> Draft</span>
+            <span className="app-eyebrow inline-flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Draft
+            </span>
           </div>
 
           <div className="flex min-h-0 flex-1 flex-col p-3 sm:p-5">
             <div className="mb-4 shrink-0 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-xl font-semibold text-ink sm:text-2xl">Sections ({form.problems.length})</h2>
-              <button onClick={onAddProblem} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent sm:w-auto"><FaPlus /> Add section</button>
+              <h2 className="app-h2">Sections ({form.problems.length})</h2>
+              <button
+                onClick={onAddProblem}
+                className="btn-quiet w-full py-2 text-sm sm:w-auto"
+              >
+                Add section
+              </button>
             </div>
             <div className="grid min-h-0 flex-1 content-start gap-2 pr-1 sm:pr-2 lg:overflow-y-auto lg:overscroll-contain">
               {form.problems.map((problem, problemIndex) => (
@@ -59,7 +64,7 @@ export default function AdminTestBuilder({
           </div>
         </div>
 
-        <aside className="glass-panel min-w-0 self-start overflow-x-hidden rounded-xl p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem] lg:overflow-y-auto">
+        <aside className="panel min-w-0 self-start overflow-x-hidden rounded-[4px] p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem] lg:overflow-y-auto">
           <label className="field-group">
             <span className="field-label">Role</span>
             <input value={form.title.replace(" Hiring Test", "")} onChange={(event) => onSetForm({ ...form, title: `${event.target.value} Hiring Test` })} className="field-surface field-control" />
@@ -92,11 +97,11 @@ export default function AdminTestBuilder({
           {form.coreSkills?.trim() && (
             <div className="mt-3 flex flex-wrap gap-2">
               {form.coreSkills.split(",").map((skill) => skill.trim()).filter(Boolean).slice(0, 12).map((skill) => (
-                <span key={skill} className="rounded-full border border-rule bg-black/5 px-2.5 py-1 text-xs font-semibold text-ink">{skill}</span>
+                <span key={skill} className="chip">{skill}</span>
               ))}
             </div>
           )}
-          <div className="mt-5 grid gap-2 text-center text-sm sm:grid-cols-3">
+          <div className="mt-6 grid grid-cols-3 border-y border-rule">
             <Metric label="Questions" value={form.problems.length} />
             <Metric label="Tests" value={totalTests} />
             <Metric label="Minutes" value={totalProblemMinutes} />
@@ -110,11 +115,11 @@ export default function AdminTestBuilder({
 function BuilderHeader({ title, onBack, onCreate, isSubmitting }) {
   return (
     <div className="mb-6 min-w-0">
-      <button onClick={onBack} className="mb-4 text-accent">Templates <FaChevronRight className="mx-2 inline text-xs text-ink-soft" /> Builder</button>
+      <button onClick={onBack} className="mb-6 text-sm text-ink-soft transition-colors hover:text-ink">&larr; Templates</button>
       <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <h1 className="max-w-full text-2xl font-semibold leading-tight text-ink sm:text-3xl lg:text-4xl">{title}</h1>
+        <h1 className="app-title max-w-full">{title}</h1>
         <div className="flex w-full items-center gap-3 sm:w-auto">
-          <button onClick={onCreate} disabled={isSubmitting} className="w-full rounded-lg bg-ink px-4 py-2.5 font-semibold text-canvas disabled:opacity-60 sm:w-auto sm:px-6">
+          <button onClick={onCreate} disabled={isSubmitting} className="btn-ink w-full sm:w-auto">
             {isSubmitting ? "Creating..." : "Create assessment"}
           </button>
         </div>
@@ -133,19 +138,17 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
           <FaChevronRight className={open ? "shrink-0 rotate-90 text-accent transition" : "shrink-0 text-ink-soft transition"} />
           <SkillIcon index={problemIndex} />
           <span className="min-w-0 flex-1">
-            <span className="block text-base font-semibold leading-snug text-ink sm:truncate">{sectionName(problem, problemIndex)}</span>
-            <span className="text-sm text-ink-soft">{problem.tests.length} test cases configured</span>
+            <span className="app-h3 block sm:truncate">{sectionName(problem, problemIndex)}</span>
+            <span className="mt-0.5 block text-[13px] text-ink-soft">{problem.tests.length} test cases</span>
           </span>
-          <span className="hidden shrink-0 text-ink-soft sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
+          <span className="app-eyebrow hidden shrink-0 sm:inline">{problem.timeLimitMinutes} min</span>
         </button>
         {canDelete && (
-          <button onClick={onRemove} className="grid h-9 w-9 shrink-0 place-items-center rounded-md border border-rose-600/40 bg-rose-50 text-rose-700" title="Delete section">
-            <FaTrash />
-          </button>
+          <button onClick={onRemove} className="shrink-0 text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent" title="Delete section">Delete</button>
         )}
       </div>
       {open && (
-        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-lg border border-rule bg-white p-3 sm:p-4">
+        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-[4px] border border-rule bg-white p-3 sm:p-4">
           <div className="grid min-w-0 gap-3 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -166,11 +169,11 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
           </label>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-semibold text-ink">Test cases</h3>
-            <button onClick={onAddTest} className="inline-flex items-center gap-2 font-bold text-accent"><FaPlus /> Add case</button>
+            <button onClick={onAddTest} className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink">Add case</button>
           </div>
           <div className="grid min-w-0 gap-2">
             {problem.tests.map((test, testIndex) => (
-              <div key={testIndex} className="grid min-w-0 gap-2 rounded-lg border border-rule bg-black/5 p-3 xl:grid-cols-[1fr_1.15fr_1.15fr_auto_auto]">
+              <div key={testIndex} className="grid min-w-0 gap-2 rounded-[4px] border border-rule bg-black/5 p-3 xl:grid-cols-[1fr_1.15fr_1.15fr_auto_auto]">
                 <label className="field-group">
                   <span className="field-label">Case name</span>
                   <input value={test.name} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
@@ -183,19 +186,17 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
                   <span className="field-label">Expected JSON</span>
                   <input value={test.expectedJson} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control font-mono" />
                 </label>
-                <label className="flex items-center gap-3 rounded-md border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
+                <label className="flex items-center gap-3 rounded-[3px] border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
                   <input type="checkbox" checked={test.visible} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
                   Visible to candidate
                 </label>
                 {problem.tests.length > 1 && (
-                  <button onClick={() => onRemoveTest(testIndex)} className="grid h-10 w-10 place-items-center rounded-md border border-rose-600/40 bg-rose-50 text-rose-700 xl:mt-6" title="Delete test case">
-                    <FaTrash />
-                  </button>
+                  <button onClick={() => onRemoveTest(testIndex)} className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent xl:mt-8" title="Delete test case">Delete</button>
                 )}
               </div>
             ))}
           </div>
-          {canDelete && <button onClick={onRemove} className="justify-self-start rounded-md border border-rose-600/40 bg-rose-50 px-4 py-2 text-sm font-bold text-rose-700">Delete section</button>}
+          {canDelete && <button onClick={onRemove} className="justify-self-start text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent">Delete section</button>}
         </div>
       )}
     </section>

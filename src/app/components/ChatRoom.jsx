@@ -77,13 +77,13 @@ export default function ChatRoom({ sessionId, userEmail }) {
 
   return (
     <div className="relative z-10 flex h-120 w-full flex-col">
-      <div className="mb-4 flex items-center rounded-xl border border-rule bg-white p-3 text-sm text-ink-soft">
+      <div className="mb-4 flex items-center rounded-[4px] border border-rule bg-white p-3 text-sm text-ink-soft">
         <FaUsers className="mr-2 text-accent" />
         <strong className="mr-2 text-ink">Active:</strong>
         {activeUsers.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {activeUsers.map((user, idx) => (
-              <span key={idx} className="rounded-lg border border-accent bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
+              <span key={idx} className="rounded-[4px] border border-accent bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
                 {user}
               </span>
             ))}
@@ -93,7 +93,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         )}
       </div>
 
-      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-xl border border-rule bg-white p-4 custom-scroll">
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[4px] border border-rule bg-white p-4 custom-scroll">
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div
@@ -106,7 +106,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
               }`}
             >
               <div
-                className={`px-3 py-2 rounded-lg text-sm ${
+                className={`px-3 py-2 rounded-[4px] text-sm ${
                   msg.sender === userEmail
                     ? "rounded-br-none bg-ink font-semibold text-canvas"
                     : "rounded-bl-none border border-rule bg-black/5 text-ink"

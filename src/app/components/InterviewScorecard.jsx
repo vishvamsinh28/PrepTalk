@@ -80,7 +80,7 @@ export default function InterviewScorecard({ sessionId, session }) {
 
   if (interviewees.length === 0) {
     return (
-      <div className="rounded-2xl border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-700">
+      <div className="rounded-[4px] border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-700">
         Add at least one interviewee to this session before submitting a report.
       </div>
     );
@@ -90,7 +90,7 @@ export default function InterviewScorecard({ sessionId, session }) {
     <form onSubmit={handleSubmit} className="space-y-6 text-left">
       {message && (
         <div
-          className={`flex items-center gap-2 rounded-2xl p-3 text-sm ${
+          className={`flex items-center gap-2 rounded-[4px] p-3 text-sm ${
             isError
               ? "border border-red-300/30 bg-red-500/10 text-red-100"
               : "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700"
@@ -129,7 +129,7 @@ export default function InterviewScorecard({ sessionId, session }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         {scoreFields.map(([name, label]) => (
-          <label key={name} className="rounded-lg border border-rule bg-white p-3">
+          <label key={name} className="rounded-[4px] border border-rule bg-white p-3">
             <span className="field-label min-h-8 text-xs">{label}</span>
             <ScorecardSelect
               id={name}
@@ -184,7 +184,7 @@ export default function InterviewScorecard({ sessionId, session }) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-ink px-7 py-4 font-semibold text-canvas shadow-lg transition hover:-translate-y-0.5"
+          className="rounded-[4px] bg-ink px-7 py-4 font-semibold text-canvas shadow-lg transition hover:-translate-y-0.5"
         >
           Save Report
         </button>
@@ -192,14 +192,14 @@ export default function InterviewScorecard({ sessionId, session }) {
           type="button"
           onClick={generateSummary}
           disabled={!savedReport?._id || summaryLoading}
-          className="rounded-xl border border-rule bg-black/5 px-7 py-4 font-bold text-ink transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-[4px] border border-rule bg-black/5 px-7 py-4 font-bold text-ink transition disabled:cursor-not-allowed disabled:opacity-50"
         >
           {summaryLoading ? "Generating summary..." : "Generate AI Summary"}
         </button>
       </div>
 
       {savedReport?.aiSummary && (
-        <div className="rounded-2xl border border-accent bg-accent/10 p-5">
+        <div className="rounded-[4px] border border-accent bg-accent/10 p-5">
           <p className="mb-2 text-lg font-semibold text-accent">AI feedback summary</p>
           <p className="whitespace-pre-wrap leading-7 text-ink">{savedReport.aiSummary}</p>
           {savedReport.actionItems?.length > 0 && (
@@ -245,7 +245,7 @@ function ScorecardSelect({ id, value, options, onChange, openSelect, setOpenSele
         <div
           role="listbox"
           tabIndex={-1}
-          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-lg border border-accent bg-white shadow-2xl"
+          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-[4px] border border-accent bg-white shadow-2xl"
         >
           {options.map((option) => {
             const isSelected = option === value;

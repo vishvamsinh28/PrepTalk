@@ -51,7 +51,7 @@ export default function LabScreen() {
   return (
     <div
       aria-hidden="true"
-      className="select-none overflow-hidden rounded-md bg-[#151311] shadow-2xl shadow-black/25 ring-1 ring-black/10"
+      className="select-none overflow-hidden rounded-[3px] bg-[#151311] shadow-2xl shadow-black/25 ring-1 ring-black/10"
     >
       <div className="flex items-center gap-3 border-b border-white/10 bg-[#1e1a17] px-4 py-2.5">
         <span className="flex gap-1.5">

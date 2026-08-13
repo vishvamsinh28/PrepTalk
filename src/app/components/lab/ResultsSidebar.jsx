@@ -33,7 +33,7 @@ export default function ResultsSidebar({
           </div>
           <div className="grid gap-2">
             {visibleResults.map((test, index) => (
-              <div key={test.name} className={`flex items-center gap-3 rounded-md px-3 py-3 text-base ${test.status === "failed" ? "bg-accent/15" : ""}`}>
+              <div key={test.name} className={`flex items-center gap-3 rounded-[3px] px-3 py-3 text-base ${test.status === "failed" ? "bg-accent/15" : ""}`}>
                 {test.status === "passed" ? <FaCheck className="text-[#9db87f]" /> : test.status === "failed" ? <FaTimes className="text-[#e4633f]" /> : <span className="h-3 w-3 rounded-full border border-white/25" />}
                 Test Case {index + 1}
               </div>
@@ -43,7 +43,7 @@ export default function ResultsSidebar({
 
         <main className="min-h-0 overflow-y-auto p-3 sm:p-4">
           {hasRun && (
-            <div className={`mb-3 rounded-md px-4 py-3 text-base font-semibold sm:text-xl ${allPassed ? "bg-[#9db87f]/15 text-[#9db87f]" : "bg-accent/15 text-[#e4633f]"}`}>
+            <div className={`mb-3 rounded-[3px] px-4 py-3 text-base font-semibold sm:text-xl ${allPassed ? "bg-[#9db87f]/15 text-[#9db87f]" : "bg-accent/15 text-[#e4633f]"}`}>
               {allPassed ? <FaCheck className="mr-3 inline text-[#9db87f]" /> : <FaTimes className="mr-3 inline text-[#e4633f]" />}
               {allPassed ? "All visible test cases passed" : `${visibleFailed} failed · ${visiblePassed} passed`}
             </div>
@@ -73,7 +73,7 @@ export default function ResultsSidebar({
               {explanationError && !failedResults.length && <ResultBlock title="Explanation Error">{explanationError}</ResultBlock>}
             </div>
           ) : (
-            <div className="rounded-md border border-white/10 p-5 text-white/50">No visible test cases for this question.</div>
+            <div className="rounded-[3px] border border-white/10 p-5 text-white/50">No visible test cases for this question.</div>
           )}
         </main>
       </div>
@@ -83,7 +83,7 @@ export default function ResultsSidebar({
 
 function ResultBlock({ title, children }) {
   return (
-    <section className="rounded-md border border-white/10 bg-white/5">
+    <section className="rounded-[3px] border border-white/10 bg-white/5">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <h3 className="font-semibold">{title}</h3>
       </div>

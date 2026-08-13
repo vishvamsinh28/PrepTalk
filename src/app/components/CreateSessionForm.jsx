@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaClipboard, FaEnvelope, FaExclamationTriangle, FaRocket } from "react-icons/fa";
 
 const defaultAgenda = "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min";
 const levels = ["Entry", "Mid", "Senior"];
@@ -120,68 +119,76 @@ export default function CreateSessionForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="glass-panel relative z-10 mx-auto w-full rounded-xl p-5 sm:p-6"
+      className="panel w-full p-8"
     >
-      <div className="mb-6 flex flex-col gap-4 border-b border-rule pb-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-accent">New interview</p>
-          <h2 className="text-2xl font-semibold tracking-tight text-ink">Create session</h2>
-          <p className="mt-2 text-sm text-ink-soft">Set up the interview, schedule, agenda, and invite package.</p>
-        </div>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink">
-          <FaRocket className="text-xl text-canvas" />
-        </div>
+      <div className="mb-8 border-b border-rule pb-6">
+        <p className="app-eyebrow">New interview</p>
+        <h2 className="app-h2 mt-3">Create session</h2>
+        <p className="mt-3 max-w-[58ch] text-sm leading-[1.7] text-ink-soft">
+          Set up the interview, schedule, agenda, and invite package.
+        </p>
       </div>
 
       {message && (
-        <div
-          className={`mb-4 flex items-center rounded-2xl p-3 text-sm ${
+        <p
+          role={isError ? "alert" : "status"}
+          className={`mb-6 border-l-2 px-4 py-3 text-sm ${
             isError
-              ? "border border-red-300/30 bg-red-500/10 text-red-100"
-              : "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700"
+              ? "border-accent bg-accent/5 text-accent"
+              : "border-emerald-700 bg-emerald-50 text-emerald-700"
           }`}
         >
-          {isError ? (
-            <FaExclamationTriangle className="mr-2" />
-          ) : (
-            <FaCheckCircle className="mr-2" />
-          )}
           {message}
-        </div>
+        </p>
       )}
 
       {createdSession && (
-        <div className="mb-6 rounded-2xl border border-emerald-600/40 bg-emerald-50 p-5">
-          <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-            <div>
-              <p className="font-semibold text-emerald-700">Session ready</p>
-              <p className="mt-1 text-sm text-ink-soft">Send this link only to assigned interviewees. Users who are not assigned cannot open the room.</p>
-            </div>
-            {copied && <span className="rounded-lg border border-rule bg-black/5 px-3 py-2 text-xs font-bold text-ink">Copied {copied}</span>}
+        <div className="mb-8 border-l-2 border-emerald-700 bg-emerald-50/60 px-5 py-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <p className="app-h3">Session ready</p>
+            {copied && <span className="app-eyebrow">Copied {copied}</span>}
           </div>
+          <p className="mt-2 max-w-[58ch] text-sm leading-[1.7] text-ink-soft">
+            Send this link only to assigned interviewees — anyone else is blocked from
+            opening the room.
+          </p>
 
-          <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
-            <input readOnly value={inviteDetails.inviteUrl} className="field-surface field-control min-w-0 text-sm" />
-            <button type="button" onClick={() => copyText("link", inviteDetails.inviteUrl)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-accent bg-accent/10 px-4 py-3 font-bold text-accent">
-              <FaClipboard />
-              Copy link
-            </button>
-            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-3 font-semibold text-canvas">
-              <FaEnvelope />
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <input
+              readOnly
+              value={inviteDetails.inviteUrl}
+              className="field-surface min-w-0 flex-1 rounded-[4px] px-3 py-2.5 text-sm"
+            />
+            <a href={inviteDetails.mailtoHref} className="btn-ink shrink-0">
               Send email
             </a>
           </div>
 
-          <div className="mt-4">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <p className="text-sm font-bold text-ink">Email content</p>
-              <button type="button" onClick={() => copyText("email", inviteDetails.emailBody)} className="inline-flex items-center gap-2 rounded-lg border border-rule bg-black/5 px-3 py-2 text-xs font-bold text-ink">
-                <FaClipboard />
-                Copy email
-              </button>
-            </div>
-            <textarea readOnly value={inviteDetails.emailBody} className="field-surface field-control min-h-44 text-sm leading-6" />
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]">
+            <button
+              type="button"
+              onClick={() => copyText("link", inviteDetails.inviteUrl)}
+              className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+            >
+              Copy link
+            </button>
+            <button
+              type="button"
+              onClick={() => copyText("email", inviteDetails.emailBody)}
+              className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+            >
+              Copy email text
+            </button>
           </div>
+
+          <details className="mt-4">
+            <summary className="app-eyebrow cursor-pointer">Preview email</summary>
+            <textarea
+              readOnly
+              value={inviteDetails.emailBody}
+              className="field-surface mt-3 min-h-44 w-full rounded-[4px] p-3 text-sm leading-6"
+            />
+          </details>
         </div>
       )}
 
@@ -317,12 +324,11 @@ export default function CreateSessionForm() {
           />
         </label>
 
-        <button
-          type="submit"
-          className="w-full rounded-xl bg-ink p-3.5 font-semibold text-canvas shadow-lg transition hover:-translate-y-0.5 lg:col-span-2"
-        >
-          Create Session
-        </button>
+        <div className="mt-3 border-t border-rule pt-6 lg:col-span-2">
+          <button type="submit" className="btn-ink w-full">
+            Create session
+          </button>
+        </div>
       </form>
     </motion.div>
   );
@@ -330,8 +336,8 @@ export default function CreateSessionForm() {
 
 function SegmentedControl({ name, value, options, onChange }) {
   return (
-    <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-rule bg-white p-1">
-      {options.map((option) => {
+    <div className="inline-flex w-full overflow-hidden rounded-[4px] border border-rule">
+      {options.map((option, index) => {
         const isActive = value === option;
         return (
           <button
@@ -339,10 +345,12 @@ function SegmentedControl({ name, value, options, onChange }) {
             type="button"
             aria-pressed={isActive}
             onClick={() => onChange(option)}
-            className={`min-h-10 rounded-md border px-2 text-sm font-bold transition ${
+            className={`min-h-11 flex-1 px-3 text-sm transition-colors ${
+              index > 0 ? "border-l border-rule" : ""
+            } ${
               isActive
-                ? "border-accent bg-accent/10 text-accent shadow-inner shadow-cyan-300/10"
-                : "border-transparent bg-transparent text-ink-soft hover:border-rule hover:bg-slate-800/45 hover:text-ink"
+                ? "bg-ink font-medium text-canvas"
+                : "bg-white text-ink-soft hover:bg-black/[0.03] hover:text-ink"
             }`}
           >
             {option}
