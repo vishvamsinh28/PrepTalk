@@ -1,287 +1,432 @@
-"use client";
-
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import {
-  FaArrowRight,
-  FaBrain,
-  FaChartLine,
-  FaClipboardCheck,
-  FaCode,
-  FaComments,
-  FaLaptopCode,
-  FaMedal,
-  FaRocket,
-  FaStopwatch,
-  FaUserGraduate,
-} from "react-icons/fa";
+import Link from "next/link";
+import { Instrument_Sans } from "next/font/google";
 import PrepTalkLogo from "./components/PrepTalkLogo";
 
-const fadeIn = {
-  hidden: { opacity: 0, y: 22 },
-  visible: { opacity: 1, y: 0 },
+const sans = Instrument_Sans({ subsets: ["latin"], display: "swap" });
+
+export const metadata = {
+  description:
+    "PrepTalk pairs you with a real interviewer in live mock-interview rooms, then checks your coding in timed, server-graded screens.",
 };
 
-const staggerContainer = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.12,
-    },
-  },
-};
-
-const features = [
-  { icon: <FaUserGraduate />, title: "Role-based prep", desc: "Interviewers build focused rooms while candidates join only the sessions assigned to them." },
-  { icon: <FaComments />, title: "Live room context", desc: "Video, chat, and presence stay together so interview feedback has the right evidence." },
-  { icon: <FaClipboardCheck />, title: "Structured scorecards", desc: "Capture communication, depth, problem solving, confidence, and role fit in one pass." },
-  { icon: <FaLaptopCode />, title: "Coding lab", desc: "Run timed code screens with a polished editor, hidden test cases, scoring, and fast review signals." },
-  { icon: <FaBrain />, title: "AI failure hints", desc: "When tests fail, candidates get targeted debugging guidance instead of vague red marks." },
-  { icon: <FaChartLine />, title: "Progress trail", desc: "Reports stay organized so interviewees can see what changed after every practice round." },
+const sessionSteps = [
+  "An interviewer opens a room, sets the agenda, and sends one invite link.",
+  "You meet on video, with chat and a shared workspace for notes and code.",
+  "The scorecard is filled in during the call. The report is waiting when it ends.",
 ];
 
-const stats = [
-  ["2", "products"],
-  ["2", "clear user roles"],
-  ["5", "score dimensions"],
+const scorecardDimensions = [
+  "Communication",
+  "Technical depth",
+  "Problem solving",
+  "Confidence",
+  "Role fit",
 ];
 
-const products = [
-  {
-    icon: <FaComments />,
-    name: "PrepTalk Interview",
-    eyebrow: "Live practice",
-    desc: "Create mock interview rooms with video, chat, shared context, AI questions, and structured scorecards.",
-    action: "Start interviewing",
-    path: "/register",
-  },
-  {
-    icon: <FaCode />,
-    name: "PrepTalk Lab",
-    eyebrow: "Coding screens",
-    desc: "Give candidates a focused coding assessment with timers, visible and hidden tests, score tracking, and AI failure explanations.",
-    action: "Open the lab",
-    path: "/register",
-  },
+const screenParts = [
+  ["Timed attempt", "the clock is part of the signal"],
+  ["Visible tests", "run locally, as often as you like"],
+  ["Hidden tests", "graded on the server when you submit"],
+  ["Failure hints", "the AI explains what broke, in words"],
+];
+
+const capabilities = [
+  [
+    "Live video rooms",
+    "WebRTC video and persistent chat in the same pane, with presence — so feedback can point at what actually happened.",
+  ],
+  [
+    "A shared workspace",
+    "Notes and code both sides can see and edit while the conversation is still going.",
+  ],
+  [
+    "Structured scorecards",
+    "Communication, depth, problem solving, confidence, role fit. Filled in during the session, not reconstructed after it.",
+  ],
+  [
+    "Timed coding screens",
+    "Visible tests run in your browser while you work. Hidden tests grade on the server when you submit.",
+  ],
+  [
+    "Hints when tests fail",
+    "A failing test comes back with an explanation of what broke, not just a red mark.",
+  ],
+  [
+    "Reports that accumulate",
+    "Every session leaves a summary. Line them up and you can see whether the practice is working.",
+  ],
+];
+
+const codeLines = [
+  [
+    { t: "function", c: "text-cyan-300" },
+    { t: " solve", c: "text-slate-100" },
+    { t: "(nums, target) {", c: "text-slate-300" },
+  ],
+  [
+    { t: "  const", c: "text-cyan-300" },
+    { t: " seen = ", c: "text-slate-300" },
+    { t: "new", c: "text-cyan-300" },
+    { t: " Map();", c: "text-slate-300" },
+  ],
+  [
+    { t: "  for", c: "text-cyan-300" },
+    { t: " (", c: "text-slate-300" },
+    { t: "let", c: "text-cyan-300" },
+    { t: " i = ", c: "text-slate-300" },
+    { t: "0", c: "text-amber-300" },
+    { t: "; i < nums.length; i++) {", c: "text-slate-300" },
+  ],
+  [
+    { t: "    const", c: "text-cyan-300" },
+    { t: " need = target - nums[i];", c: "text-slate-300" },
+  ],
+  [
+    { t: "    if", c: "text-cyan-300" },
+    { t: " (seen.has(need)) ", c: "text-slate-300" },
+    { t: "return", c: "text-cyan-300" },
+    { t: " [seen.get(need), i];", c: "text-slate-300" },
+  ],
+  [{ t: "    seen.set(nums[i], i);", c: "text-slate-300" }],
+  [{ t: "  }", c: "text-slate-300" }],
+  [{ t: "}", c: "text-slate-300" }],
 ];
 
 export default function HomePage() {
-  const router = useRouter();
-
   return (
-    <main className="app-shell overflow-hidden">
-      <section className="relative min-h-screen px-5 py-8 sm:px-8 lg:px-12">
-        <div className="soft-grid absolute inset-0 opacity-70" />
-        <div className="relative z-10 mx-auto flex min-h-[calc(100vh-4rem)] max-w-7xl flex-col">
-          <header className="flex items-center justify-between">
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-3 text-left"
-              aria-label="PrepTalk home"
+    <main className={`${sans.className} min-h-screen bg-paper text-ink`}>
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <header className="flex items-center justify-between border-b border-rule py-5">
+          <Link href="/" aria-label="PrepTalk home" className="flex items-center gap-2.5">
+            <PrepTalkLogo showWord={false} markClassName="h-8 w-8" />
+            <span className="text-[17px] font-semibold tracking-tight">PrepTalk</span>
+          </Link>
+          <nav aria-label="Main" className="flex items-center gap-5">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-ink-soft transition-colors hover:text-ink"
             >
-              <PrepTalkLogo />
-            </button>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => router.push("/login")}
-                className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-semibold text-white/85 transition hover:border-cyan-300/70 hover:text-white"
-              >
-                Login
-              </button>
-              <button
-                onClick={() => router.push("/register")}
-                className="rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
-              >
-                Start
-              </button>
-            </div>
-          </header>
-
-          <div className="grid flex-1 items-center gap-12 py-12 lg:grid-cols-[1.02fr_0.98fr] lg:py-8">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-              className="max-w-3xl"
-            >
-              <motion.p variants={fadeIn} className="mb-5 inline-flex rounded-xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-cyan-100 backdrop-blur">
-                Two products for sharper interview prep.
-              </motion.p>
-              <motion.h1 variants={fadeIn} className="text-5xl font-black leading-[1.03] tracking-tight sm:text-6xl lg:text-7xl">
-                Interview rooms and coding labs that feel <span className="gradient-text">sharp, live, and human.</span>
-              </motion.h1>
-              <motion.p variants={fadeIn} className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-                PrepTalk now combines live interview practice with Lab-style coding screens, so teams can evaluate conversation, problem solving, and code in one place.
-              </motion.p>
-              <motion.div variants={fadeIn} className="mt-8 flex flex-col gap-4 sm:flex-row">
-                <button
-                  onClick={() => router.push("/register")}
-                  className="inline-flex items-center justify-center gap-3 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-xl shadow-cyan-500/20 transition hover:-translate-y-1"
-                >
-                  Get started free
-                  <FaArrowRight />
-                </button>
-                <button
-                  onClick={() => router.push("/login")}
-                  className="rounded-xl border border-white/15 bg-white/8 px-7 py-4 font-bold text-white transition hover:border-cyan-300/70 hover:bg-white/12"
-                >
-                  Sign in
-                </button>
-              </motion.div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.2 }}
-              className="glass-panel rounded-2xl p-5 sm:p-7"
-            >
-              <div className="rounded-3xl border border-white/10 bg-slate-950/50 p-5">
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-cyan-200">PrepTalk Lab</p>
-                    <h2 className="text-2xl font-black">Pair Sum Signal</h2>
-                  </div>
-                  <span className="inline-flex items-center gap-2 rounded-xl bg-emerald-400/15 px-3 py-1 text-xs font-bold text-emerald-200 ring-1 ring-emerald-300/30">
-                    <FaStopwatch />
-                    28:14
-                  </span>
-                </div>
-
-                <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                  <div className="rounded-2xl border border-white/10 bg-[#07101d] p-4">
-                    <div className="mb-4 flex items-center gap-2">
-                      <span className="h-3 w-3 rounded-full bg-rose-400" />
-                      <span className="h-3 w-3 rounded-full bg-amber-300" />
-                      <span className="h-3 w-3 rounded-full bg-emerald-300" />
-                    </div>
-                    <div className="space-y-2 font-mono text-xs text-slate-300">
-                      <p><span className="text-slate-600">01</span> <span className="text-cyan-200">function</span> solve(nums, target) {"{"}</p>
-                      <p><span className="text-slate-600">02</span> &nbsp;&nbsp;<span className="text-cyan-200">const</span> seen = <span className="text-emerald-200">new</span> Map();</p>
-                      <p><span className="text-slate-600">03</span> &nbsp;&nbsp;<span className="text-cyan-200">return</span> [0, 1];</p>
-                      <p><span className="text-slate-600">04</span> {"}"}</p>
-                    </div>
-                  </div>
-                  <div className="grid gap-3">
-                    {["Sample 1 passed", "Sample 2 passed", "Hidden 1 pending"].map((item, index) => (
-                      <div key={item} className="rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm font-bold text-slate-200">{item}</span>
-                          <span className={`rounded-xl px-3 py-1 text-xs font-bold ${index < 2 ? "bg-emerald-300/15 text-emerald-100" : "bg-amber-300/15 text-amber-100"}`}>
-                            {index < 2 ? "OK" : "Submit"}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3">
-                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-amber-100">AI hint</p>
-                      <p className="mt-2 text-sm text-slate-300">Check duplicate handling before hidden tests.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 grid gap-3">
-                  {["Interview: live room", "Lab: code screen", "Reports: score trail"].map((item, index) => (
-                    <div key={item} className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/8 px-4 py-3">
-                      <span className="text-sm text-slate-200">{item}</span>
-                      <span className="rounded-xl bg-cyan-300/15 px-3 py-1 text-xs font-bold text-cyan-100">
-                        {index === 2 ? "Ready" : "Live"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <section className="relative px-5 py-20 sm:px-8 lg:px-12">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-            <div>
-              <p className="mb-3 text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Product suite</p>
-              <h2 className="text-4xl font-black tracking-tight sm:text-5xl">Interview and Lab work together.</h2>
-            </div>
-            <p className="text-lg leading-8 text-slate-300">
-              Use Interview for live conversation practice and Lab for timed coding screens. Both feed a cleaner picture of candidate readiness.
-            </p>
-          </div>
-
-          <div className="mb-8 grid gap-5 lg:grid-cols-2">
-            {products.map((product) => (
-              <article key={product.name} className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">{product.eyebrow}</p>
-                    <h3 className="mt-3 text-3xl font-black">{product.name}</h3>
-                  </div>
-                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-linear-to-br from-cyan-300/90 via-emerald-300/90 to-blue-400/90 text-xl text-slate-950">
-                    {product.icon}
-                  </div>
-                </div>
-                <p className="mt-4 leading-7 text-slate-300">{product.desc}</p>
-                <button
-                  onClick={() => router.push(product.path)}
-                  className="mt-5 inline-flex items-center gap-3 rounded-xl border border-white/15 bg-white/8 px-5 py-3 font-bold text-white transition hover:border-cyan-300/70 hover:bg-white/12"
-                >
-                  {product.action}
-                  <FaArrowRight />
-                </button>
-              </article>
-            ))}
-          </div>
-
-          <motion.div
-            className="grid gap-5 md:grid-cols-2 lg:grid-cols-3"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            {features.map((feature) => (
-              <motion.article key={feature.title} variants={fadeIn} className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40">
-                <div className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-linear-to-br from-cyan-300/90 via-emerald-300/90 to-blue-400/90 text-xl text-slate-950">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-black">{feature.title}</h3>
-                <p className="mt-3 leading-7 text-slate-300">{feature.desc}</p>
-              </motion.article>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="px-5 pb-24 sm:px-8 lg:px-12">
-        <div className="glass-panel mx-auto grid max-w-7xl gap-8 rounded-2xl p-8 md:grid-cols-[1.1fr_0.9fr] md:p-10">
-          <div>
-            <h2 className="text-4xl font-black tracking-tight">Ready to make your next mock interview count?</h2>
-            <p className="mt-4 max-w-2xl text-slate-300">
-              Create an account, pick your role, and move straight into a workflow that looks as focused as the interview should feel.
-            </p>
-            <button
-              onClick={() => router.push("/register")}
-              className="mt-7 inline-flex items-center gap-3 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1"
+              Log in
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-[3px] bg-ink px-4 py-2 text-sm font-medium text-paper transition-colors hover:bg-ink/85"
             >
               Create account
-              <FaArrowRight />
-            </button>
+            </Link>
+          </nav>
+        </header>
+
+        <section className="grid gap-12 py-16 sm:py-20 lg:grid-cols-12 lg:gap-8 lg:py-28">
+          <div className="lg:col-span-8">
+            <p className="landing-rise landing-mono uppercase text-ink-soft">
+              Mock interview rooms · Timed coding screens
+            </p>
+            <h1
+              className="landing-display landing-rise mt-6 max-w-[14ch]"
+              style={{ animationDelay: "70ms" }}
+            >
+              You can&rsquo;t practice interviews alone.
+            </h1>
+            <p
+              className="landing-rise mt-6 max-w-[52ch] text-lg leading-relaxed text-ink-soft"
+              style={{ animationDelay: "140ms" }}
+            >
+              PrepTalk puts a real interviewer in the room with you — live video, shared
+              code, and a scorecard that says what needs work. Then timed coding screens
+              tell you whether it stuck.
+            </p>
+            <div
+              className="landing-rise mt-9 flex flex-wrap items-center gap-x-7 gap-y-4"
+              style={{ animationDelay: "210ms" }}
+            >
+              <Link
+                href="/register"
+                className="rounded-[3px] bg-ink px-6 py-3.5 text-[15px] font-medium text-paper transition-colors hover:bg-ink/85"
+              >
+                Create a free account
+              </Link>
+              <a
+                href="#product"
+                className="text-[15px] font-medium underline decoration-rule decoration-2 underline-offset-4 transition-colors hover:decoration-ink"
+              >
+                See the product
+              </a>
+            </div>
+            <p
+              className="landing-rise landing-mono mt-8 text-ink-soft"
+              style={{ animationDelay: "280ms" }}
+            >
+              Free to use — runs in the browser.
+            </p>
           </div>
-          <div className="grid grid-cols-3 gap-3">
-            {stats.map(([value, label]) => (
-              <div key={label} className="rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-center">
-                <p className="text-4xl font-black gradient-text">{value}</p>
-                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-slate-300">{label}</p>
+
+          <aside
+            className="landing-rise border-t border-rule pt-8 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1"
+            style={{ animationDelay: "260ms" }}
+            aria-label="How a session runs"
+          >
+            <h2 className="landing-mono uppercase text-ink-soft">
+              A session, start to finish
+            </h2>
+            <ol className="mt-5 space-y-5">
+              {sessionSteps.map((step, i) => (
+                <li key={step} className="flex gap-4">
+                  <span className="landing-mono pt-0.5 text-accent">0{i + 1}</span>
+                  <span className="text-[15px] leading-relaxed text-ink-soft">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </aside>
+        </section>
+      </div>
+
+      <section id="product" className="bg-ink py-14 sm:py-20">
+        <div className="mx-auto max-w-6xl px-5 sm:px-8">
+          <figure>
+            {/* Placeholder rendered in markup — swap the framed div for a real
+                screenshot (public/images/) once one is captured. */}
+            <div
+              aria-hidden="true"
+              className="select-none overflow-hidden rounded-md shadow-2xl ring-1 ring-white/10"
+            >
+              <div className="flex items-center gap-3 border-b border-white/10 bg-[#08111f] px-4 py-2.5">
+                <span className="flex gap-1.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-600/60" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-600/60" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-slate-600/60" />
+                </span>
+                <span className="font-mono text-[11px] text-slate-500">
+                  PrepTalk Lab · Assessment
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="grid bg-[#07101d] sm:grid-cols-[1fr_1.5fr]">
+                <div className="hidden border-r border-white/10 bg-[#0a1322] p-5 sm:block">
+                  <p className="text-sm font-bold text-slate-100">Pair Sum</p>
+                  <p className="mt-1 text-[10px] font-semibold text-slate-500">
+                    Medium · 40 points · 30:00
+                  </p>
+                  <p className="mt-4 text-[11px] leading-relaxed text-slate-400">
+                    Given an array of integers and a target, return the indices of the
+                    two numbers that add up to the target. Each input has exactly one
+                    solution, and you may not use the same element twice.
+                  </p>
+                  <div className="mt-4 rounded border border-white/10 bg-white/5 p-2.5 font-mono text-[10px] text-slate-400">
+                    solve([2, 7, 11, 15], 9) → [0, 1]
+                  </div>
+                  <div className="mt-5 space-y-1.5">
+                    {[
+                      ["Sample 1", "passed"],
+                      ["Sample 2", "passed"],
+                      ["Hidden tests", "on submit"],
+                    ].map(([name, state]) => (
+                      <div
+                        key={name}
+                        className="flex items-center justify-between rounded border border-white/10 bg-white/5 px-2.5 py-1.5"
+                      >
+                        <span className="text-[10px] font-semibold text-slate-300">
+                          {name}
+                        </span>
+                        <span
+                          className={`font-mono text-[10px] ${
+                            state === "passed" ? "text-emerald-300" : "text-slate-500"
+                          }`}
+                        >
+                          {state}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between border-b border-white/10 bg-[#08111f] px-4 py-2">
+                    <span className="flex items-center gap-2.5">
+                      <span className="text-xs font-bold text-slate-100">Editor</span>
+                      <span className="rounded border border-white/10 bg-white/8 px-2 py-0.5 text-[10px] font-semibold text-slate-300">
+                        JavaScript
+                      </span>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="rounded border border-emerald-300/25 bg-emerald-300/10 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-200">
+                        24:31
+                      </span>
+                      <span className="rounded bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-2.5 py-0.5 text-[10px] font-black text-slate-950">
+                        Submit
+                      </span>
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-[2.25rem_1fr]">
+                    <div className="border-r border-white/10 bg-[#08111f] py-3 text-right font-mono text-[11px] leading-5 text-slate-600">
+                      {codeLines.map((_, i) => (
+                        <div key={i} className="pr-2.5">
+                          {i + 1}
+                        </div>
+                      ))}
+                    </div>
+                    <pre className="overflow-x-auto p-3 font-mono text-[11px] leading-5">
+                      <code>
+                        {codeLines.map((line, i) => (
+                          <div key={i}>
+                            {line.map((seg, j) => (
+                              <span key={j} className={seg.c}>
+                                {seg.t}
+                              </span>
+                            ))}
+                          </div>
+                        ))}
+                      </code>
+                    </pre>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-white/10 bg-[#08111f] px-4 py-2.5">
+                    <span className="text-[10px] font-semibold text-slate-500">
+                      8 lines · Visible tests run locally. Final score is graded on the
+                      server.
+                    </span>
+                    <span className="rounded border border-emerald-300/35 bg-emerald-300/10 px-2.5 py-1 text-[10px] font-bold text-emerald-200">
+                      Run code
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption className="landing-mono mt-5 text-slate-400">
+              PrepTalk Lab, mid-attempt — visible tests run locally, hidden tests grade
+              on submit.
+            </figcaption>
+          </figure>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 px-5 py-8 text-center text-sm text-slate-400">
-        © {new Date().getFullYear()} PrepTalk. Built for better practice.
-      </footer>
+      <div className="mx-auto max-w-6xl px-5 sm:px-8">
+        <section className="py-16 sm:py-24" aria-labelledby="products-heading">
+          <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+            <h2 id="products-heading" className="landing-h2 lg:col-span-7">
+              Two rooms. One loop.
+            </h2>
+            <p className="text-[17px] leading-relaxed text-ink-soft lg:col-span-5 lg:self-end">
+              Interview is where you talk. Lab is where you code. Reports connect the
+              two, so the next session starts where the last one ended.
+            </p>
+          </div>
+
+          <article className="mt-14 grid gap-10 border-t border-rule pt-12 lg:grid-cols-12 lg:gap-8">
+            <div className="lg:col-span-5">
+              <p className="landing-mono uppercase text-ink-soft">01 · PrepTalk Interview</p>
+              <h3 className="landing-h3 mt-4">
+                A live room with a real person on the other side.
+              </h3>
+              <p className="mt-4 max-w-[48ch] leading-relaxed text-ink-soft">
+                Video, chat, and a shared workspace in one place. The interviewer runs
+                the agenda; you work the problem. Nobody has to pretend a chatbot is a
+                hiring manager.
+              </p>
+              <Link
+                href="/register"
+                className="mt-6 inline-block text-[15px] font-medium text-accent underline decoration-accent/30 decoration-2 underline-offset-4 transition-colors hover:decoration-accent"
+              >
+                Start interviewing →
+              </Link>
+            </div>
+            <div className="lg:col-span-6 lg:col-start-7">
+              <p className="landing-mono uppercase text-ink-soft">
+                The scorecard — five dimensions
+              </p>
+              <ul className="mt-4">
+                {scorecardDimensions.map((dim, i) => (
+                  <li
+                    key={dim}
+                    className="flex items-baseline gap-4 border-b border-rule py-3.5"
+                  >
+                    <span className="landing-mono text-accent">0{i + 1}</span>
+                    <span className="text-[15px] font-medium">{dim}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+
+          <article className="mt-14 grid gap-10 border-t border-rule pt-12 lg:grid-cols-12 lg:gap-8">
+            <div className="lg:order-2 lg:col-span-5 lg:col-start-8">
+              <p className="landing-mono uppercase text-ink-soft">02 · PrepTalk Lab</p>
+              <h3 className="landing-h3 mt-4">
+                Coding screens graded by tests, not impressions.
+              </h3>
+              <p className="mt-4 max-w-[48ch] leading-relaxed text-ink-soft">
+                A timer, visible tests you can run while you work, and hidden tests that
+                grade server-side on submit. When something fails, you get an explanation
+                of what broke — not just a red X.
+              </p>
+              <Link
+                href="/register"
+                className="mt-6 inline-block text-[15px] font-medium text-accent underline decoration-accent/30 decoration-2 underline-offset-4 transition-colors hover:decoration-accent"
+              >
+                Open the lab →
+              </Link>
+            </div>
+            <div className="lg:order-1 lg:col-span-6">
+              <p className="landing-mono uppercase text-ink-soft">What a screen includes</p>
+              <ul className="mt-4">
+                {screenParts.map(([name, detail]) => (
+                  <li
+                    key={name}
+                    className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-rule py-3.5"
+                  >
+                    <span className="text-[15px] font-medium">{name}</span>
+                    <span className="text-[14px] text-ink-soft">{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        </section>
+
+        <section className="border-t border-rule py-16 sm:py-24" aria-labelledby="capabilities-heading">
+          <h2 id="capabilities-heading" className="landing-h2 max-w-[24ch]">
+            Everything in the current build.
+          </h2>
+          <ol className="mt-10">
+            {capabilities.map(([title, desc], i) => (
+              <li
+                key={title}
+                className="grid gap-2 border-t border-rule py-6 md:grid-cols-[4rem_1fr_1.6fr] md:gap-6"
+              >
+                <span className="landing-mono pt-1 text-ink-soft">0{i + 1}</span>
+                <h3 className="text-lg font-medium tracking-tight">{title}</h3>
+                <p className="leading-relaxed text-ink-soft">{desc}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="border-t border-rule py-16 sm:py-24">
+          <h2 className="landing-h2 max-w-[22ch]">
+            The real interview is a bad place to learn.
+          </h2>
+          <p className="mt-5 max-w-[46ch] text-lg leading-relaxed text-ink-soft">
+            Set up a room, run the reps, read the report. Free while we build it out.
+          </p>
+          <Link
+            href="/register"
+            className="mt-8 inline-block rounded-[3px] bg-ink px-6 py-3.5 text-[15px] font-medium text-paper transition-colors hover:bg-ink/85"
+          >
+            Create a free account
+          </Link>
+        </section>
+
+        <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-rule py-8 text-sm text-ink-soft">
+          <p>© {new Date().getFullYear()} PrepTalk</p>
+          <nav aria-label="Footer" className="flex gap-6">
+            <Link href="/login" className="transition-colors hover:text-ink">
+              Log in
+            </Link>
+            <Link href="/register" className="transition-colors hover:text-ink">
+              Create account
+            </Link>
+          </nav>
+        </footer>
+      </div>
     </main>
   );
 }
