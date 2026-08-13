@@ -1,12 +1,15 @@
 @import "tailwindcss";
 
-/* Landing-page palette (src/app/page.jsx). Additive — app pages don't use these names. */
+/* Landing-page palette (src/app/components/landing/*). Additive — app pages don't use these names. */
 @theme {
-  --color-paper: #faf9f6;
-  --color-ink: #17150f;
-  --color-ink-soft: #5b5750;
-  --color-rule: #e6e3da;
-  --color-accent: #0c6b52;
+  --color-canvas: #f4f1ea;
+  --color-ink: #151311;
+  --color-ink-soft: #6b655d;
+  --color-rule: #ddd7cb;
+  --color-accent: #c0341a;
+  --color-accent-light: #e4633f;
+  --color-night: #151311;
+  --color-night-soft: #221e1a;
 }
 
 :root {
@@ -302,36 +305,68 @@ textarea.field-control {
   list-style: disc;
 }
 
-/* Landing page type scale + motion (used only by src/app/page.jsx) */
+/* Landing page type system (used only by src/app/components/landing/*).
+   Editorial serif for statements, grotesk for product and UI copy. */
+.landing-page {
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+}
+
+.landing-serif {
+  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 .landing-display {
-  font-size: clamp(2.6rem, 6.5vw, 5rem);
+  font-size: clamp(3.25rem, 5.6vw, 5rem);
   line-height: 1.02;
-  letter-spacing: -0.03em;
-  font-weight: 600;
+  letter-spacing: -0.021em;
   text-wrap: balance;
 }
 
 .landing-h2 {
-  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-  line-height: 1.08;
-  letter-spacing: -0.022em;
-  font-weight: 600;
+  font-size: clamp(2.25rem, 3.8vw, 3.25rem);
+  line-height: 1.06;
+  letter-spacing: -0.018em;
   text-wrap: balance;
 }
 
 .landing-h3 {
-  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.018em;
-  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  letter-spacing: -0.014em;
+  font-weight: 500;
   text-wrap: balance;
 }
 
 .landing-mono {
   font-family: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.13em;
+}
+
+/* Typewriter caret in the hero headline */
+.landing-caret {
+  display: inline-block;
+  width: 0.055em;
+  min-width: 2px;
+  height: 0.78em;
+  margin-left: 0.07em;
+  translate: 0 0.03em;
+  background: currentColor;
+  animation: landing-blink 1.05s steps(1, end) infinite;
+}
+
+@keyframes landing-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes landing-rise {
@@ -352,5 +387,9 @@ textarea.field-control {
 @media (prefers-reduced-motion: reduce) {
   .landing-rise {
     animation: none;
+  }
+
+  .landing-caret {
+    display: none;
   }
 }
