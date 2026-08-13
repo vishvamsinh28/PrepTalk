@@ -3,9 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
-import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaEye, FaEyeSlash, FaLock, FaUsersCog } from "react-icons/fa";
-import PrepTalkLogo from "../components/PrepTalkLogo";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import AuthLayout from "../components/AuthLayout";
+
+const roles = [
+  ["Interviewee", "Join sessions, take screens"],
+  ["Interviewer", "Create rooms, score people"],
+];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -46,139 +50,146 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5 py-10">
-      <div className="soft-grid absolute inset-0 opacity-60"></div>
+    <AuthLayout
+      headline="Your first mock interview is one link away."
+      blurb="Create an account, pick a side of the table, and run a session that behaves like the real thing."
+      altPrompt="Already have an account?"
+      altLabel="Log in"
+      altHref="/login"
+    >
+      <h2 className="landing-serif text-[1.75rem] leading-tight tracking-[-0.02em] text-ink">
+        Create your account
+      </h2>
+      <p className="mt-1.5 text-sm text-ink-soft">
+        Free while we build it out. No card required.
+      </p>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="glass-panel relative z-10 w-full max-w-md space-y-6 rounded-2xl p-8"
-      >
-        <div className="text-center mb-6">
-          <div className="flex justify-center mb-4">
-            <PrepTalkLogo showWord={false} markClassName="h-16 w-16" />
-          </div>
-          <h2 className="text-4xl font-black tracking-tight gradient-text">Create account</h2>
-          <p className="mt-3 text-slate-300">Join PrepTalk and elevate your skills today.</p>
-        </div>
+      {error && (
+        <p
+          role="alert"
+          className="mt-6 border-l-2 border-accent bg-accent/5 px-4 py-3 text-sm text-accent"
+        >
+          {error}
+        </p>
+      )}
 
-        {error && (
-          <div className="rounded-2xl border border-red-300/30 bg-red-500/10 p-3 text-sm text-red-100">
-            {error}
-          </div>
-        )}
-        
-        {success && (
-          <div className="rounded-2xl border border-emerald-300/30 bg-emerald-500/10 p-3 text-sm text-emerald-100">
-            {success}
-          </div>
-        )}
+      {success && (
+        <p
+          role="status"
+          className="mt-6 border-l-2 border-emerald-700 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+        >
+          {success}
+        </p>
+      )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
-              <FaUser />
-            </div>
-            <input
-              type="text"
-              name="username"
-              placeholder="Username"
-              value={formData.username}
-              onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
-              required
-            />
-          </div>
-          
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
-              <FaEnvelope />
-            </div>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 pl-12 transition"
-              required
-            />
-          </div>
-          
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
-              <FaLock />
-            </div>
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-ink">Name</span>
+          <input
+            type="text"
+            name="username"
+            placeholder="Ada Lovelace"
+            value={formData.username}
+            onChange={handleChange}
+            autoComplete="name"
+            className="field-surface w-full rounded-[4px] px-4 py-3 text-[15px]"
+            required
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-ink">Email</span>
+          <input
+            type="email"
+            name="email"
+            placeholder="you@company.com"
+            value={formData.email}
+            onChange={handleChange}
+            autoComplete="email"
+            className="field-surface w-full rounded-[4px] px-4 py-3 text-[15px]"
+            required
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1.5 block text-sm font-medium text-ink">Password</span>
+          <span className="relative block">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-              placeholder="Password"
+              placeholder="At least 8 characters"
               value={formData.password}
               onChange={handleChange}
-              className="field-surface w-full rounded-2xl p-4 pl-12 pr-12 transition"
+              autoComplete="new-password"
+              className="field-surface w-full rounded-[4px] px-4 py-3 pr-12 text-[15px]"
               required
             />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-300 transition hover:text-white"
+              className="absolute inset-y-0 right-0 flex items-center px-4 text-ink-soft transition-colors hover:text-ink"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
-          </div>
-          
-          <div className="relative">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-cyan-200/80">
-              <FaUsersCog />
-            </div>
-            <select 
-              name="role" 
-              value={formData.role} 
-              onChange={handleChange} 
-              className="field-surface w-full appearance-none rounded-2xl p-4 pl-12 transition"
-            >
-              <option value="Interviewee">Interviewee</option>
-              <option value="Interviewer">Interviewer</option>
-            </select>
-          </div>
+          </span>
+        </label>
 
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full rounded-2xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 p-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 disabled:opacity-70"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...
-              </span>
-            ) : "Create Account"}
-          </button>
-        </form>
+        <fieldset>
+          <legend className="mb-1.5 block text-sm font-medium text-ink">
+            I&rsquo;m joining as
+          </legend>
+          <div className="grid grid-cols-2 gap-2">
+            {roles.map(([value, description]) => (
+              <label
+                key={value}
+                className={`cursor-pointer rounded-[4px] border px-3 py-2.5 transition-colors ${
+                  formData.role === value
+                    ? "border-accent bg-accent/5"
+                    : "border-rule bg-white hover:border-ink/30"
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="role"
+                    value={value}
+                    checked={formData.role === value}
+                    onChange={handleChange}
+                    className="accent-[#c0341a]"
+                  />
+                  <span className="text-sm font-medium text-ink">{value}</span>
+                </span>
+                <span className="mt-1 block text-[12px] leading-snug text-ink-soft">
+                  {description}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
-        <div className="text-center text-sm text-slate-300">
-          <p>
-            Already have an account?{" "}
-            <button 
-              onClick={() => router.push("/login")}
-              className="font-bold text-cyan-200 transition hover:text-white"
-            >
-              Sign in
-            </button>
-          </p>
-        </div>
-        
-        <div className="mt-6 border-t border-white/10 pt-5">
-          <p className="text-center text-xs text-slate-400">
-            By registering, you agree to PrepTalk's Terms of Service and Privacy Policy
-          </p>
-        </div>
-      </motion.div>
-    </div>
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full rounded-[4px] bg-ink px-6 py-3 text-[15px] font-medium text-canvas transition-opacity hover:opacity-85 disabled:opacity-60"
+        >
+          {isLoading ? "Creating account…" : "Create account"}
+        </button>
+      </form>
+
+      <p className="mt-4 text-[12px] leading-relaxed text-ink-soft">
+        By registering you agree to PrepTalk&rsquo;s Terms of Service and Privacy Policy.
+      </p>
+
+      <p className="mt-6 border-t border-rule pt-6 text-sm text-ink-soft lg:hidden">
+        Already have an account?{" "}
+        <button
+          onClick={() => router.push("/login")}
+          className="font-medium text-accent underline decoration-accent/30 decoration-2 underline-offset-4"
+        >
+          Log in
+        </button>
+      </p>
+    </AuthLayout>
   );
 }

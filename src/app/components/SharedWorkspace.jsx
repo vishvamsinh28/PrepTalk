@@ -120,20 +120,20 @@ export default function SharedWorkspace({ sessionId }) {
     <section className="glass-panel rounded-xl p-5 sm:p-6">
       <div className="mb-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Workspace</p>
-          <h2 className="mt-1 text-2xl font-black text-white">Whiteboard & coding pad</h2>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Workspace</p>
+          <h2 className="mt-1 text-2xl font-semibold text-ink">Whiteboard & coding pad</h2>
         </div>
         <div className="grid gap-2 sm:grid-cols-2">
           <button
             onClick={clearWorkspace}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-2.5 font-bold text-rose-100"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-600/40 bg-rose-50 px-4 py-2.5 font-bold text-rose-700"
           >
             <FaEraser />
             Clear all
           </button>
           <button
             onClick={() => saveWorkspace(workspace)}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-ink px-5 py-2.5 font-semibold text-canvas"
           >
             <FaSave />
             Save
@@ -148,7 +148,7 @@ export default function SharedWorkspace({ sessionId }) {
             <button
               type="button"
               onClick={() => clearWorkspaceField("notes")}
-              className="inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/10 px-2 py-1 text-xs font-bold text-slate-200"
+              className="inline-flex items-center gap-1 rounded-md border border-rule bg-black/5 px-2 py-1 text-xs font-bold text-ink"
             >
               <FaEraser />
               Clear
@@ -172,7 +172,7 @@ export default function SharedWorkspace({ sessionId }) {
             <button
               type="button"
               onClick={() => clearWorkspaceField("code")}
-              className="ml-auto inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/10 px-2 py-1 text-xs font-bold text-slate-200"
+              className="ml-auto inline-flex items-center gap-1 rounded-md border border-rule bg-black/5 px-2 py-1 text-xs font-bold text-ink"
             >
               <FaEraser />
               Clear
@@ -190,7 +190,7 @@ export default function SharedWorkspace({ sessionId }) {
         </label>
       </div>
 
-      {status && <p className="mt-3 text-sm text-slate-300">{status}</p>}
+      {status && <p className="mt-3 text-sm text-ink-soft">{status}</p>}
     </section>
   );
 }

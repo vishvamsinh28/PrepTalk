@@ -122,14 +122,14 @@ export default function CreateSessionForm() {
       transition={{ duration: 0.6 }}
       className="glass-panel relative z-10 mx-auto w-full rounded-xl p-5 sm:p-6"
     >
-      <div className="mb-6 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="mb-6 flex flex-col gap-4 border-b border-rule pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">New interview</p>
-          <h2 className="text-2xl font-black tracking-tight text-white">Create session</h2>
-          <p className="mt-2 text-sm text-slate-300">Set up the interview, schedule, agenda, and invite package.</p>
+          <p className="mb-2 text-sm font-bold uppercase tracking-[0.18em] text-accent">New interview</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-ink">Create session</h2>
+          <p className="mt-2 text-sm text-ink-soft">Set up the interview, schedule, agenda, and invite package.</p>
         </div>
-        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-linear-to-br from-cyan-300 via-emerald-300 to-blue-400">
-          <FaRocket className="text-xl text-slate-950" />
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-ink">
+          <FaRocket className="text-xl text-canvas" />
         </div>
       </div>
 
@@ -138,7 +138,7 @@ export default function CreateSessionForm() {
           className={`mb-4 flex items-center rounded-2xl p-3 text-sm ${
             isError
               ? "border border-red-300/30 bg-red-500/10 text-red-100"
-              : "border border-emerald-300/30 bg-emerald-500/10 text-emerald-100"
+              : "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700"
           }`}
         >
           {isError ? (
@@ -151,22 +151,22 @@ export default function CreateSessionForm() {
       )}
 
       {createdSession && (
-        <div className="mb-6 rounded-2xl border border-emerald-300/25 bg-emerald-300/10 p-5">
+        <div className="mb-6 rounded-2xl border border-emerald-600/40 bg-emerald-50 p-5">
           <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div>
-              <p className="font-black text-emerald-100">Session ready</p>
-              <p className="mt-1 text-sm text-slate-300">Send this link only to assigned interviewees. Users who are not assigned cannot open the room.</p>
+              <p className="font-semibold text-emerald-700">Session ready</p>
+              <p className="mt-1 text-sm text-ink-soft">Send this link only to assigned interviewees. Users who are not assigned cannot open the room.</p>
             </div>
-            {copied && <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white">Copied {copied}</span>}
+            {copied && <span className="rounded-lg border border-rule bg-black/5 px-3 py-2 text-xs font-bold text-ink">Copied {copied}</span>}
           </div>
 
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
             <input readOnly value={inviteDetails.inviteUrl} className="field-surface field-control min-w-0 text-sm" />
-            <button type="button" onClick={() => copyText("link", inviteDetails.inviteUrl)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-3 font-bold text-cyan-100">
+            <button type="button" onClick={() => copyText("link", inviteDetails.inviteUrl)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-accent bg-accent/10 px-4 py-3 font-bold text-accent">
               <FaClipboard />
               Copy link
             </button>
-            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-4 py-3 font-black text-slate-950">
+            <a href={inviteDetails.mailtoHref} className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink px-4 py-3 font-semibold text-canvas">
               <FaEnvelope />
               Send email
             </a>
@@ -174,8 +174,8 @@ export default function CreateSessionForm() {
 
           <div className="mt-4">
             <div className="mb-2 flex items-center justify-between gap-3">
-              <p className="text-sm font-bold text-white">Email content</p>
-              <button type="button" onClick={() => copyText("email", inviteDetails.emailBody)} className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-xs font-bold text-white">
+              <p className="text-sm font-bold text-ink">Email content</p>
+              <button type="button" onClick={() => copyText("email", inviteDetails.emailBody)} className="inline-flex items-center gap-2 rounded-lg border border-rule bg-black/5 px-3 py-2 text-xs font-bold text-ink">
                 <FaClipboard />
                 Copy email
               </button>
@@ -319,7 +319,7 @@ export default function CreateSessionForm() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5 lg:col-span-2"
+          className="w-full rounded-xl bg-ink p-3.5 font-semibold text-canvas shadow-lg transition hover:-translate-y-0.5 lg:col-span-2"
         >
           Create Session
         </button>
@@ -330,7 +330,7 @@ export default function CreateSessionForm() {
 
 function SegmentedControl({ name, value, options, onChange }) {
   return (
-    <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-white/10 bg-slate-950/40 p-1">
+    <div className="grid grid-cols-3 gap-1.5 rounded-lg border border-rule bg-white p-1">
       {options.map((option) => {
         const isActive = value === option;
         return (
@@ -341,8 +341,8 @@ function SegmentedControl({ name, value, options, onChange }) {
             onClick={() => onChange(option)}
             className={`min-h-10 rounded-md border px-2 text-sm font-bold transition ${
               isActive
-                ? "border-cyan-300/45 bg-cyan-300/14 text-cyan-100 shadow-inner shadow-cyan-300/10"
-                : "border-transparent bg-transparent text-slate-300 hover:border-white/10 hover:bg-slate-800/45 hover:text-white"
+                ? "border-accent bg-accent/10 text-accent shadow-inner shadow-cyan-300/10"
+                : "border-transparent bg-transparent text-ink-soft hover:border-rule hover:bg-slate-800/45 hover:text-ink"
             }`}
           >
             {option}

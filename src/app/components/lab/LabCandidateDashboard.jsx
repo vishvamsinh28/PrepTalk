@@ -219,14 +219,14 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
 
   if (activeAssessment && activeProblem) {
     return (
-      <div className="app-shell relative min-h-screen overflow-x-hidden px-3 pb-5 pt-24 text-slate-50 sm:px-5 lg:overflow-hidden">
+      <div className="app-shell relative min-h-screen overflow-x-hidden px-3 pb-5 pt-24 text-ink sm:px-5 lg:overflow-hidden">
         <div className="soft-grid absolute inset-0 opacity-60" />
         {submissionError && (
-          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-lg border border-rose-300/25 bg-rose-400/10 px-5 py-3 font-bold text-rose-100">
+          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-lg border border-rose-600/40 bg-rose-50 px-5 py-3 font-bold text-rose-700">
             {submissionError}
           </div>
         )}
-        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-xl border border-white/10 bg-slate-950/45 shadow-xl shadow-black/20 lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
+        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-xl border border-[#2b2620] bg-[#151311] shadow-lg lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
           <ProblemRail problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
           <main
             className="grid min-h-0 min-w-0 lg:grid-cols-[var(--problem-panel-width)_0.5rem_minmax(0,1fr)]"
@@ -235,7 +235,7 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
             <ProblemPanel problem={activeProblem} panelWidth={problemPanelWidth} />
             <button
               onPointerDown={startResize}
-              className="hidden cursor-col-resize border-x border-white/10 bg-slate-950/60 transition hover:bg-cyan-300/20 lg:block"
+              className="hidden cursor-col-resize border-x border-white/10 bg-[#1e1a17] transition hover:bg-accent/30 lg:block"
               aria-label="Resize problem and editor panels"
               title="Drag to resize panels"
             />
@@ -268,39 +268,39 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24 text-slate-50">
+    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24 text-ink">
       <div className="soft-grid absolute inset-0 opacity-60" />
       <main className="relative z-10 mx-auto max-w-6xl">
         <section className="glass-panel rounded-xl p-6">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">PrepTalk Lab</p>
-          <h1 className="mt-2 text-4xl font-black gradient-text">Assigned assessments</h1>
-          <p className="mt-3 text-slate-300">Start an assigned coding assessment when you are ready.</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-accent">PrepTalk Lab</p>
+          <h1 className="mt-2 text-4xl font-semibold gradient-text">Assigned assessments</h1>
+          <p className="mt-3 text-ink-soft">Start an assigned coding assessment when you are ready.</p>
         </section>
-        {submitMessage && <p className="mt-5 rounded-lg border border-emerald-300/25 bg-emerald-300/10 p-4 text-emerald-100">{submitMessage}</p>}
+        {submitMessage && <p className="mt-5 rounded-lg border border-emerald-600/40 bg-emerald-50 p-4 text-emerald-700">{submitMessage}</p>}
         <div className="mt-8 max-h-[calc(100vh-22rem)] min-h-[18rem] overflow-auto pr-2">
           <div className="grid gap-5">
           {initialAssessmentId && !assessments.some((assessment) => assessment._id === initialAssessmentId) && (
-            <div className="rounded-xl border border-amber-300/25 bg-amber-300/10 p-5 font-semibold text-amber-100">
+            <div className="rounded-xl border border-amber-600/40 bg-amber-50 p-5 font-semibold text-amber-700">
               The invited assessment was not found for this account. Make sure you are logged in with the assigned candidate email.
             </div>
           )}
           {sortedAssessments.map((assessment) => (
-            <article key={assessment._id} className="rounded-xl border border-white/10 bg-slate-950/45 p-6 shadow-xl shadow-black/20">
+            <article key={assessment._id} className="rounded-xl border border-rule bg-white p-6 shadow-xl">
               <div className="flex flex-wrap items-center justify-between gap-5">
                 <div>
-                  <p className="font-black text-emerald-100"><FaClock className="mr-2 inline" />{assessment.durationMinutes} mins</p>
-                  <h2 className="mt-3 text-2xl font-black text-white">{assessment.title}</h2>
-                  <p className="mt-2 text-slate-400">{assessment.problems?.length || 0} sections · {assessment.submissions?.length || 0} completed attempts · Due {formatCandidateDeadline(assessment.deadlineAt)}</p>
+                  <p className="font-semibold text-emerald-700"><FaClock className="mr-2 inline" />{assessment.durationMinutes} mins</p>
+                  <h2 className="mt-3 text-2xl font-semibold text-ink">{assessment.title}</h2>
+                  <p className="mt-2 text-ink-soft">{assessment.problems?.length || 0} sections · {assessment.submissions?.length || 0} completed attempts · Due {formatCandidateDeadline(assessment.deadlineAt)}</p>
                   <CandidateStatus assessment={assessment} />
                 </div>
-                <button onClick={() => startAssessment(assessment)} className="inline-flex items-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 font-black text-slate-950">
+                <button onClick={() => startAssessment(assessment)} className="inline-flex items-center gap-2 rounded-lg bg-ink px-5 py-3 font-semibold text-canvas">
                   <FaPlay />
                   {(assessment.submissions?.length || 0) > 0 ? "Retry assessment" : "Start assessment"}
                 </button>
               </div>
             </article>
           ))}
-          {assessments.length === 0 && <div className="rounded-xl border border-white/10 bg-slate-950/45 p-6 text-slate-400">No assigned assessments.</div>}
+          {assessments.length === 0 && <div className="rounded-xl border border-rule bg-white p-6 text-ink-soft">No assigned assessments.</div>}
           </div>
         </div>
       </main>
@@ -312,7 +312,7 @@ function CandidateStatus({ assessment }) {
   const latest = [...(assessment.submissions || [])].sort((left, right) => new Date(right.submittedAt) - new Date(left.submittedAt))[0];
 
   if (!latest) {
-    return <span className="mt-4 inline-flex rounded-full border border-amber-300/25 bg-amber-300/10 px-3 py-1 text-sm font-bold text-amber-100">Pending</span>;
+    return <span className="mt-4 inline-flex rounded-full border border-amber-600/40 bg-amber-50 px-3 py-1 text-sm font-bold text-amber-700">Pending</span>;
   }
 
   const passed = Number(latest.passedTests) || 0;
@@ -320,7 +320,7 @@ function CandidateStatus({ assessment }) {
   const allPassed = total > 0 && passed === total;
 
   return (
-    <span className={`mt-4 inline-flex rounded-full border px-3 py-1 text-sm font-bold ${allPassed ? "border-emerald-300/25 bg-emerald-300/10 text-emerald-100" : "border-rose-300/25 bg-rose-400/10 text-rose-100"}`}>
+    <span className={`mt-4 inline-flex rounded-full border px-3 py-1 text-sm font-bold ${allPassed ? "border-emerald-600/40 bg-emerald-50 text-emerald-700" : "border-rose-600/40 bg-rose-50 text-rose-700"}`}>
       Submitted · {passed}/{total} tests passed
     </span>
   );
@@ -335,9 +335,9 @@ function formatCandidateDeadline(value) {
 
 function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) {
   return (
-    <aside className="border-b border-white/10 bg-slate-950/55 lg:grid lg:grid-rows-[4rem_1fr] lg:border-b-0 lg:border-r">
+    <aside className="border-b border-white/10 bg-[#1e1a17] lg:grid lg:grid-rows-[4rem_1fr] lg:border-b-0 lg:border-r">
       <div className="hidden place-items-center border-b border-white/10 px-4 lg:grid">
-        <span className="grid h-10 w-10 place-items-center rounded-md border border-cyan-300/25 bg-cyan-300/10 text-cyan-100" title="Questions">
+        <span className="grid h-10 w-10 place-items-center rounded-md border border-accent bg-accent/20 text-[#e4633f]" title="Questions">
           <FaListOl />
         </span>
       </div>
@@ -350,11 +350,11 @@ function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) 
             <div key={problem.id}>
               <button
                 onClick={() => onSelect(problem.id)}
-                className={`grid h-10 min-w-14 place-items-center rounded-md border px-3 text-sm font-black lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
-                  activeProblemId === problem.id ? "border-cyan-300/60 bg-cyan-300/10 text-white" : "border-transparent text-slate-300 hover:border-white/10 hover:bg-white/5"
+                className={`grid h-10 min-w-14 place-items-center rounded-md border px-3 text-sm font-semibold lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
+                  activeProblemId === problem.id ? "border-accent bg-accent/20 text-white" : "border-transparent text-white/60 hover:border-white/20 hover:bg-white/5"
                 }`}
               >
-                {passed ? <FaCheck className="text-emerald-200" /> : failed ? <FaTimes className="text-rose-200" /> : `Q${index + 1}`}
+                {passed ? <FaCheck className="text-emerald-400" /> : failed ? <FaTimes className="text-rose-400" /> : `Q${index + 1}`}
               </button>
             </div>
           );

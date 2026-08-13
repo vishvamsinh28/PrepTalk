@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Landing-page palette (src/app/components/landing/*). Additive — app pages don't use these names. */
+/* Shared palette — landing page and app both use these tokens. */
 @theme {
   --color-canvas: #f4f1ea;
   --color-ink: #151311;
@@ -13,12 +13,15 @@
 }
 
 :root {
-  --bg-ink: #07111f;
-  --bg-panel: #0d1728;
-  --accent-cyan: #22d3ee;
-  --accent-emerald: #34d399;
-  --accent-blue: #60a5fa;
-  --accent-amber: #fbbf24;
+  --bg-ink: #f4f1ea;
+  --bg-panel: #fffefb;
+  --ink: #151311;
+  --ink-soft: #6b655d;
+  --rule: #ddd7cb;
+  --accent: #c0341a;
+  /* Editor and video surfaces stay dark on purpose — see .code-surface */
+  --code-bg: #07101d;
+  --code-chrome: #08111f;
 }
 
 * {
@@ -36,13 +39,8 @@ body {
   min-height: 100vh;
   min-height: 100svh;
   background-color: var(--bg-ink);
-  background:
-    radial-gradient(circle at 12% 8%, rgba(34, 211, 238, 0.14), transparent 30rem),
-    radial-gradient(circle at 88% 14%, rgba(52, 211, 153, 0.12), transparent 28rem),
-    radial-gradient(circle at 50% 105%, rgba(96, 165, 250, 0.14), transparent 34rem),
-    linear-gradient(135deg, var(--bg-ink) 0%, #091524 46%, #0b1220 100%);
-  color: #f8fafc;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   overscroll-behavior-y: none;
 }
 
@@ -57,39 +55,35 @@ select {
 .app-shell {
   min-height: 100vh;
   min-height: 100svh;
-  color: #f8fafc;
+  color: var(--ink);
   background-color: var(--bg-ink);
-  background:
-    radial-gradient(circle at 8% 4%, rgba(34, 211, 238, 0.13), transparent 28rem),
-    radial-gradient(circle at 92% 12%, rgba(52, 211, 153, 0.12), transparent 30rem),
-    linear-gradient(135deg, #07111f 0%, #0c1728 48%, #08111d 100%);
 }
 
+/* Faint warm grid — texture only, no glow */
 .soft-grid {
   background-image:
-    linear-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(21, 19, 17, 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(21, 19, 17, 0.032) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: linear-gradient(to bottom, black, transparent 72%);
 }
 
 .glass-panel {
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(145deg, rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.64)),
-    linear-gradient(135deg, rgba(34, 211, 238, 0.05), rgba(52, 211, 153, 0.035));
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
-  backdrop-filter: blur(20px);
+  border: 1px solid var(--rule);
+  background: var(--bg-panel);
+  box-shadow: 0 1px 2px rgba(21, 19, 17, 0.04);
+}
+
+/* Editor / terminal surfaces stay dark on purpose */
+.code-surface {
+  background: var(--code-bg);
+  color: #e2e8f0;
 }
 
 .field-surface {
-  border: 1px solid rgba(148, 163, 184, 0.22);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(8, 17, 31, 0.9));
-  color: #f8fafc;
-  box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  border: 1px solid var(--rule);
+  background: #ffffff;
+  color: var(--ink);
   line-height: 1.4;
   transition:
     border-color 160ms ease,
@@ -98,21 +92,17 @@ select {
 }
 
 .field-surface:hover {
-  border-color: rgba(148, 163, 184, 0.34);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(8, 17, 31, 0.96));
+  border-color: #c9c2b3;
 }
 
 .field-surface::placeholder {
-  color: #75859b;
+  color: #9c958a;
 }
 
 .field-surface:focus {
-  border-color: rgba(34, 211, 238, 0.8);
-  background: #08111f;
-  box-shadow:
-    0 0 0 4px rgba(34, 211, 238, 0.11),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-color: var(--accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.12);
   outline: none;
 }
 
@@ -120,25 +110,25 @@ select {
 .field-surface:-webkit-autofill:hover,
 .field-surface:-webkit-autofill:focus,
 .field-surface:-webkit-autofill:active {
-  -webkit-text-fill-color: #f8fafc;
-  caret-color: #f8fafc;
-  border-color: rgba(34, 211, 238, 0.8);
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  border-color: var(--accent);
   box-shadow:
-    0 0 0 1000px #08111f inset,
-    0 0 0 4px rgba(34, 211, 238, 0.11);
+    0 0 0 1000px #ffffff inset,
+    0 0 0 3px rgba(192, 52, 26, 0.12);
   transition: background-color 9999s ease-in-out 0s;
 }
 
 .field-surface:disabled,
 .field-surface[readonly] {
-  border-color: rgba(148, 163, 184, 0.18);
-  background: rgba(15, 23, 42, 0.54);
-  color: #cbd5e1;
+  border-color: var(--rule);
+  background: #f1ede4;
+  color: #8b8478;
 }
 
 .field-surface option {
-  background: #0f172a;
-  color: #f8fafc;
+  background: #ffffff;
+  color: var(--ink);
 }
 
 .field-group {
@@ -151,16 +141,16 @@ select {
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.45rem;
-  color: #e2e8f0;
+  color: var(--ink);
   font-size: 0.78rem;
-  font-weight: 850;
+  font-weight: 600;
   letter-spacing: 0.02em;
 }
 
 .field-hint {
-  color: #94a3b8;
+  color: var(--ink-soft);
   font-size: 0.74rem;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .field-control {
@@ -178,10 +168,10 @@ textarea.field-control {
 
 .field-select {
   appearance: none;
-  background-color: #08111f;
+  background-color: #ffffff;
   background-image:
-    linear-gradient(45deg, transparent 50%, #67e8f9 50%),
-    linear-gradient(135deg, #67e8f9 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
   background-position:
     calc(100% - 1.05rem) 50%,
     calc(100% - 0.78rem) 50%;
@@ -191,10 +181,10 @@ textarea.field-control {
 }
 
 .field-select:hover {
-  background-color: #0b1525;
+  background-color: #fffefb;
   background-image:
-    linear-gradient(45deg, transparent 50%, #67e8f9 50%),
-    linear-gradient(135deg, #67e8f9 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
 }
 
 .field-toggle {
@@ -204,8 +194,8 @@ textarea.field-control {
   flex: 0 0 auto;
   appearance: none;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-  background: rgba(15, 23, 42, 0.82);
+  border: 1px solid var(--rule);
+  background: #ebe6da;
   cursor: pointer;
   transition:
     background 160ms ease,
@@ -221,32 +211,32 @@ textarea.field-control {
   width: 1.05rem;
   height: 1.05rem;
   border-radius: 999px;
-  background: #cbd5e1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(21, 19, 17, 0.18);
   transition:
     transform 160ms ease,
     background 160ms ease;
 }
 
 .field-toggle:checked {
-  border-color: rgba(34, 211, 238, 0.65);
-  background: rgba(34, 211, 238, 0.26);
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.1);
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: none;
 }
 
 .field-toggle:checked::after {
   transform: translateX(1.22rem);
-  background: #67e8f9;
+  background: #ffffff;
 }
 
 .field-toggle:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.14);
+  box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.16);
 }
 
 .form-section {
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid var(--rule);
+  background: #fffefb;
   border-radius: 1rem;
   padding: 1rem;
 }
@@ -254,46 +244,47 @@ textarea.field-control {
 .form-label {
   display: block;
   margin-bottom: 0.45rem;
-  color: #dbeafe;
+  color: var(--ink);
   font-size: 0.78rem;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.055em;
   text-transform: uppercase;
 }
 
 .form-help {
   margin-top: 0.4rem;
-  color: #94a3b8;
+  color: var(--ink-soft);
   font-size: 0.78rem;
   line-height: 1.45;
 }
 
+/* Was a cyan/blue gradient — now the editorial serif used for page titles */
 .gradient-text {
-  background: linear-gradient(90deg, #f8fafc 0%, #a7f3d0 38%, #67e8f9 72%, #93c5fd 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.018em;
+  color: var(--ink);
 }
 
 .lab-light .light-field .field-label {
-  color: #1f2937;
+  color: var(--ink);
 }
 
 .lab-light .light-field .field-surface {
-  border-color: #d7dce8;
+  border-color: var(--rule);
   background: #ffffff;
-  color: #111827;
+  color: var(--ink);
   box-shadow: none;
 }
 
 .lab-light .light-field .field-surface::placeholder {
-  color: #8b93a3;
+  color: #9c958a;
 }
 
 .lab-light .light-field .field-surface:focus {
-  border-color: #5b72e8;
+  border-color: var(--accent);
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(91, 114, 232, 0.12);
+  box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.12);
 }
 
 .lab-dark textarea {
@@ -346,27 +337,37 @@ textarea.field-control {
   letter-spacing: 0.13em;
 }
 
-/* Typewriter caret in the hero headline */
-.landing-caret {
+/* Rolling hero word — a clipped slot whose width eases to the active word */
+.landing-roll {
+  /* one slot tall; the track steps by exactly this per word */
+  --roll-h: 1.16em;
   display: inline-block;
-  width: 0.055em;
-  min-width: 2px;
-  height: 0.78em;
-  margin-left: 0.07em;
-  translate: 0 0.03em;
-  background: currentColor;
-  animation: landing-blink 1.05s steps(1, end) infinite;
+  overflow: hidden;
+  vertical-align: bottom;
+  height: var(--roll-h);
+  /* overflow:hidden moves an inline-block's baseline to its bottom edge, so the
+     word sits (slot height - line height) / 2 too high. Push it back down. */
+  translate: 0 calc((var(--roll-h) - 1.02em) / 2);
+  /* shorter + ease-out so the slot reaches its width before the word lands,
+     otherwise the incoming word is clipped by the overflow */
+  transition: width 380ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@keyframes landing-blink {
-  0%,
-  50% {
-    opacity: 1;
-  }
-  50.01%,
-  100% {
-    opacity: 0;
-  }
+.landing-roll-track {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  transition: transform 580ms cubic-bezier(0.66, 0, 0.24, 1);
+}
+
+/* max-content keeps each word at its natural width so the slot can measure it
+   without being clamped by its own clipped width */
+.landing-roll-track > span {
+  display: block;
+  width: max-content;
+  height: var(--roll-h);
+  line-height: var(--roll-h);
+  white-space: nowrap;
 }
 
 @keyframes landing-rise {
@@ -389,7 +390,8 @@ textarea.field-control {
     animation: none;
   }
 
-  .landing-caret {
-    display: none;
+  .landing-roll,
+  .landing-roll-track {
+    transition: none;
   }
 }

@@ -77,23 +77,23 @@ export default function ChatRoom({ sessionId, userEmail }) {
 
   return (
     <div className="relative z-10 flex h-120 w-full flex-col">
-      <div className="mb-4 flex items-center rounded-xl border border-white/10 bg-slate-950/35 p-3 text-sm text-slate-300">
-        <FaUsers className="mr-2 text-cyan-200" />
-        <strong className="mr-2 text-white">Active:</strong>
+      <div className="mb-4 flex items-center rounded-xl border border-rule bg-white p-3 text-sm text-ink-soft">
+        <FaUsers className="mr-2 text-accent" />
+        <strong className="mr-2 text-ink">Active:</strong>
         {activeUsers.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {activeUsers.map((user, idx) => (
-              <span key={idx} className="rounded-lg border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-xs font-bold text-cyan-100">
+              <span key={idx} className="rounded-lg border border-accent bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
                 {user}
               </span>
             ))}
           </div>
         ) : (
-          <span className="text-slate-400">No users online</span>
+          <span className="text-ink-soft">No users online</span>
         )}
       </div>
 
-      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-xl border border-white/10 bg-slate-950/35 p-4 custom-scroll">
+      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-xl border border-rule bg-white p-4 custom-scroll">
         <AnimatePresence>
           {messages.map((msg, index) => (
             <motion.div
@@ -108,8 +108,8 @@ export default function ChatRoom({ sessionId, userEmail }) {
               <div
                 className={`px-3 py-2 rounded-lg text-sm ${
                   msg.sender === userEmail
-                    ? "rounded-br-none bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 font-semibold text-slate-950"
-                    : "rounded-bl-none border border-white/10 bg-white/10 text-slate-200"
+                    ? "rounded-br-none bg-ink font-semibold text-canvas"
+                    : "rounded-bl-none border border-rule bg-black/5 text-ink"
                 }`}
               >
                 <strong className="mb-1 block text-xs opacity-70">
@@ -133,7 +133,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
         />
         <button
           onClick={handleSendMessage}
-          className="rounded-r-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-3 text-slate-950 transition hover:brightness-110"
+          className="rounded-r-lg bg-ink px-5 py-3 text-canvas transition hover:brightness-110"
           aria-label="Send message"
         >
           <FaPaperPlane />

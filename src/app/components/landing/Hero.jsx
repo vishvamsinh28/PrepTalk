@@ -1,5 +1,5 @@
 import Link from "next/link";
-import TypedWord from "./TypedWord";
+import RollingWord from "./RollingWord";
 
 export default function Hero() {
   return (
@@ -7,8 +7,12 @@ export default function Hero() {
       <div className="mx-auto max-w-[58rem] text-center">
         <span className="mx-auto block h-0.5 w-10 bg-accent" />
 
-        <h1 className="landing-serif landing-display landing-rise mt-10 text-ink">
-          <TypedWord words={["Fail", "Rehearse", "Botch", "Survive"]} /> the interview
+        {/* aria-label keeps the sentence readable — the slot holds every word at once */}
+        <h1
+          className="landing-serif landing-display landing-rise mt-10 text-ink"
+          aria-label="Fail the interview before it counts."
+        >
+          <RollingWord words={["Fail", "Rehearse", "Botch", "Survive"]} /> the interview
           <br />
           before it counts.
         </h1>

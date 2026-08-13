@@ -27,13 +27,11 @@ export default function DashboardClient({ userData }) {
       href: "/interviewer",
       icon: <FaUserShield />,
       label: "Open Interviewer Panel",
-      className: "from-cyan-300 via-emerald-300 to-blue-400",
     },
     Interviewee: {
       href: "/interviewee",
       icon: <FaUserFriends />,
       label: "Open Interviewee Panel",
-      className: "from-emerald-300 via-cyan-300 to-blue-400",
     },
   };
   const action = roleActions[userData?.role];
@@ -61,18 +59,18 @@ export default function DashboardClient({ userData }) {
         className="relative z-10 mx-auto grid w-full max-w-6xl gap-5 lg:grid-cols-[1.15fr_0.85fr]"
       >
         <motion.section variants={itemVariants} className="glass-panel rounded-xl p-6 sm:p-8">
-          <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-cyan-200">Dashboard</p>
-          <h1 className="max-w-2xl text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+          <p className="mb-4 text-sm font-bold uppercase tracking-[0.2em] text-accent">Dashboard</p>
+          <h1 className="max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
             Welcome back to <span className="gradient-text">PrepTalk.</span>
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
+          <p className="mt-4 max-w-2xl text-base leading-7 text-ink-soft">
             {roleDescriptions[userData?.role] || "Get ready to explore PrepTalk and enhance your skills!"}
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-2 text-sm text-slate-200">
+            <span className="rounded-lg border border-rule bg-black/5 px-3 py-2 text-sm text-ink">
               {userData?.email}
             </span>
-            <span className="rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-sm font-bold text-cyan-100">
+            <span className="rounded-lg border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent">
               {userData?.role}
             </span>
           </div>
@@ -80,7 +78,7 @@ export default function DashboardClient({ userData }) {
             <motion.a
               variants={itemVariants}
               href={action.href}
-              className={`mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-linear-to-r ${action.className} px-6 py-3.5 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-1`}
+              className="mt-8 inline-flex items-center justify-center gap-3 rounded-lg bg-ink px-6 py-3.5 font-semibold text-canvas transition hover:opacity-85"
             >
               {action.icon}
               {action.label}
@@ -91,20 +89,20 @@ export default function DashboardClient({ userData }) {
 
         <motion.aside variants={itemVariants} className="grid gap-5">
           <div className="glass-panel rounded-xl p-5">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-200">Next steps</p>
-            <h2 className="mt-2 text-2xl font-black text-white">Useful shortcuts</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-amber-700">Next steps</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">Useful shortcuts</h2>
             <div className="mt-5 grid gap-3">
               {quickActions.map((item) => (
                 <a
                   key={item.label}
                   href={item.href}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-slate-950/35 px-4 py-3 text-slate-200 transition hover:border-cyan-200/40 hover:bg-cyan-300/10 hover:text-white"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-rule bg-white px-4 py-3 text-ink transition hover:border-accent hover:bg-accent/10 hover:text-ink"
                 >
                   <span className="inline-flex items-center gap-3 font-bold">
-                    <span className="text-cyan-200">{item.icon}</span>
+                    <span className="text-accent">{item.icon}</span>
                     {item.label}
                   </span>
-                  <FaArrowRight className="text-sm text-slate-500" />
+                  <FaArrowRight className="text-sm text-ink-soft" />
                 </a>
               ))}
             </div>

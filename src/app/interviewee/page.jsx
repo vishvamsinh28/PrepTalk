@@ -21,28 +21,28 @@ export default async function IntervieweePage() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-10 grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewee workspace</p>
-            <h1 className="text-5xl font-black tracking-tight gradient-text">Your practice room</h1>
-            <p className="mt-3 max-w-2xl text-slate-300">Join assigned sessions, review prep guidance, and track your feedback history.</p>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">Interviewee workspace</p>
+            <h1 className="text-5xl font-semibold tracking-tight gradient-text">Your practice room</h1>
+            <p className="mt-3 max-w-2xl text-ink-soft">Join assigned sessions, review prep guidance, and track your feedback history.</p>
           </div>
-          <div className="glass-panel rounded-2xl p-4 text-sm text-slate-300">
-            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-amber-200">Signed in as</span>
-            <span className="mt-1 block break-all text-white">{userData.email}</span>
+          <div className="glass-panel rounded-2xl p-4 text-sm text-ink-soft">
+            <span className="block text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Signed in as</span>
+            <span className="mt-1 block break-all text-ink">{userData.email}</span>
           </div>
         </div>
 
         <section>
           <div className="mb-5">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Assigned</p>
-            <h2 className="text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Assigned</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink">Your Sessions</h2>
           </div>
           <IntervieweeSessionList />
         </section>
 
         <section className="mt-14">
           <div className="mb-5">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Feedback</p>
-            <h2 className="text-3xl font-black tracking-tight text-white">Your Reports</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Feedback</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink">Your Reports</h2>
           </div>
           <ReportList />
         </section>

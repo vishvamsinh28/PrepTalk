@@ -50,7 +50,7 @@ export default function ReportList() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center gap-2 text-cyan-200">
+      <div className="flex items-center justify-center gap-2 text-accent">
         <FaSpinner className="animate-spin" />
         <span>Loading reports...</span>
       </div>
@@ -60,9 +60,9 @@ export default function ReportList() {
   if (reports.length === 0) {
     return (
       <div className="glass-panel rounded-2xl p-8 text-center">
-        <FaClipboardCheck className="mx-auto mb-3 text-4xl text-cyan-200" />
-        <p className="text-lg font-bold text-white">No reports yet.</p>
-        <p className="text-sm text-slate-300">Completed interview scorecards will appear here.</p>
+        <FaClipboardCheck className="mx-auto mb-3 text-4xl text-accent" />
+        <p className="text-lg font-bold text-ink">No reports yet.</p>
+        <p className="text-sm text-ink-soft">Completed interview scorecards will appear here.</p>
       </div>
     );
   }
@@ -73,11 +73,11 @@ export default function ReportList() {
         <article key={report._id} className="glass-panel rounded-2xl p-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between mb-4">
             <div>
-              <h3 className="text-xl font-black text-white">{report.recommendation}</h3>
-              <p className="text-sm text-slate-300">{report.intervieweeEmail}</p>
+              <h3 className="text-xl font-semibold text-ink">{report.recommendation}</h3>
+              <p className="text-sm text-ink-soft">{report.intervieweeEmail}</p>
             </div>
             <div className="flex flex-wrap items-center gap-2 md:justify-end">
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-ink-soft">
                 {new Date(report.createdAt).toLocaleDateString()}
               </p>
               {canDeleteReports && (
@@ -85,7 +85,7 @@ export default function ReportList() {
                   type="button"
                   onClick={() => deleteReport(report)}
                   disabled={deletingId === report._id}
-                  className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-3 py-2 text-xs font-bold text-rose-100 disabled:opacity-60"
+                  className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-rose-600/40 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 disabled:opacity-60"
                 >
                   <FaTrash />
                   {deletingId === report._id ? "Deleting..." : "Delete"}
@@ -96,30 +96,30 @@ export default function ReportList() {
 
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-5">
             {Object.entries(report.scores || {}).map(([name, score]) => (
-              <div key={name} className="rounded-2xl border border-white/10 bg-slate-950/35 p-3">
-                <p className="text-xs text-slate-400">{scoreLabels[name] || name}</p>
-                <p className="text-2xl font-black gradient-text">{score}</p>
+              <div key={name} className="rounded-2xl border border-rule bg-white p-3">
+                <p className="text-xs text-ink-soft">{scoreLabels[name] || name}</p>
+                <p className="text-2xl font-semibold gradient-text">{score}</p>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="mb-1 font-bold text-slate-100">Strengths</p>
-              <p className="whitespace-pre-wrap text-slate-300">{report.strengths}</p>
+              <p className="mb-1 font-bold text-ink">Strengths</p>
+              <p className="whitespace-pre-wrap text-ink-soft">{report.strengths}</p>
             </div>
             <div>
-              <p className="mb-1 font-bold text-slate-100">Next improvements</p>
-              <p className="whitespace-pre-wrap text-slate-300">{report.improvements}</p>
+              <p className="mb-1 font-bold text-ink">Next improvements</p>
+              <p className="whitespace-pre-wrap text-ink-soft">{report.improvements}</p>
             </div>
           </div>
 
           {report.aiSummary && (
-            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
-              <p className="mb-2 font-black text-cyan-100">AI summary</p>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-slate-200">{report.aiSummary}</p>
+            <div className="mt-5 rounded-2xl border border-accent bg-accent/10 p-4">
+              <p className="mb-2 font-semibold text-accent">AI summary</p>
+              <p className="whitespace-pre-wrap text-sm leading-6 text-ink">{report.aiSummary}</p>
               {report.actionItems?.length > 0 && (
-                <ul className="mt-3 space-y-1 text-sm text-slate-200">
+                <ul className="mt-3 space-y-1 text-sm text-ink">
                   {report.actionItems.map((item) => <li key={item}>- {item}</li>)}
                 </ul>
               )}

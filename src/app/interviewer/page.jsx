@@ -22,12 +22,12 @@ export default async function InterviewerPage() {
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mb-8">
           <div>
-            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-200">Interviewer workspace</p>
-            <h1 className="text-4xl font-black tracking-tight gradient-text sm:text-5xl">Run better interviews</h1>
-            <p className="mt-3 max-w-2xl text-slate-300">Create sessions, send invites, generate AI questions, and review reports from one focused workspace.</p>
-            <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-white/10 bg-slate-950/35 px-3 py-2 text-sm text-slate-300">
-              <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-amber-200">Signed in</span>
-              <span className="min-w-0 truncate text-white">{userData.email}</span>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-accent">Interviewer workspace</p>
+            <h1 className="text-4xl font-semibold tracking-tight gradient-text sm:text-5xl">Run better interviews</h1>
+            <p className="mt-3 max-w-2xl text-ink-soft">Create sessions, send invites, generate AI questions, and review reports from one focused workspace.</p>
+            <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-lg border border-rule bg-white px-3 py-2 text-sm text-ink-soft">
+              <span className="shrink-0 text-xs font-bold uppercase tracking-[0.16em] text-amber-700">Signed in</span>
+              <span className="min-w-0 truncate text-ink">{userData.email}</span>
             </div>
           </div>
         </div>
@@ -40,8 +40,8 @@ export default async function InterviewerPage() {
           <section id="sessions" className="xl:sticky xl:top-24">
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <p className="text-sm font-bold uppercase tracking-[0.18em] text-cyan-200">Manage</p>
-                <h2 className="text-3xl font-black tracking-tight text-white">Your Sessions</h2>
+                <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Manage</p>
+                <h2 className="text-3xl font-semibold tracking-tight text-ink">Your Sessions</h2>
               </div>
             </div>
             <SessionList compact />
@@ -50,8 +50,8 @@ export default async function InterviewerPage() {
 
         <section id="reports" className="mt-14">
           <div className="mb-5">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-200">Review</p>
-            <h2 className="text-3xl font-black tracking-tight text-white">Submitted Reports</h2>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-amber-700">Review</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-ink">Submitted Reports</h2>
           </div>
           <ReportList />
         </section>

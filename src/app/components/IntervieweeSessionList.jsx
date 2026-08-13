@@ -37,7 +37,7 @@ export default function IntervieweeSessionList() {
   };
 
   return (
-    <div className="text-slate-100">
+    <div className="text-ink">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -46,8 +46,8 @@ export default function IntervieweeSessionList() {
       >
         {sessions.length === 0 ? (
           <motion.div variants={itemVariants} className="glass-panel rounded-2xl p-8 text-center">
-            <p className="text-lg font-bold text-white">No sessions assigned yet.</p>
-            <p className="text-sm text-slate-300">Please check back later.</p>
+            <p className="text-lg font-bold text-ink">No sessions assigned yet.</p>
+            <p className="text-sm text-ink-soft">Please check back later.</p>
           </motion.div>
         ) : (
           <motion.div className="grid max-h-168 gap-5 overflow-y-auto pr-1" variants={containerVariants}>
@@ -59,21 +59,21 @@ export default function IntervieweeSessionList() {
                   initial="hidden"
                   animate="visible"
                   exit="hidden"
-                  className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-cyan-200/40"
+                  className="glass-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-accent"
                 >
-                  <h3 className="mb-2 text-2xl font-black text-white">{session.title}</h3>
-                  <p className="mb-4 text-sm leading-6 text-slate-300">{session.description}</p>
+                  <h3 className="mb-2 text-2xl font-semibold text-ink">{session.title}</h3>
+                  <p className="mb-4 text-sm leading-6 text-ink-soft">{session.description}</p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <span className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role}</span>
-                    <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level}</span>
-                    <span className="rounded-xl border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType}</span>
+                    <span className="rounded-xl border border-accent bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{session.role}</span>
+                    <span className="rounded-xl border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.level}</span>
+                    <span className="rounded-xl border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.interviewType}</span>
                     {session.skills?.map((skill) => (
-                      <span key={skill} className="rounded-xl border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+                      <span key={skill} className="rounded-xl border border-rule bg-white px-3 py-1 text-xs text-ink-soft">{skill}</span>
                     ))}
                   </div>
                   <button
                     onClick={() => router.push(`/session/${session._id}`)}
-                    className="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-300 via-cyan-300 to-blue-400 px-6 py-3 font-black text-slate-950 transition hover:-translate-y-0.5"
+                    className="flex items-center gap-2 rounded-xl bg-ink px-6 py-3 font-semibold text-canvas transition hover:-translate-y-0.5"
                   >
                     <FaSignInAlt />
                     Join Session

@@ -67,14 +67,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 px-5 py-4 backdrop-blur-sm">
-      <div
-        className={`mx-auto flex max-w-7xl items-center justify-between transition-all duration-300 ${
-          isScrolled
-            ? "rounded-2xl bg-slate-950/72 px-4 py-2 shadow-xl shadow-black/20"
-            : ""
-        }`}
-      >
+    <nav
+      className={`fixed left-0 right-0 top-0 z-50 px-5 transition-colors duration-200 ${
+        isScrolled ? "border-b border-rule bg-canvas/95 backdrop-blur-sm" : ""
+      }`}
+    >
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between">
           <button
             className="flex items-center gap-3 text-left"
             onClick={() => router.push(getRoleHome(userRole))}
@@ -101,7 +99,7 @@ export default function Navbar() {
             <div>
               <button
                 onClick={handleLogout}
-                className="flex items-center rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+                className="flex items-center rounded-[4px] bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-opacity hover:opacity-85"
               >
                 <FaSignOutAlt className="mr-1" />
                 Logout
@@ -112,7 +110,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4 md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="rounded-lg border border-white/15 p-2 text-slate-200 hover:text-white focus:outline-none"
+              className="rounded-lg border border-rule p-2 text-ink hover:text-ink focus:outline-none"
             >
               {!isMenuOpen ? (
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,7 +124,7 @@ export default function Navbar() {
             </button>
           </div>
         {isMenuOpen && (
-          <div className="absolute left-5 right-5 top-20 rounded-2xl border border-white/10 bg-slate-950/95 py-3 shadow-lg md:hidden">
+          <div className="absolute left-5 right-5 top-20 rounded-2xl border border-rule bg-white py-3 shadow-lg md:hidden">
             <div className="space-y-1 px-2">
               {navItems.map((item) => (
                 <MobileNavItem
@@ -138,13 +136,13 @@ export default function Navbar() {
                 />
               ))}
 
-              <div className="mt-3 border-t border-white/10 pt-3">
+              <div className="mt-3 border-t border-rule pt-3">
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsMenuOpen(false);
                   }}
-                  className="flex w-full items-center justify-center rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 p-3 font-black text-slate-950"
+                  className="flex w-full items-center justify-center rounded-xl bg-ink p-3 font-semibold text-canvas"
                 >
                   <FaSignOutAlt className="mr-2" />
                   Logout
@@ -163,8 +161,8 @@ function NavItem({ icon, label, onClick, isActive }) {
     <button
       onClick={onClick}
       className={`flex items-center rounded-md px-3 py-1.5 text-sm font-bold transition-colors ${isActive
-        ? "text-cyan-100"
-        : "text-white/75 hover:text-white"
+        ? "text-accent"
+        : "text-ink-soft hover:text-ink"
         }`}
     >
       <span className="mr-1.5">{icon}</span>
@@ -178,8 +176,8 @@ function MobileNavItem({ icon, label, onClick, isActive }) {
     <button
       onClick={onClick}
       className={`flex w-full items-center rounded-lg px-3 py-3 text-sm font-bold transition-colors ${isActive
-        ? "border border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
-        : "text-slate-300 hover:bg-white/10 hover:text-white"
+        ? "border border-accent bg-accent/10 text-accent"
+        : "text-ink-soft hover:bg-black/5 hover:text-ink"
         }`}
     >
       <span className="mr-2">{icon}</span>

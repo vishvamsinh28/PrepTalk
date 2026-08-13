@@ -210,7 +210,7 @@ export default function LabAdminDashboard({ initialAssessmentId = "" }) {
   };
 
   return (
-    <div className="app-shell relative min-h-screen overflow-x-hidden px-4 pb-6 pt-20 text-slate-50 sm:px-5 lg:overflow-hidden lg:pb-8 lg:pt-24">
+    <div className="app-shell relative min-h-screen overflow-x-hidden px-4 pb-6 pt-20 text-ink sm:px-5 lg:overflow-hidden lg:pb-8 lg:pt-24">
       <div className="soft-grid absolute inset-0 opacity-60" />
       {error && (
         <div className="relative z-10 mx-auto mb-4 flex max-w-7xl flex-col items-end gap-3">

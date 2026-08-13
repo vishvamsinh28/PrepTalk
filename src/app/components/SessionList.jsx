@@ -45,7 +45,7 @@ export default function SessionList({ compact = false }) {
   };
 
   return (
-    <div className="text-slate-100">
+    <div className="text-ink">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -55,7 +55,7 @@ export default function SessionList({ compact = false }) {
         {loading && (
           <motion.div
             variants={itemVariants}
-            className="flex items-center justify-center space-x-2 text-cyan-200"
+            className="flex items-center justify-center space-x-2 text-accent"
           >
             <FaSpinner className="animate-spin text-xl" />
             <span>Loading sessions...</span>
@@ -67,9 +67,9 @@ export default function SessionList({ compact = false }) {
             variants={itemVariants}
             className="glass-panel rounded-2xl p-8 text-center"
           >
-            <FaExclamationCircle className="mx-auto mb-3 text-4xl text-cyan-200" />
-            <p className="text-lg font-bold text-white">No sessions found.</p>
-            <p className="text-sm text-slate-300">Create a new session to get started.</p>
+            <FaExclamationCircle className="mx-auto mb-3 text-4xl text-accent" />
+            <p className="text-lg font-bold text-ink">No sessions found.</p>
+            <p className="text-sm text-ink-soft">Create a new session to get started.</p>
           </motion.div>
         )}
 
@@ -131,15 +131,15 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
       initial="hidden"
       animate="visible"
       exit="hidden"
-      className="glass-panel h-full rounded-xl p-5 transition hover:-translate-y-1 hover:border-cyan-200/40"
+      className="glass-panel h-full rounded-xl p-5 transition hover:-translate-y-1 hover:border-accent"
     >
       <div className="flex flex-col gap-3">
         <div>
-          <h3 className={compact ? "mb-2 text-xl font-black text-white" : "mb-2 text-2xl font-black text-white"}>{session.title}</h3>
-          <p className="mb-3 line-clamp-3 text-sm leading-6 text-slate-300">{session.description}</p>
+          <h3 className={compact ? "mb-2 text-xl font-semibold text-ink" : "mb-2 text-2xl font-semibold text-ink"}>{session.title}</h3>
+          <p className="mb-3 line-clamp-3 text-sm leading-6 text-ink-soft">{session.description}</p>
         </div>
         {session.scheduledAt && (
-          <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-xs font-bold text-amber-100">
+          <span className="inline-flex w-fit items-center gap-2 rounded-lg border border-amber-600/40 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">
             <FaCalendarAlt />
             {new Date(session.scheduledAt).toLocaleString()}
           </span>
@@ -147,17 +147,17 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-4">
-        <span className="rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">{session.role || "General"}</span>
-        <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.level || "Entry"}</span>
-        <span className="rounded-lg border border-white/10 bg-white/10 px-3 py-1 text-xs text-slate-200">{session.interviewType || "Mixed"}</span>
+        <span className="rounded-lg border border-accent bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{session.role || "General"}</span>
+        <span className="rounded-lg border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.level || "Entry"}</span>
+        <span className="rounded-lg border border-rule bg-black/5 px-3 py-1 text-xs text-ink">{session.interviewType || "Mixed"}</span>
         {session.skills?.map((skill) => (
-          <span key={skill} className="rounded-lg border border-white/10 bg-slate-950/35 px-3 py-1 text-xs text-slate-300">{skill}</span>
+          <span key={skill} className="rounded-lg border border-rule bg-white px-3 py-1 text-xs text-ink-soft">{skill}</span>
         ))}
       </div>
 
-      <p className="mb-5 text-xs text-slate-400">Interviewees: <span className="text-slate-200">{session.interviewees?.join(", ") || "None assigned"}</span></p>
+      <p className="mb-5 text-xs text-ink-soft">Interviewees: <span className="text-ink">{session.interviewees?.join(", ") || "None assigned"}</span></p>
       {copied && (
-        <p className="mb-3 rounded-lg border border-emerald-300/25 bg-emerald-300/10 px-3 py-2 text-xs font-bold text-emerald-100">
+        <p className="mb-3 rounded-lg border border-emerald-600/40 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700">
           Link copied
         </p>
       )}
@@ -165,7 +165,7 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
       <div className="grid gap-2 sm:grid-cols-2">
         <button
           onClick={() => router.push(`/session/${session._id}`)}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-5 py-2.5 font-black text-slate-950 transition hover:-translate-y-0.5"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-ink px-5 py-2.5 font-semibold text-canvas transition hover:-translate-y-0.5"
         >
           <FaSignInAlt />
           Join Session
@@ -173,14 +173,14 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
         {inviteUrl && (
           <button
             onClick={copyLink}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 font-bold text-cyan-100"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-accent bg-accent/10 px-4 py-2.5 font-bold text-accent"
           >
             <FaLink />
             Copy Link
           </button>
         )}
         {(session.interviewees || []).length > 0 && (
-          <a href={mailtoHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/10 px-4 py-2.5 font-bold text-white">
+          <a href={mailtoHref} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rule bg-black/5 px-4 py-2.5 font-bold text-ink">
             <FaEnvelope />
             Email Invite
           </a>
@@ -188,7 +188,7 @@ function SessionCard({ session, router, variants, compact, onDeleted }) {
         <button
           onClick={deleteSession}
           disabled={deleting}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-300/25 bg-rose-400/10 px-4 py-2.5 font-bold text-rose-100 disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-rose-600/40 bg-rose-50 px-4 py-2.5 font-bold text-rose-700 disabled:opacity-60"
         >
           <FaTrash />
           {deleting ? "Deleting..." : "Delete"}

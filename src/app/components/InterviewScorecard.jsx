@@ -80,7 +80,7 @@ export default function InterviewScorecard({ sessionId, session }) {
 
   if (interviewees.length === 0) {
     return (
-      <div className="rounded-2xl border border-amber-300/30 bg-amber-300/10 p-4 text-sm text-amber-100">
+      <div className="rounded-2xl border border-amber-600/40 bg-amber-50 p-4 text-sm text-amber-700">
         Add at least one interviewee to this session before submitting a report.
       </div>
     );
@@ -93,7 +93,7 @@ export default function InterviewScorecard({ sessionId, session }) {
           className={`flex items-center gap-2 rounded-2xl p-3 text-sm ${
             isError
               ? "border border-red-300/30 bg-red-500/10 text-red-100"
-              : "border border-emerald-300/30 bg-emerald-500/10 text-emerald-100"
+              : "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700"
           }`}
         >
           {isError ? <FaExclamationTriangle /> : <FaCheckCircle />}
@@ -129,7 +129,7 @@ export default function InterviewScorecard({ sessionId, session }) {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
         {scoreFields.map(([name, label]) => (
-          <label key={name} className="rounded-lg border border-white/10 bg-slate-950/30 p-3">
+          <label key={name} className="rounded-lg border border-rule bg-white p-3">
             <span className="field-label min-h-8 text-xs">{label}</span>
             <ScorecardSelect
               id={name}
@@ -184,7 +184,7 @@ export default function InterviewScorecard({ sessionId, session }) {
       <div className="flex flex-wrap gap-3">
         <button
           type="submit"
-          className="rounded-xl bg-linear-to-r from-cyan-300 via-emerald-300 to-blue-400 px-7 py-4 font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:-translate-y-0.5"
+          className="rounded-xl bg-ink px-7 py-4 font-semibold text-canvas shadow-lg transition hover:-translate-y-0.5"
         >
           Save Report
         </button>
@@ -192,18 +192,18 @@ export default function InterviewScorecard({ sessionId, session }) {
           type="button"
           onClick={generateSummary}
           disabled={!savedReport?._id || summaryLoading}
-          className="rounded-xl border border-white/15 bg-white/10 px-7 py-4 font-bold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl border border-rule bg-black/5 px-7 py-4 font-bold text-ink transition disabled:cursor-not-allowed disabled:opacity-50"
         >
           {summaryLoading ? "Generating summary..." : "Generate AI Summary"}
         </button>
       </div>
 
       {savedReport?.aiSummary && (
-        <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-5">
-          <p className="mb-2 text-lg font-black text-cyan-100">AI feedback summary</p>
-          <p className="whitespace-pre-wrap leading-7 text-slate-200">{savedReport.aiSummary}</p>
+        <div className="rounded-2xl border border-accent bg-accent/10 p-5">
+          <p className="mb-2 text-lg font-semibold text-accent">AI feedback summary</p>
+          <p className="whitespace-pre-wrap leading-7 text-ink">{savedReport.aiSummary}</p>
           {savedReport.actionItems?.length > 0 && (
-            <ul className="mt-4 space-y-2 text-sm text-slate-200">
+            <ul className="mt-4 space-y-2 text-sm text-ink">
               {savedReport.actionItems.map((item) => <li key={item}>- {item}</li>)}
             </ul>
           )}
@@ -238,14 +238,14 @@ function ScorecardSelect({ id, value, options, onChange, openSelect, setOpenSele
         }`}
       >
         <span className="min-w-0 truncate">{value}</span>
-        <FaChevronDown className={`shrink-0 text-xs text-cyan-200 transition ${isOpen ? "rotate-180" : ""}`} />
+        <FaChevronDown className={`shrink-0 text-xs text-accent transition ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       {isOpen && (
         <div
           role="listbox"
           tabIndex={-1}
-          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-lg border border-cyan-300/25 bg-slate-950 shadow-2xl shadow-black/40"
+          className="absolute left-0 right-0 top-[calc(100%+0.35rem)] z-50 overflow-hidden rounded-lg border border-accent bg-white shadow-2xl"
         >
           {options.map((option) => {
             const isSelected = option === value;
@@ -260,8 +260,8 @@ function ScorecardSelect({ id, value, options, onChange, openSelect, setOpenSele
                 onClick={() => chooseValue(option)}
                 className={`block w-full px-4 py-3 text-left text-sm font-bold transition ${
                   isSelected
-                    ? "bg-cyan-300/14 text-cyan-100"
-                    : "text-slate-200 hover:bg-white/10 hover:text-white"
+                    ? "bg-accent/10 text-accent"
+                    : "text-ink hover:bg-black/5 hover:text-ink"
                 }`}
               >
                 {option}

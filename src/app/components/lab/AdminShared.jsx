@@ -14,7 +14,7 @@ export function Toast({ tone, text }) {
 export function SkillIcon({ index }) {
   const icons = [<FaPuzzlePiece key="p" />, <FaCode key="c" />, <FaDatabase key="d" />];
   return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-cyan-300/25 bg-cyan-300/10 text-cyan-100 sm:h-12 sm:w-12">
+    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-accent bg-accent/10 text-accent sm:h-12 sm:w-12">
       {icons[index % icons.length]}
     </span>
   );
@@ -22,9 +22,9 @@ export function SkillIcon({ index }) {
 
 export function Metric({ label, value }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-slate-950/35 p-2.5">
-      <p className="text-[0.68rem] font-bold uppercase text-slate-400">{label}</p>
-      <p className="mt-0.5 text-lg font-black text-white">{value}</p>
+    <div className="rounded-lg border border-rule bg-white p-2.5">
+      <p className="text-[0.68rem] font-bold uppercase text-ink-soft">{label}</p>
+      <p className="mt-0.5 text-lg font-semibold text-ink">{value}</p>
     </div>
   );
 }
