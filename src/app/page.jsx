@@ -1,5 +1,4 @@
 import ClosingCta from "./components/landing/ClosingCta";
-import DesktopOnly from "./components/landing/DesktopOnly";
 import Hero from "./components/landing/Hero";
 import LandingFooter from "./components/landing/LandingFooter";
 import LandingNav from "./components/landing/LandingNav";
@@ -14,18 +13,14 @@ export const metadata = {
 export default function HomePage() {
   return (
     <div className="landing-page bg-canvas text-ink">
-      <DesktopOnly />
-
-      <div className="hidden lg:block">
-        <LandingNav />
-        <main>
-          <Hero />
-          <Manifesto />
-          <ProductBands />
-          <ClosingCta />
-        </main>
-        <LandingFooter />
-      </div>
+      <LandingNav />
+      <main>
+        <Hero />
+        <Manifesto />
+        <ProductBands />
+        <ClosingCta />
+      </main>
+      <LandingFooter />
     </div>
   );
 }

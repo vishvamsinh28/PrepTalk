@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
+import DesktopOnly from "./components/DesktopOnly";
 import Navbar from "./components/Navbar";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -32,8 +33,14 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${body.variable} ${display.variable}`}>
       <body className="antialiased">
-        <Navbar />
-        {children}
+        {/* PrepTalk is desktop-only: every route is gated here so no page can
+            leak onto small screens. lg:contents keeps the wrapper out of the
+            box tree on desktop, so page layouts are unaffected. */}
+        <DesktopOnly />
+        <div className="hidden lg:contents">
+          <Navbar />
+          {children}
+        </div>
         <Analytics />
       </body>
     </html>

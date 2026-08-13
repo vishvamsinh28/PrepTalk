@@ -36,12 +36,12 @@ export default function Hero() {
           >
             Create a free account
           </Link>
-          <Link
-            href="/login"
+          <a
+            href="#interview"
             className="text-[15px] font-medium text-ink underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-accent"
           >
-            Log in
-          </Link>
+            See a session room
+          </a>
         </div>
 
         <p

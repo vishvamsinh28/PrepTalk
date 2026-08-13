@@ -24,20 +24,15 @@ export default function LandingNav() {
           </a>
         </nav>
 
-        <div className="ml-auto flex items-center gap-6">
-          <Link
-            href="/login"
-            className="text-sm text-ink-soft transition-colors hover:text-ink"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/register"
-            className="bg-ink px-5 py-2.5 text-sm font-medium text-canvas transition-opacity hover:opacity-85"
-          >
-            Create a free account
-          </Link>
-        </div>
+        {/* No sign-up button here: this header scrolls away with the hero, so a
+            CTA would only ever duplicate the hero's. Conversion lives in the
+            hero and the closing section. */}
+        <Link
+          href="/login"
+          className="ml-auto text-sm text-ink-soft transition-colors hover:text-ink"
+        >
+          Log in
+        </Link>
       </div>
     </header>
   );

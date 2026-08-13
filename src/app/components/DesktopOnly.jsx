@@ -1,4 +1,4 @@
-import PrepTalkLogo from "../PrepTalkLogo";
+import PrepTalkLogo from "./PrepTalkLogo";
 
 export default function DesktopOnly() {
   return (
