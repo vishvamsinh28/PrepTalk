@@ -59,9 +59,20 @@ export default function LabAdminDashboard({ initialAssessmentId = "" }) {
     return haystack.includes(query.toLowerCase());
   });
 
+  /**
+   * Loads the interviewer's assessments into state.
+   * Catches its own failure rather than rejecting: the mount effect calls this
+   * without awaiting, so an uncaught rejection would surface as an unhandled
+   * promise and leave the list silently empty with no explanation.
+   * @returns {Promise<void>} Always resolves; failures land in the error toast.
+   */
   const loadAssessments = async () => {
-    const data = await getJson("/api/lab/assessments");
-    setAssessments(data.assessments || []);
+    try {
+      const data = await getJson("/api/lab/assessments");
+      setAssessments(data.assessments || []);
+    } catch (err) {
+      setError(err?.message || "Could not load assessments.");
+    }
   };
 
   const chooseTemplate = (template) => {

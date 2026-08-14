@@ -46,11 +46,7 @@ export function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
  * after mount, and the `streamsRef` lookup catches media that already arrived
  * before this tile rendered. Without the second path, a peer whose stream
  * landed during negotiation would show a permanently black tile.
- *
- * KNOWN ISSUE: the effect registers `peer.on("stream")` with no cleanup, so a
- * re-run (or a StrictMode double-mount) stacks duplicate listeners on the same
- * peer. Harmless today because the handler is idempotent, but it should return
- * `() => peer.off("stream", handler)`.
+ * The listener is removed on cleanup so effect re-runs don't stack duplicates.
  *
  * @param {object} props - Component props.
  * @param {object} props.peer - simple-peer instance for this participant.
@@ -63,16 +59,24 @@ export function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   const ref = useRef();
 
   useEffect(() => {
-    peer.on("stream", remoteStream => {
+    const applyStream = (remoteStream) => {
       if (ref.current) {
         ref.current.srcObject = remoteStream;
       }
-    });
+    };
+
+    peer.on("stream", applyStream);
 
     // Covers the case where the stream arrived before this tile mounted.
     if (streamsRef.current[peerId] && ref.current) {
       ref.current.srcObject = streamsRef.current[peerId];
     }
+
+    // Without this, a re-run or StrictMode double-mount stacks another listener
+    // on the same peer, and every renegotiated stream fires all of them.
+    return () => {
+      peer.removeListener?.("stream", applyStream);
+    };
   }, [peer, peerId, streamsRef]);
 
   return (

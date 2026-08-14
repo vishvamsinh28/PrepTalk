@@ -14,6 +14,8 @@
  * @param {object[]} props.sortedAssessments - Display order.
  * @param {string} props.initialAssessmentId - Deep-linked id from the URL, or `""`.
  * @param {string} props.submitMessage - Confirmation from a just-completed submission.
+ * @param {string} [props.loadError] - Message when the assessment list failed to load;
+ *   distinguishes a real failure from genuinely having none assigned.
  * @param {Function} props.onStart - Called with an assessment to begin it.
  * @returns {JSX.Element} The picker.
  */
@@ -22,6 +24,7 @@ export default function AssessmentPicker({
   sortedAssessments,
   initialAssessmentId,
   submitMessage,
+  loadError = "",
   onStart,
 }) {
   return (
@@ -38,6 +41,14 @@ export default function AssessmentPicker({
         {submitMessage && (
           <p className="mt-6 border-l-2 border-emerald-700 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {submitMessage}
+          </p>
+        )}
+        {loadError && (
+          <p
+            role="status"
+            className="mt-6 border-l-2 border-accent bg-accent/5 px-4 py-3 text-sm text-accent"
+          >
+            {loadError}
           </p>
         )}
         <div className="max-h-[calc(100vh-22rem)] min-h-[18rem] overflow-auto pr-2">

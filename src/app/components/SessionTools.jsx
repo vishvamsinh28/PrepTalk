@@ -13,10 +13,9 @@ import { normalizeQuestionList } from "@/lib/questionBank";
  * or clear updates it from the response instead of refetching.
  * Generate and clear controls render for interviewers only; the API enforces
  * the same rule, so hiding them is UX rather than security.
- *
- * KNOWN GAP: the async handlers below use `try/finally` with no `catch`, so a
- * failed generation just stops the spinner and leaves the panel unchanged with
- * no explanation. They should surface the error the way `CreateSessionForm` does.
+ * All four tool actions go through `runToolAction`, which owns the loading flag
+ * and the error banner — so a failed AI generation says so instead of just
+ * stopping the spinner.
  *
  * @param {object} props - Component props.
  * @param {string} props.sessionId - Session being viewed.
@@ -30,6 +29,7 @@ export default function SessionTools({ sessionId, session, userRole }) {
   const [loading, setLoading] = useState("");
   const [origin, setOrigin] = useState("");
   const [copiedInvite, setCopiedInvite] = useState(false);
+  const [toolsError, setToolsError] = useState("");
 
   // Read after mount: `window.location` doesn't exist during SSR, and using it
   // inline would cause a hydration mismatch.
@@ -44,64 +44,83 @@ export default function SessionTools({ sessionId, session, userRole }) {
   }, [origin, sessionId]);
 
   /**
+   * Runs one tool action behind a shared loading flag and error banner.
+   * Every action here calls the network and can fail — AI generation especially,
+   * since it depends on an upstream model. Routing them all through one wrapper
+   * means a failure can never leave the panel silently unchanged.
+   * @param {string} key - Loading key identifying which button is busy.
+   * @param {() => Promise<void>} action - The work to run.
+   * @param {string} failureMessage - Shown if `action` throws without a message.
+   * @returns {Promise<void>} Always resolves; failures surface in `toolsError`.
+   */
+  const runToolAction = async (key, action, failureMessage) => {
+    setLoading(key);
+    setToolsError("");
+    try {
+      await action();
+    } catch (error) {
+      setToolsError(error?.message || failureMessage);
+    } finally {
+      setLoading("");
+    }
+  };
+
+  /**
    * Regenerates the question bank, replacing whatever is there.
    * Also refreshes the prep guide, since the endpoint returns both.
-   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   * @returns {Promise<void>}
    */
-  const generateQuestions = async () => {
-    setLoading("questions");
-    try {
+  const generateQuestions = () =>
+    runToolAction("questions", async () => {
       const data = await postJson(`/api/session/${sessionId}/questions`, {});
       setQuestions(normalizeQuestionList(data.questions));
       setPrepGuide(data.prepGuide || "");
-    } finally {
-      setLoading("");
-    }
-  };
+    }, "Could not generate questions.");
 
   /**
    * Clears the question bank, leaving the prep guide alone.
-   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   * @returns {Promise<void>}
    */
-  const clearQuestions = async () => {
-    setLoading("clear-questions");
-    try {
+  const clearQuestions = () =>
+    runToolAction("clear-questions", async () => {
       await deleteJson(`/api/session/${sessionId}/questions`);
       setQuestions([]);
-    } finally {
-      setLoading("");
-    }
-  };
+    }, "Could not clear questions.");
 
   /**
    * Clears the prep guide, leaving the question bank alone.
-   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   * @returns {Promise<void>}
    */
-  const clearPrep = async () => {
-    setLoading("clear-prep");
-    try {
+  const clearPrep = () =>
+    runToolAction("clear-prep", async () => {
       await deleteJson(`/api/session/${sessionId}/prep`);
       setPrepGuide("");
-    } finally {
-      setLoading("");
-    }
-  };
+    }, "Could not clear the prep guide.");
 
-  const generatePrep = async () => {
-    setLoading("prep");
-    try {
+  /**
+   * Regenerates the prep guide only.
+   * @returns {Promise<void>}
+   */
+  const generatePrep = () =>
+    runToolAction("prep", async () => {
       const data = await postJson(`/api/session/${sessionId}/prep`, {});
       setPrepGuide(data.prepGuide || "");
-    } finally {
-      setLoading("");
-    }
-  };
+    }, "Could not generate the prep guide.");
 
+  /**
+   * Copies the join link and flashes a confirmation for 1.8s.
+   * @returns {Promise<void>} Clipboard failures surface in the error banner —
+   *   browsers reject when the document isn't focused or the origin isn't secure.
+   */
   const copyInvite = async () => {
     if (!inviteUrl) return;
-    await navigator.clipboard?.writeText(inviteUrl);
-    setCopiedInvite(true);
-    window.setTimeout(() => setCopiedInvite(false), 1800);
+    try {
+      await navigator.clipboard?.writeText(inviteUrl);
+      setCopiedInvite(true);
+      window.setTimeout(() => setCopiedInvite(false), 1800);
+    } catch (error) {
+      setToolsError(error?.message || "Could not copy the invite link.");
+    }
   };
 
   const mailtoHref = `mailto:${(session.interviewees || []).join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(`Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role}\n${session.scheduledAt ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n` : ""}${inviteUrl ? `Join link: ${inviteUrl}\n` : ""}\n\nSee you there.`)}`;
@@ -109,6 +128,15 @@ export default function SessionTools({ sessionId, session, userRole }) {
 
   return (
     <section className="grid gap-x-16 gap-y-14 lg:grid-cols-[0.8fr_1.2fr]">
+      {toolsError && (
+        <p
+          role="status"
+          className="border-l-2 border-accent bg-accent/5 px-4 py-3 text-sm text-accent lg:col-span-2"
+        >
+          {toolsError}
+        </p>
+      )}
+
       <div>
         <div className="border-b border-rule pb-4">
           <p className="app-eyebrow">Agenda</p>

@@ -38,6 +38,7 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
   const [explanationError, setExplanationError] = useState("");
   const [submitMessage, setSubmitMessage] = useState("");
   const [submissionError, setSubmissionError] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [secondsRemaining, setSecondsRemaining] = useState(0);
   const [hasAutoSubmitted, setHasAutoSubmitted] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -47,9 +48,22 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
     loadAssessments();
   }, []);
 
+  /**
+   * Loads the candidate's assigned assessments into state.
+   * Catches its own failure rather than rejecting: the mount effect calls this
+   * without awaiting, so an uncaught rejection would surface as an unhandled
+   * promise and leave the candidate staring at "no assessments assigned" when
+   * the real problem was a failed request.
+   * @returns {Promise<void>} Always resolves; failures land in `loadError`.
+   */
   const loadAssessments = async () => {
-    const data = await getJson("/api/lab/assessments");
-    setAssessments(data.assessments || []);
+    try {
+      const data = await getJson("/api/lab/assessments");
+      setAssessments(data.assessments || []);
+      setLoadError("");
+    } catch (error) {
+      setLoadError(error?.message || "Could not load your assessments.");
+    }
   };
   const sortedAssessments = useMemo(() => {
     if (!initialAssessmentId) return assessments;
@@ -176,6 +190,10 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
       }
       setResultsByProblem((previous) => ({ ...previous, [activeProblem.id]: nextResults }));
       await explainFailedTests(nextResults);
+    } catch (error) {
+      // The sandbox itself resolves rather than rejects, so reaching here means
+      // the worker couldn't be created at all — worth saying, not swallowing.
+      setExplanationError(error?.message || "Could not run the tests in this browser.");
     } finally {
       setIsRunning(false);
     }
@@ -263,6 +281,7 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
       sortedAssessments={sortedAssessments}
       initialAssessmentId={initialAssessmentId}
       submitMessage={submitMessage}
+      loadError={loadError}
       onStart={startAssessment}
     />
   );

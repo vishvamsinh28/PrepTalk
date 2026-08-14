@@ -36,7 +36,7 @@ export default function ChatRoom({ sessionId, userEmail }) {
   const [messages, setMessages] = useState([]);
   const [activeUsers, setActiveUsers] = useState([]);
 
-  const messagesEndRef = useRef(null);
+  const messageListRef = useRef(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -90,8 +90,20 @@ export default function ChatRoom({ sessionId, userEmail }) {
     };
   }, [sessionId, userEmail]);
 
+  // Keep the newest message in view by scrolling the list itself.
+  // Deliberately NOT `scrollIntoView` on a bottom anchor: that walks up and
+  // scrolls every scrollable ancestor, so on this ~3000px session page it
+  // dragged the whole window down on each new message. Setting scrollTop
+  // touches this container and nothing else.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const list = messageListRef.current;
+    if (!list) return;
+
+    // Plain assignment, and deliberately no smooth behaviour: a smooth scroll
+    // (via the option or `scroll-behavior: smooth`) is silently dropped in some
+    // environments, which would leave the newest message off-screen entirely.
+    // An instant jump to the latest message is the behaviour that always holds.
+    list.scrollTop = list.scrollHeight;
   }, [messages]);
 
   /**
@@ -123,7 +135,10 @@ export default function ChatRoom({ sessionId, userEmail }) {
         {activeUsers.length > 0 ? `Active · ${activeUsers.join(", ")}` : "Nobody else here yet"}
       </p>
 
-      <div className="mt-4 min-h-0 flex-1 overflow-y-auto border-t border-rule">
+      <div
+        ref={messageListRef}
+        className="mt-4 min-h-0 flex-1 overflow-y-auto border-t border-rule"
+      >
         {messages.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink-soft">
             No messages yet. Say hello.
@@ -153,7 +168,6 @@ export default function ChatRoom({ sessionId, userEmail }) {
                 );
               })}
             </AnimatePresence>
-            <div ref={messagesEndRef} />
           </ul>
         )}
       </div>
