@@ -1,7 +1,27 @@
+/**
+ * @file Mic and camera toggles for the video room.
+ * Muting here *stops and removes* the track rather than setting `enabled =
+ * false`, so the browser's hardware indicator actually goes out — the tradeoff
+ * is that unmuting must re-request the device and renegotiate with every peer.
+ */
+
 import { requestUserMedia, storeMediaPreferences, syncLocalVideoElement } from "./videoRoomMedia";
 
-/* Verbatim extraction of the audio/video toggle handlers — parameterized on the
-   hook state they close over. */
+/**
+ * Builds the audio and video toggle handlers.
+ * Takes hook state as arguments, so these are rebuilt each render and always
+ * see the current `stream` and enabled flags.
+ * @param {object} deps - State and setters from `useVideoRoom`.
+ * @param {MediaStream|null} deps.stream - Local stream; both toggles no-op without it.
+ * @param {boolean} deps.audioEnabled - Current mic state.
+ * @param {boolean} deps.videoEnabled - Current camera state.
+ * @param {Function} deps.setAudioEnabled - Mic state setter.
+ * @param {Function} deps.setVideoEnabled - Camera state setter.
+ * @param {Function} deps.setMediaError - Surfaces device errors to the UI.
+ * @param {{current: Array<{peer: object}>}} deps.peersRef - Live peers to renegotiate against.
+ * @param {{current: HTMLVideoElement|null}} deps.userVideo - Local preview element.
+ * @returns {{toggleAudio: Function, toggleVideo: Function}} Toggle handlers.
+ */
 export function createMediaToggles({
   stream,
   audioEnabled,
@@ -12,6 +32,11 @@ export function createMediaToggles({
   peersRef,
   userVideo,
 }) {
+  /**
+   * Mutes by stopping and removing the mic track, unmutes by re-acquiring it.
+   * Preferences are written on each path so the choice survives a rejoin.
+   * @returns {void} Async work is fire-and-forget; failures surface via `setMediaError`.
+   */
   const toggleAudio = () => {
     if (stream) {
       const nextAudioEnabled = !audioEnabled;
@@ -58,6 +83,12 @@ export function createMediaToggles({
     }
   };
 
+  /**
+   * Same stop-and-reacquire cycle as `toggleAudio`, plus a local preview resync.
+   * `syncLocalVideoElement` runs on both paths because removing the track leaves
+   * the `<video>` element showing a frozen last frame otherwise.
+   * @returns {void} Async work is fire-and-forget; failures surface via `setMediaError`.
+   */
   const toggleVideo = () => {
     if (stream) {
       const nextVideoEnabled = !videoEnabled;

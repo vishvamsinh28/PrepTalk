@@ -2,11 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
+/** @file The candidate's session list. Read-only counterpart to `SessionList`. */
+
 import { useRouter } from "next/navigation";
 
 /**
- * Hairline list of sessions assigned to the interviewee with
- * join buttons.
+ * Lists sessions assigned to the signed-in interviewee, each with a join button.
+ * Hits the same `/api/session/list` endpoint as the interviewer view — the API
+ * filters by role, so this component needs no role handling of its own.
+ * Offers no delete or edit actions, which is the substantive difference from
+ * `SessionList`; a candidate can only join.
+ * A failed fetch falls through to the same empty state as "none assigned",
+ * which is a known softening of a real error.
+ * @returns {JSX.Element} The list, its empty state, or a loading line.
  */
 export default function IntervieweeSessionList() {
   const [sessions, setSessions] = useState([]);

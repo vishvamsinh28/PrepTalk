@@ -1,7 +1,10 @@
+/** @file The two product sections on the landing page: Interview and Lab. */
+
 import Link from "next/link";
 import InterviewScreen from "./InterviewScreen";
 import LabScreen from "./LabScreen";
 
+/** Feature rows for the Interview band, as `[title, description]`. */
 const roomParts = [
   ["Video and chat", "WebRTC video with persistent chat and presence, in one pane."],
   ["Shared workspace", "Notes and code both sides can edit while the call is running."],
@@ -15,6 +18,7 @@ const roomParts = [
   ],
 ];
 
+/** Bullet points for the Lab band. Plain strings — no titles in this list. */
 const labPoints = [
   "A timer that runs with the attempt",
   "Visible tests the candidate runs in-browser, as often as they like",
@@ -23,8 +27,12 @@ const labPoints = [
 ];
 
 /**
- * The two product sections: Interview (dark, with room recreation)
- * and Lab (light, with editor recreation).
+ * The two product bands, returned as a fragment rather than one wrapper.
+ * They alternate ground — Interview on night, Lab on canvas — and each needs to
+ * bleed full-width, so wrapping them in a shared container would break that.
+ * The `#interview` and `#lab` ids are the anchor targets used by the nav and
+ * footer links.
+ * @returns {JSX.Element} Both product sections.
  */
 export default function ProductBands() {
   return (

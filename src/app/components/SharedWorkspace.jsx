@@ -2,12 +2,26 @@
 
 import { useEffect, useRef, useState } from "react";
 import * as Ably from "ably";
+/**
+ * @file The shared notes and code pad. Autosaves on a debounce and mirrors to
+ * the other participant over Ably.
+ */
+
 import { getJson, patchJson } from "@/lib/clientApi";
 
 /**
- * Realtime shared notes + dark code pad, autosaved on a debounce and
- * synced over Ably.
- * @param {{ sessionId: string }} props
+ * Realtime shared notes and code pad, autosaved on an 800ms debounce.
+ * Two refs carry the tricky state. `skipNextSaveRef` marks a state change as
+ * *incoming* (loaded from the server or pushed by a peer) so echoing it back
+ * doesn't start a save loop between the two participants. `latestWorkspaceRef`
+ * lets a resolving save notice the user typed while it was in flight, so the
+ * server's echo is discarded instead of overwriting newer keystrokes.
+ * Remote updates are filtered by `connectionId` — without that, your own
+ * published update would come back and clobber what you're typing.
+ * Last write wins across participants; there is no merge.
+ * @param {object} props - Component props.
+ * @param {string} props.sessionId - Session whose workspace to load and sync.
+ * @returns {JSX.Element} The workspace panel.
  */
 export default function SharedWorkspace({ sessionId }) {
   const [workspace, setWorkspace] = useState({ notes: "", code: "" });
@@ -115,10 +129,20 @@ export default function SharedWorkspace({ sessionId }) {
     }
   };
 
+  /**
+   * Clears one pane, leaving the other untouched.
+   * Only sets state — the debounce effect handles persisting and publishing.
+   * @param {"notes"|"code"} field - Pane to clear.
+   * @returns {void}
+   */
   const clearWorkspaceField = (field) => {
     setWorkspace((current) => ({ ...current, [field]: "" }));
   };
 
+  /**
+   * Clears both panes. Same deal — the debounce saves and publishes it.
+   * @returns {void}
+   */
   const clearWorkspace = () => {
     setWorkspace({ notes: "", code: "" });
   };
@@ -140,6 +164,14 @@ export default function SharedWorkspace({ sessionId }) {
     return () => clearTimeout(saveTimerRef.current);
   }, [workspace, loaded]);
 
+  /**
+   * Grows a textarea to fit its content, up to a ceiling.
+   * Height is reset to `auto` first so `scrollHeight` reflects the new content
+   * rather than the previous height — without that the box only ever grows.
+   * @param {React.SyntheticEvent} event - Input event; `currentTarget` is the textarea.
+   * @param {number} [maxHeight=320] - Pixel ceiling, past which it scrolls instead.
+   * @returns {void}
+   */
   const autoGrow = (event, maxHeight = 320) => {
     event.currentTarget.style.height = "auto";
     const nextHeight = Math.min(event.currentTarget.scrollHeight, maxHeight);

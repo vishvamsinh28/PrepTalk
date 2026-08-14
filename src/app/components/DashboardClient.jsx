@@ -1,8 +1,11 @@
 "use client";
 
+/** @file The signed-in landing page at `/dashboard`, shared by both roles. */
+
 import ProgressDashboard from "./ProgressDashboard";
 import PageHeader, { SignedInAs, SectionHeading } from "./ui/PageHeader";
 
+/** Role-specific intro copy. An unknown role falls through to generic text. */
 const roleCopy = {
   Interviewer: {
     description:
@@ -15,9 +18,15 @@ const roleCopy = {
 };
 
 /**
- * Signed-in dashboard: role-aware shortcuts, account details, and
- * score averages.
- * @param {{ userData: { email?: string, role?: string } }} props
+ * Signed-in dashboard: role-aware shortcuts, account details, and score averages.
+ * Both roles get the same two destinations with different descriptions — the
+ * routes diverge only for the interview workspace, since `/lab` decides its own
+ * view by role.
+ * Every field is optional-chained because this renders from the token payload,
+ * which a stale session can leave partially populated.
+ * @param {object} props - Component props.
+ * @param {{email?: string, role?: string}} props.userData - Signed-in user's token claims.
+ * @returns {JSX.Element} The dashboard.
  */
 export default function DashboardClient({ userData }) {
   const role = userData?.role;

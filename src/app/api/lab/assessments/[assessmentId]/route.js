@@ -1,3 +1,5 @@
+/** @file `/api/lab/assessments/:id` — read, update, and delete a single assessment. */
+
 import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
@@ -7,11 +9,20 @@ import { isValidObjectId } from "@/lib/sessionAccess";
 import { normalizeEmailList, normalizeText } from "@/lib/validation";
 import LabAssessment from "@/models/LabAssessment";
 
+/** Roles allowed in the Lab. Anything else is a 403. */
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
 /**
- * GET /api/lab/assessments/:id — one assessment, sanitized for the
- * caller's role. Auth: owner or assigned candidate.
+ * Returns one assessment, sanitized for the caller's role.
+ * Interviewers get the full document including hidden tests and every
+ * submission; candidates get visible tests and only their own results. The
+ * deadline check applies to candidates only, so an owner can still review work
+ * after the assessment closes.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @param {{ params: Promise<{ assessmentId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ assessment }`;
+ *   400 on a malformed id; 401 signed out; 403 for unknown roles or
+ *   non-participants; 404 when missing; 410 past the deadline for candidates; 500 otherwise.
  */
 export async function GET(req, props) {
   try {
@@ -36,7 +47,13 @@ export async function GET(req, props) {
 }
 
 /**
- * DELETE /api/lab/assessments/:id — removes an assessment. Auth: owner.
+ * Deletes an assessment and, with it, every submission stored inside it.
+ * Ownership is re-checked against `createdBy` directly rather than via
+ * `userCanAccessAssessment`, since that helper would also admit candidates.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @param {{ params: Promise<{ assessmentId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 on success; 400 on
+ *   a malformed id; 401 signed out; 403 for non-owners; 404 when missing; 500 otherwise.
  */
 export async function DELETE(req, props) {
   try {
@@ -61,7 +78,19 @@ export async function DELETE(req, props) {
 }
 
 /**
- * PATCH /api/lab/assessments/:id — updates settings/problems. Auth: owner.
+ * Updates an assessment's candidates, skills, deadline, and problems.
+ * NOTE: `title` and `description` are pinned to the stored values before
+ * normalizing, so this endpoint cannot rename an assessment — sending a new
+ * title is silently ignored. Intentional or not, the builder UI has no rename
+ * control today; add one and this line must change too.
+ * Existing submissions are left untouched, so editing problems after candidates
+ * have submitted leaves their old results scored against the previous tests.
+ * @param {import("next/server").NextRequest} req - Body carries the builder payload.
+ * @param {{ params: Promise<{ assessmentId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with the sanitized
+ *   `{ assessment }`; 400 for no candidates, unregistered candidates, an invalid
+ *   or past deadline, no sections, out-of-range duration, or malformed test
+ *   JSON; 401 signed out; 403 for non-owners; 404 when missing; 500 otherwise.
  */
 export async function PATCH(req, props) {
   try {
@@ -126,11 +155,25 @@ export async function PATCH(req, props) {
   }
 }
 
+/**
+ * Normalizes core skills from an array or comma-separated string.
+ * Third copy of this logic — the others live in `@/lib/labAccess` and the
+ * sibling assessments route. Worth exporting one from `labAccess`.
+ * @param {unknown} value - Array of skills or a comma-separated string.
+ * @returns {string[]} Unique, non-empty skill names, capped at 12.
+ */
 function normalizeSkillList(value) {
   const rawSkills = Array.isArray(value) ? value : String(value || "").split(",");
   return [...new Set(rawSkills.map((skill) => normalizeText(skill, 80)).filter(Boolean))].slice(0, 12);
 }
 
+/**
+ * Finds the first test whose JSON won't parse, as a user-facing message.
+ * Same as the sibling create route but worded "Section" rather than "Problem",
+ * matching the edit UI's terminology.
+ * @param {object[]} problems - Normalized problems, each with a `tests` array.
+ * @returns {string} Message naming the offending section and test, or `""` when all are valid.
+ */
 function findInvalidTest(problems) {
   for (const [problemIndex, problem] of problems.entries()) {
     if (!problem.tests.length) return `Section ${problemIndex + 1} needs at least one test case.`;
@@ -144,11 +187,17 @@ function findInvalidTest(problems) {
   return "";
 }
 
+/**
+ * True when a string parses as JSON.
+ * @param {string} value - Raw `inputJson` or `expectedJson` from a test case.
+ * @returns {boolean} `true` when `JSON.parse` succeeds.
+ */
 function isValidJson(value) {
   try {
     JSON.parse(value);
     return true;
   } catch {
+    // Parse failure is the answer here, not an error to propagate.
     return false;
   }
 }

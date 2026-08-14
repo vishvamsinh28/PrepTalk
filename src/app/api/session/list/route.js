@@ -1,11 +1,17 @@
+/** @file `GET /api/session/list` — the caller's sessions, filtered by role. */
+
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 
 /**
- * GET /api/session/list — sessions the caller owns or is invited to.
- * Auth: signed in.
+ * Lists sessions the caller owns (interviewer) or is invited to (interviewee).
+ * The role picks the query field, so neither role can see the other's sessions
+ * — there is no "all sessions" branch by design.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ sessions }`
+ *   newest-first; 401 when signed out; 500 on query failure.
  */
 export async function GET(req) {
   try {

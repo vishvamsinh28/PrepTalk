@@ -1,7 +1,15 @@
+/** @file The small-viewport gate. PrepTalk is desktop-only by design, not by omission. */
+
 import PrepTalkLogo from "./PrepTalkLogo";
 
 /**
- * Full-screen gate shown below lg viewports — the app is desktop-only.
+ * Full-screen notice shown below the `lg` breakpoint.
+ * Gated purely by CSS (`lg:hidden`), so the desktop tree still mounts
+ * underneath — the app isn't unmounted on small screens, just covered. That
+ * keeps it a one-line addition per page, at the cost of doing the work anyway.
+ * Because it's width-based rather than device-based, a narrow desktop window
+ * also triggers it.
+ * @returns {JSX.Element} The gate.
  */
 export default function DesktopOnly() {
   return (

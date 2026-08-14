@@ -1,3 +1,5 @@
+/** @file `POST /api/reports/summary` — turns a saved scorecard into AI feedback prose. Report author only. */
+
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -6,6 +8,13 @@ import InterviewReport from "@/models/InterviewReport";
 import Session from "@/models/Session";
 import { isValidObjectId } from "@/lib/sessionAccess";
 
+/**
+ * Builds the prompt asking Gemini to turn a scorecard into candidate-facing prose.
+ * Every value comes from stored records, never from the request body, so a
+ * caller cannot steer the wording of feedback about someone else.
+ * @param {{ session: object, report: object }} input - Session context and the saved scorecard.
+ * @returns {string} Prompt text requesting `{ aiSummary, actionItems }`.
+ */
 function summaryPrompt({ session, report }) {
   return `
 Return only valid JSON:
@@ -27,8 +36,14 @@ Notes: ${report.notes || "None"}
 }
 
 /**
- * POST /api/reports/summary — generates an AI summary + action items
- * for a saved report. Auth: report author.
+ * Generates an AI summary and action items for a saved report, then stores them.
+ * Overwrites any previous summary, so re-running produces fresh wording — that
+ * is the intended "regenerate" behaviour. Only the interviewer who wrote the
+ * report may call it, even though the interviewee can read the result.
+ * @param {import("next/server").NextRequest} req - Body must carry `{ reportId }`.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with the updated report;
+ *   400 for a missing or malformed id; 401 signed out; 403 for non-authors;
+ *   404 when the report or its session is gone; 500 when Gemini fails.
  */
 export async function POST(req) {
   try {

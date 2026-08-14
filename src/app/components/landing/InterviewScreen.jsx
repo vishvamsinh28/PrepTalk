@@ -1,3 +1,6 @@
+/** @file Static mockup of the session room, used as landing-page artwork. */
+
+/** Sample scorecard values. Illustrative only — not read from any real report. */
 const scores = [
   ["Communication", 4],
   ["Technical depth", 3],
@@ -6,16 +9,21 @@ const scores = [
   ["Role fit", 4],
 ];
 
+/** Sample chat transcript as `[speaker, message]`. Written to show follow-up questioning. */
 const chat = [
   ["Priya", "Walk me through why you reached for a Map here."],
   ["You", "Lookup is O(1), so the scan stays linear instead of nested."],
   ["Priya", "Good. What happens when the array has duplicates?"],
 ];
 
-/*
- * Faithful recreation of the real session room
- * (see components/VideoRoom.jsx, ChatRoom.jsx, InterviewScorecard.jsx).
- * Swap the whole block for a captured screenshot when one exists.
+/**
+ * Hand-built recreation of the session room, used as landing artwork.
+ * Markup rather than a screenshot so it stays crisp at any zoom and restyles
+ * with the design tokens — the cost is that it drifts as the real room changes
+ * (`VideoRoom`, `ChatRoom`, `InterviewScorecard`).
+ * `aria-hidden` and `select-none`: it's decorative, and the surrounding copy
+ * already states everything it depicts.
+ * @returns {JSX.Element} The mockup.
  */
 export default function InterviewScreen() {
   return (

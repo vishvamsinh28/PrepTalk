@@ -3,12 +3,31 @@
 import { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { Metric, SkillIcon } from "./AdminShared";
+/** @file Step two of creating an assessment: edit sections and tests, then create. */
+
 import { sanitizeWholeNumberInput, sectionName, toWholeNumber } from "./adminUtils";
 
 /**
- * Assessment builder: collapsible sections with test-case table rows
- * plus the assignment sidebar.
- * @param {object} props Builder state and mutation callbacks.
+ * Assessment builder: collapsible sections, their test cases, and assignment settings.
+ * Fully controlled — `LabAdminDashboard` owns `form` and every mutation goes
+ * back through a callback, so there's no draft copy here to fall out of sync.
+ * Total duration and test count are derived on each render rather than tracked
+ * in state, which is what keeps the summary honest as sections are edited.
+ * Validation happens on submit via `validateAssessmentForm`, not per keystroke,
+ * so a half-typed section doesn't flash errors.
+ * @param {object} props - Component props.
+ * @param {object} props.form - Builder form state.
+ * @param {boolean} props.isSubmitting - Disables create while in flight.
+ * @param {Function} props.onAddProblem - Appends a blank section.
+ * @param {Function} props.onAddTest - Appends a test case to a section.
+ * @param {Function} props.onBack - Returns to the template picker.
+ * @param {Function} props.onCreate - Validates and submits the assessment.
+ * @param {Function} props.onRemoveProblem - Removes a section by index.
+ * @param {Function} props.onRemoveTest - Removes a test case.
+ * @param {Function} props.onSetForm - Replaces top-level form fields.
+ * @param {Function} props.onUpdateProblem - Merges a patch into one section.
+ * @param {Function} props.onUpdateTest - Merges a patch into one test case.
+ * @returns {JSX.Element} The builder.
  */
 export default function AdminTestBuilder({
   form,

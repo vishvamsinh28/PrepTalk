@@ -2,11 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { submissionKey, statusTone } from "./assessmentReport";
+/** @file Read-only submissions report for one assessment. Interviewer-facing. */
+
 import { formatDateTime } from "./adminUtils";
 
 /**
- * Read-only submissions report with candidate search.
- * @param {{ report: object }} props
+ * Submissions report with candidate search and a detail pane.
+ * Selection is stored as a *key* rather than an index, so filtering the list
+ * doesn't silently switch which submission you're reading. The effect
+ * reconciles that key when the derived selection changes — for example when a
+ * search excludes the row you had open, it falls back to the first match.
+ * Shows hidden-test results and full submitted code, so it must never be
+ * rendered for a candidate.
+ * @param {object} props - Component props.
+ * @param {object} props.report - Output of `buildAssessmentReport`.
+ * @returns {JSX.Element} The report viewer.
  */
 export default function ReportViewer({ report }) {
   const [query, setQuery] = useState("");

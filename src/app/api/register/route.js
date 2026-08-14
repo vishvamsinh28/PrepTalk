@@ -1,3 +1,5 @@
+/** @file `POST /api/register` — creates an account. Does not sign the user in; the client redirects to login. */
+
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
@@ -6,8 +8,14 @@ import { parseWith, registerSchema } from "@/lib/validation";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 /**
- * POST /api/register — creates an account after zod validation and
- * rate limiting. Returns 201 on success.
+ * Creates an account with a bcrypt-hashed password.
+ * Uniqueness is checked up front for a clean error and enforced by the unique
+ * index for correctness — the catch below translates that index's duplicate-key
+ * error, which is what a concurrent signup actually hits.
+ * Deliberately returns no cookie: registering does not sign you in.
+ * @param {import("next/server").NextRequest} req - Body carries `{ username, email, password, role }`.
+ * @returns {Promise<import("next/server").NextResponse>} 201 on success; 400 on
+ *   schema failure or duplicate email; 429 when rate limited; 500 otherwise.
  */
 export async function POST(req) {
   try {

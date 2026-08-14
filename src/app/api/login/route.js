@@ -1,3 +1,5 @@
+/** @file `POST /api/login` — verifies credentials and issues the session cookie. */
+
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
@@ -7,8 +9,15 @@ import { loginSchema, parseWith } from "@/lib/validation";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 /**
- * POST /api/login — verifies credentials and sets the httpOnly JWT
- * cookie. Rate limited per IP+email.
+ * Authenticates a user and returns the httpOnly session cookie.
+ * Unknown email and wrong password both answer the same "Invalid credentials"
+ * 401, so the response never reveals whether an account exists. Rate limited to
+ * 8 attempts per 15 minutes, keyed on IP *and* email, so one attacker cannot
+ * lock a victim out by burning their allowance from elsewhere.
+ * @param {import("next/server").NextRequest} req - Body carries `{ email, password }`.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with a `Set-Cookie`
+ *   header; 400 on schema failure; 401 on bad credentials; 429 when rate
+ *   limited; 500 otherwise.
  */
 export async function POST(req) {
   try {

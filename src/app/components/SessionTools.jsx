@@ -2,12 +2,27 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { deleteJson, postJson } from "@/lib/clientApi";
+/** @file In-room session tools: agenda, AI question bank, and prep guide. */
+
 import { normalizeQuestionList } from "@/lib/questionBank";
 
 /**
- * Session agenda plus the AI question bank and prep guide, with
- * generate/clear controls for the interviewer.
- * @param {{ sessionId: string, session: object, userRole: string }} props
+ * Session agenda plus the AI question bank and prep guide.
+ * Seeded from the server-rendered `session` prop rather than fetched, so the
+ * panel paints with content already present. State is then local, and generate
+ * or clear updates it from the response instead of refetching.
+ * Generate and clear controls render for interviewers only; the API enforces
+ * the same rule, so hiding them is UX rather than security.
+ *
+ * KNOWN GAP: the async handlers below use `try/finally` with no `catch`, so a
+ * failed generation just stops the spinner and leaves the panel unchanged with
+ * no explanation. They should surface the error the way `CreateSessionForm` does.
+ *
+ * @param {object} props - Component props.
+ * @param {string} props.sessionId - Session being viewed.
+ * @param {object} props.session - Serialized session, supplying the initial bank and guide.
+ * @param {string} props.userRole - Gates the generate/clear controls.
+ * @returns {JSX.Element} The tools panel.
  */
 export default function SessionTools({ sessionId, session, userRole }) {
   const [questions, setQuestions] = useState(normalizeQuestionList(session.questionBank));
@@ -16,15 +31,23 @@ export default function SessionTools({ sessionId, session, userRole }) {
   const [origin, setOrigin] = useState("");
   const [copiedInvite, setCopiedInvite] = useState(false);
 
+  // Read after mount: `window.location` doesn't exist during SSR, and using it
+  // inline would cause a hydration mismatch.
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
 
+  /** Join link for this session; empty until `origin` resolves on the client. */
   const inviteUrl = useMemo(() => {
     if (!origin) return "";
     return `${origin}/session/${sessionId}`;
   }, [origin, sessionId]);
 
+  /**
+   * Regenerates the question bank, replacing whatever is there.
+   * Also refreshes the prep guide, since the endpoint returns both.
+   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   */
   const generateQuestions = async () => {
     setLoading("questions");
     try {
@@ -36,6 +59,10 @@ export default function SessionTools({ sessionId, session, userRole }) {
     }
   };
 
+  /**
+   * Clears the question bank, leaving the prep guide alone.
+   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   */
   const clearQuestions = async () => {
     setLoading("clear-questions");
     try {
@@ -46,6 +73,10 @@ export default function SessionTools({ sessionId, session, userRole }) {
     }
   };
 
+  /**
+   * Clears the prep guide, leaving the question bank alone.
+   * @returns {Promise<void>} A rejection propagates unhandled — see the gap noted above.
+   */
   const clearPrep = async () => {
     setLoading("clear-prep");
     try {

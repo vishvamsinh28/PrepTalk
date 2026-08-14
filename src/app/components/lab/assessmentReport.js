@@ -1,18 +1,29 @@
+/**
+ * @file Assessment reporting: aggregation, and a dependency-free PDF writer.
+ * The PDF is built by hand rather than with jsPDF/pdfmake to keep the client
+ * bundle small — the tradeoff is ASCII-only text and fixed-pitch layout.
+ */
+
 import { formatDateTime } from "./adminUtils";
 
 /**
- * Stable identity for a submission (candidate email + timestamp).
- * @param {object} submission
- * @returns {string}
+ * Stable React key for a submission: email, attempt number, and timestamp.
+ * All three are needed — one candidate can submit repeatedly, and attempt
+ * number alone repeats across candidates.
+ * @param {object} submission - Submission record.
+ * @returns {string} Composite key.
  */
 export function submissionKey(submission) {
   return `${submission.candidateEmail}-${submission.attempts}-${submission.submittedAt}`;
 }
 
 /**
- * Overall pass/fail/partial status for one submission.
- * @param {object} submission
- * @returns {string}
+ * Overall pass/fail status for one submission.
+ * Only an all-tests-pass run counts as `"Passed"`; partial credit still reads
+ * `"Failed"`, since the badge answers "did this clear the bar", not "what score".
+ * A submission with zero tests also reads `"Failed"` rather than `"Passed"`.
+ * @param {object|null} submission - Submission record, or null when not yet attempted.
+ * @returns {string} `"Passed"`, `"Failed"`, or `"Pending"` when absent.
  */
 export function submissionResultStatus(submission) {
   if (!submission) return "Pending";
@@ -21,9 +32,11 @@ export function submissionResultStatus(submission) {
 }
 
 /**
- * Maps a submission status to its display tone.
- * @param {string} status
- * @returns {string}
+ * Maps a submission status to its Tailwind badge classes.
+ * Anything unrecognized falls through to the amber "pending" tone, so a new
+ * status renders neutrally rather than unstyled.
+ * @param {string} status - Value from `submissionResultStatus`.
+ * @returns {string} Tailwind class string.
  */
 export function statusTone(status) {
   if (status === "Passed") return "border-emerald-600/40 bg-emerald-50 text-emerald-700";
@@ -32,10 +45,15 @@ export function statusTone(status) {
 }
 
 /**
- * Aggregates an assessment and its submissions into the report
- * structure the viewer and PDF share.
- * @param {object} assessment
- * @returns {object}
+ * Aggregates an assessment and its submissions into one report structure.
+ * Test inputs and expectations are pulled from the *assessment* by index while
+ * results come from the submission, because graded results don't carry the
+ * original JSON. That pairing is positional, so editing a problem's tests after
+ * submission will misalign this against older runs.
+ * Only interviewers should call this — it exposes hidden tests and every
+ * candidate's code.
+ * @param {object} assessment - Full assessment document with `submissions`.
+ * @returns {object} Report shared by the on-screen viewer and the PDF writer.
  */
 export function buildAssessmentReport(assessment) {
   return {
@@ -79,9 +97,16 @@ export function buildAssessmentReport(assessment) {
 }
 
 /**
- * Renders the report as a minimal single-file PDF Blob (no deps).
- * @param {object} report
- * @returns {Blob}
+ * Renders the report as a PDF, writing the file format by hand.
+ * Emits one Page plus one content-stream object per page, which is why object
+ * ids advance by two (`3 + pageIndex * 2`) and why the xref table is built from
+ * running byte offsets — a wrong offset makes readers reject the file.
+ * Courier is used because it is a PDF base-14 font (no embedding needed) and
+ * monospaced, so submitted code keeps its indentation.
+ * Layout is fixed at 45 lines per page and 92 characters per line, tuned for
+ * 10pt Courier on US Letter.
+ * @param {object} report - Output of `buildAssessmentReport`.
+ * @returns {Blob} `application/pdf` blob ready for a download link.
  */
 export function createReportPdf(report) {
   const lines = reportLines(report).flatMap((line) => wrapLine(line, 92));
@@ -119,9 +144,13 @@ export function createReportPdf(report) {
 }
 
 /**
- * Flattens the report into printable text lines for the PDF.
- * @param {object} report
- * @returns {string[]}
+ * Flattens the report into printable lines, indented by nesting depth.
+ * Indentation is plain spaces because the PDF writer has no layout engine — two
+ * spaces per level is the whole hierarchy.
+ * Includes hidden tests and full candidate code, so the result is
+ * interviewer-only material.
+ * @param {object} report - Output of `buildAssessmentReport`.
+ * @returns {string[]} Lines, pre-wrap; `createReportPdf` wraps and paginates them.
  */
 export function reportLines(report) {
   const lines = [
@@ -154,10 +183,12 @@ export function reportLines(report) {
 }
 
 /**
- * Hard-wraps one line to a maximum character width.
- * @param {string} line
- * @param {number} maxLength
- * @returns {string[]}
+ * Hard-wraps a line to a fixed character width.
+ * Splits mid-word by design: the content is mostly code, where breaking at
+ * spaces would misrepresent the source more than a hard cut does.
+ * @param {string} line - Line to wrap.
+ * @param {number} maxLength - Maximum characters per chunk.
+ * @returns {string[]} One entry when it already fits, otherwise fixed-width chunks.
  */
 export function wrapLine(line, maxLength) {
   const text = String(line);
@@ -170,17 +201,27 @@ export function wrapLine(line, maxLength) {
 }
 
 /**
- * Escapes parentheses/backslashes for PDF string literals.
- * @param {string} value
- * @returns {string}
+ * Escapes a string for a PDF literal.
+ * Parentheses and backslashes are the delimiters of PDF strings, so both must be
+ * escaped — and backslashes first, or the escapes we add would be re-escaped.
+ * KNOWN LIMITATION: non-ASCII is replaced with `?`, because Courier's base-14
+ * encoding has no glyphs for it. Accented names and non-Latin text will be
+ * mangled in the PDF; embedding a Unicode font is the only real fix.
+ * @param {string} value - Raw text.
+ * @returns {string} ASCII-safe, escaped text.
  */
 export function escapePdf(value) {
   return String(value).replace(/[^\x20-\x7E]/g, "?").replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
 }
 
 /**
- * Finds the candidate's submitted code for a given problem.
- * @returns {string}
+ * Recovers a candidate's code for a problem when the graded result omits it.
+ * Matches on index first, then title, because older submissions were stored
+ * before `problemIndex` was recorded — the title match is that fallback and
+ * will misfire if two sections share a title.
+ * @param {object[]|null} solutions - Raw solutions stored with the submission.
+ * @param {object} problem - Graded problem result, supplying index and title.
+ * @returns {string} The submitted code, or `""` when no match is found.
  */
 export function findSubmittedCode(solutions, problem) {
   const match = (solutions || []).find((solution) => solution.problemIndex === problem.problemIndex || solution.title === problem.title);
@@ -188,18 +229,23 @@ export function findSubmittedCode(solutions, problem) {
 }
 
 /**
- * Filename-safe slug of a title.
- * @param {string} value
- * @returns {string}
+ * Builds a filename-safe slug for the downloaded report.
+ * Falls back to `"assessment"` twice — for nullish input, and again when the
+ * title is entirely non-alphanumeric and reduces to an empty string.
+ * @param {string} value - Assessment title.
+ * @returns {string} Lowercase hyphenated slug; never empty.
  */
 export function slugify(value) {
   return String(value || "assessment").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "assessment";
 }
 
 /**
- * Formats a date for a datetime-local input, in local time.
- * @param {unknown} value
- * @returns {string}
+ * Formats a date for a `datetime-local` input, in local time.
+ * Subtracts the timezone offset before slicing because `toISOString` emits UTC
+ * while the input renders local — without it the field shows a shifted time.
+ * Duplicates `defaultDeadlineInputValue` in `adminUtils`; worth sharing one.
+ * @param {unknown} value - Date or ISO string.
+ * @returns {string} `YYYY-MM-DDTHH:mm`, or `""` when unparseable.
  */
 export function toDateTimeLocalValue(value) {
   const date = new Date(value);
@@ -210,18 +256,21 @@ export function toDateTimeLocalValue(value) {
 }
 
 /**
- * Splits a comma-separated email string into trimmed entries.
- * @param {string} value
- * @returns {string[]}
+ * Splits a comma-separated email string into unique, trimmed entries.
+ * Deduplicates but does not validate — addresses are checked server-side.
+ * @param {string} value - Comma-separated emails.
+ * @returns {string[]} Unique, non-empty entries.
  */
 export function parseRecipientList(value) {
   return [...new Set(String(value || "").split(",").map((email) => email.trim()).filter(Boolean))];
 }
 
 /**
- * Deep clone of assessment problems for safe draft editing.
- * @param {object[]} problems
- * @returns {object[]}
+ * Clones assessment problems two levels deep for draft editing.
+ * Same depth as `cloneProblem` in `adminUtils`, applied to a whole array, so
+ * edits to a draft never write through to the fetched assessment.
+ * @param {object[]|null} problems - Problems from a fetched assessment.
+ * @returns {object[]} Independent copies; `[]` for nullish input.
  */
 export function cloneAssessmentProblems(problems) {
   return (problems || []).map((problem) => ({

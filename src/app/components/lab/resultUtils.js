@@ -1,3 +1,5 @@
+/** @file Formatting and comparison helpers for the Lab candidate results panel. */
+
 /**
  * mm:ss for a seconds count.
  * Negative and non-finite inputs clamp to 0, so a drifting timer can't render
@@ -44,18 +46,21 @@ export function deepEqual(left, right) {
 }
 
 /**
- * Pretty-prints a test value for the results panel.
- * @param {unknown} value
- * @returns {string}
+ * Renders a test value for the results panel.
+ * Returns the string `"undefined"` for undefined input — which is the useful
+ * display when a candidate's `solve` returns nothing.
+ * @param {unknown} value - Expected or actual test value.
+ * @returns {string} JSON representation.
  */
 export function formatValue(value) {
   return JSON.stringify(value);
 }
 
 /**
- * Initial idle result rows for a problem's tests.
- * @param {object} problem
- * @returns {object[]}
+ * Builds idle result rows so the panel lists every test before the first run.
+ * Spreads each test, so rows carry `name` and `expected` alongside run state.
+ * @param {object} problem - Runnable problem with a `tests` array.
+ * @returns {object[]} One `status: "idle"` row per test.
  */
 export function createResults(problem) {
   return problem.tests.map((test) => ({
@@ -69,8 +74,13 @@ export function createResults(problem) {
 }
 
 /**
- * Static debugging hint used when no AI insight exists.
- * @returns {string}
+ * Static debugging hint shown until (or instead of) an AI explanation.
+ * Kept deliberately generic — it points at the failure without revealing the
+ * approach, so a candidate who never calls the AI route isn't handed the answer.
+ * @param {object} test - Test row, supplying `expected`.
+ * @param {unknown} output - Actual output; ignored when `error` is set.
+ * @param {string} error - Runtime error message, or `""` for a wrong answer.
+ * @returns {string} Hint text.
  */
 export function fallbackInsight(test, output, error) {
   if (error) {

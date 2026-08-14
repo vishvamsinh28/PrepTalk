@@ -2,11 +2,15 @@ import { getCurrentUser } from "@/lib/serverAuth";
 import IntervieweeSessionList from "../components/IntervieweeSessionList";
 import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
+/** @file `/interviewee` — the candidate's workspace: assigned sessions and their feedback. */
+
 import PageHeader, { SignedInAs, SectionHeading } from "../components/ui/PageHeader";
 
 /**
- * Interviewee workspace page: assigned sessions and received reports.
- * Server-gated to the Interviewee role.
+ * Candidate workspace, gated to the Interviewee role.
+ * Mirrors the interviewer page minus anything authoring-related — no create
+ * form, and `ReportList` renders read-only for this role.
+ * @returns {Promise<JSX.Element>} The workspace, or an auth notice.
  */
 export default async function IntervieweePage() {
   const userData = await getCurrentUser();

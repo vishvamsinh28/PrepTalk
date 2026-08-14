@@ -2,12 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { deleteJson, getJson } from "@/lib/clientApi";
+/** @file The interviewer's session list, with join, invite, and delete actions. */
+
 import { useRouter } from "next/navigation";
 
 /**
- * Interviewer's sessions as hairline rows with join, invite, and
- * delete actions. Listens for preptalk:sessions-updated.
- * @param {{ compact?: boolean }} props
+ * Lists the interviewer's sessions with per-row actions.
+ * Refetches on the `preptalk:sessions-updated` window event, which
+ * `CreateSessionForm` dispatches after a successful create — a DOM event rather
+ * than shared state because the two components are siblings with no common
+ * parent holding session data. Deletes update locally instead, since the row
+ * already knows which id went.
+ * @param {object} props - Component props.
+ * @param {boolean} [props.compact=false] - Caps height and scrolls, for the sidebar placement.
+ * @returns {JSX.Element} The list, its empty state, or a loading line.
  */
 export default function SessionList({ compact = false }) {
   const router = useRouter();
@@ -65,11 +73,23 @@ export default function SessionList({ compact = false }) {
   );
 }
 
+/**
+ * One session row with its join, copy-invite, and delete controls.
+ * Split out so each row owns its own copied/deleting state — held in the parent,
+ * one row's spinner would show on all of them.
+ * @param {object} props - Component props.
+ * @param {object} props.session - Session to render.
+ * @param {object} props.router - Next router, passed down rather than re-hooked per row.
+ * @param {Function} props.onDeleted - Called with the id after a successful delete.
+ * @returns {JSX.Element} The row.
+ */
 function SessionRow({ session, router, onDeleted }) {
   const [origin, setOrigin] = useState("");
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  // Read after mount, not during render: `window.location` doesn't exist during
+  // SSR, and using it inline would produce a hydration mismatch.
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);

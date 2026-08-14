@@ -1,13 +1,22 @@
+/** @file `GET /api/progress` — score averages across the caller's reports, for the progress dashboard. */
+
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import InterviewReport from "@/models/InterviewReport";
 
+/** The five scorecard dimensions. Must match `SCORE_KEYS` in the reports route. */
 const scoreKeys = ["communication", "technicalDepth", "problemSolving", "confidence", "roleFit"];
 
 /**
- * GET /api/progress — per-dimension score averages across the caller's
- * reports. Auth: signed-in user.
+ * Averages each scorecard dimension across every report the caller is party to.
+ * Interviewers see the reports they wrote, interviewees the ones about them.
+ * A missing dimension counts as 0 rather than being skipped, so one malformed
+ * report drags the average down instead of silently changing the divisor.
+ * With no reports every average is 0, which the dashboard renders as an empty state.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with
+ *   `{ totalReports, averages }` rounded to one decimal; 401 signed out; 500 otherwise.
  */
 export async function GET(req) {
   try {

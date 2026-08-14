@@ -1,3 +1,5 @@
+/** @file `POST /api/session` — creates an interview session. Interviewer only. */
+
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
@@ -5,9 +7,20 @@ import { json, serverError } from "@/lib/api";
 import { normalizeEmailList, normalizeStringList, normalizeText } from "@/lib/validation";
 import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
 
+/** Seniority values the form offers; anything else is a 400. */
 const LEVELS = new Set(["Entry", "Mid", "Senior"]);
+
+/** Interview formats the form offers; anything else is a 400. */
 const INTERVIEW_TYPES = new Set(["Technical", "Behavioral", "Mixed"]);
 
+/**
+ * Parses the agenda into `{ title, minutes }` rows.
+ * Accepts a structured array from JSON clients, or the textarea's one-per-line
+ * format where each line is `Title - 15 min`. The regex makes the duration
+ * suffix optional, so a bare `Warm-up` line still parses and defaults to 10 min.
+ * @param {Array<{title: string, minutes: number}>|string} agenda - Rows or raw textarea text.
+ * @returns {Array<{title: string, minutes: number}>} Up to 20 rows, each clamped to 1-240 minutes.
+ */
 function parseAgenda(agenda) {
   if (Array.isArray(agenda)) {
     return agenda
@@ -34,8 +47,13 @@ function parseAgenda(agenda) {
 }
 
 /**
- * POST /api/session — creates an interview session (agenda, schedule,
- * invitees). Auth: interviewer.
+ * Creates an interview session and assigns its candidates.
+ * Invitees must already have Interviewee accounts — unregistered addresses are
+ * rejected with a 400 naming them, rather than silently creating a session
+ * nobody can join.
+ * @param {import("next/server").NextRequest} req - Body carries the create-session form payload.
+ * @returns {Promise<import("next/server").NextResponse>} 201 with the saved session;
+ *   400 on validation failure, 401 when signed out, 403 for non-interviewers, 500 otherwise.
  */
 export async function POST(req) {
   try {

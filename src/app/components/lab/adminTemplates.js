@@ -1,5 +1,17 @@
 /**
- * Prebuilt role templates selectable in the create flow.
+ * @file Prebuilt assessment templates offered in the Lab create flow.
+ * These are seed content the interviewer edits, not fixed assessments — nothing
+ * here is validated until the builder form is submitted.
+ */
+
+/**
+ * Role templates selectable when creating a test.
+ * Treat as immutable: `templateToForm` clones problems before editing, and
+ * mutating an entry here would leak into every later create.
+ * Each `starterCode` must define a `solve` function, since that's what both
+ * sandboxes call.
+ * @type {Array<{id: string, title: string, icon: string, summary: string,
+ *   coreSkills: string[], durationMinutes: number, problems: object[]}>}
  */
 export const roleTemplates = [
   {
@@ -142,7 +154,12 @@ export const roleTemplates = [
 ];
 
 /**
- * Factory for an empty builder problem.
+ * Starting point for a hand-written section.
+ * A shared object, not a factory despite the name — always clone it (via
+ * `cloneProblem`) before putting it in form state, or two sections will edit
+ * the same tests array.
+ * @type {{title: string, difficulty: string, timeLimitMinutes: number,
+ *   points: number, prompt: string, starterCode: string, tests: object[]}}
  */
 export const blankProblem = {
   title: "Custom Coding Question",
@@ -158,7 +175,11 @@ export const blankProblem = {
 };
 
 /**
- * The start-from-blank template entry.
+ * The start-from-blank entry, shown alongside `roleTemplates`.
+ * Kept separate so the picker can pin it last regardless of how many role
+ * templates exist.
+ * @type {{id: string, title: string, icon: string, summary: string,
+ *   coreSkills: string[], durationMinutes: number, problems: object[]}}
  */
 export const customTemplate = {
   id: "custom",

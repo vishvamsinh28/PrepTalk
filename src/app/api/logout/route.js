@@ -1,7 +1,16 @@
+/** @file `POST /api/logout` — clears the session cookie. */
+
 import { clearAuthCookie } from "@/lib/auth";
 import { json, serverError } from "@/lib/api";
 
-/** Clears the auth cookie. Always safe to call, even when not logged in. */
+/**
+ * Logs the user out by returning an already-expired cookie.
+ * Deliberately requires no auth check and is idempotent — calling it while
+ * signed out still succeeds, so a client with a stale session can always
+ * recover to a clean state.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with a `Set-Cookie`
+ *   that clears `prepTalkToken`; 500 only if serialization itself fails.
+ */
 export async function POST() {
   try {
     const serialized = clearAuthCookie();

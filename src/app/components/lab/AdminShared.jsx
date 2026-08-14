@@ -1,8 +1,17 @@
 "use client";
 
+/** @file Small presentational pieces shared across the Lab admin screens. */
+
 /**
- * Left-rule status callout for admin actions.
- * @param {{ tone: "success"|"error", text: string }} props
+ * Status callout for admin actions, marked by a coloured left rule.
+ * `role="status"` makes it a polite live region, so a screen reader announces
+ * the outcome without stealing focus. Any tone other than `"success"` renders
+ * as an error, so a typo fails loud rather than silently unstyled.
+ * Does not self-dismiss — the parent owns how long it stays.
+ * @param {object} props - Component props.
+ * @param {"success"|"error"} props.tone - Visual treatment.
+ * @param {string} props.text - Message to show.
+ * @returns {JSX.Element} The callout.
  */
 export function Toast({ tone, text }) {
   const classes =
@@ -19,8 +28,15 @@ export function Toast({ tone, text }) {
   );
 }
 
-/* Was a rotating puzzle/code/database icon chosen by array position — decoration
-   that implied a meaning it never had. A section number is honest and readable. */
+/**
+ * Zero-padded section number, shown where a list needs a leading marker.
+ * Named `SkillIcon` for historical reasons — it used to rotate through
+ * puzzle/code/database glyphs by array position, which implied a categorisation
+ * that never existed. A number says only what's true.
+ * @param {object} props - Component props.
+ * @param {number} props.index - Zero-based position; rendered one-based as `01`, `02`.
+ * @returns {JSX.Element} The number.
+ */
 export function SkillIcon({ index }) {
   return (
     <span className="app-eyebrow mt-1 shrink-0 tabular-nums text-accent">
@@ -30,8 +46,13 @@ export function SkillIcon({ index }) {
 }
 
 /**
- * Bordered stat cell: mono label over serif value.
- * @param {{ label: string, value: React.ReactNode }} props
+ * Stat cell: mono label over a serif value.
+ * Carries its own right border with `last:border-r-0`, so a row of these needs
+ * no divider markup and no knowledge of how many siblings it has.
+ * @param {object} props - Component props.
+ * @param {string} props.label - Small uppercase label.
+ * @param {React.ReactNode} props.value - The figure; a node, so it can carry a unit.
+ * @returns {JSX.Element} The cell.
  */
 export function Metric({ label, value }) {
   return (

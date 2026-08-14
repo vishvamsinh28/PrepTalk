@@ -1,9 +1,13 @@
+/** @file Landing-page header. Separate from the app `Navbar`, which renders null on `/`. */
+
 import Link from "next/link";
 import PrepTalkLogo from "../PrepTalkLogo";
 
 /**
  * Landing header: wordmark, section anchors, and a login link.
- * Deliberately no sign-up button — conversion lives in hero and closer.
+ * Static (not fixed) so it scrolls away with the hero — which is why it carries
+ * no sign-up CTA; that would only duplicate the hero's.
+ * @returns {JSX.Element} The header.
  */
 export default function LandingNav() {
   return (

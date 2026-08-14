@@ -1,9 +1,19 @@
 "use client";
 
+/** @file Segmented control used for short, mutually exclusive choices (level, interview type). */
+
 /**
- * Flush segmented control; selected option fills ink. Emits the raw
- * option value.
- * @param {{ name: string, value: string, options: string[], onChange: Function }} props
+ * Segmented button group; the selected option fills ink.
+ * Buttons are `type="button"` so clicking one inside a form doesn't submit it,
+ * and the hidden input carries the value for native form submission — the
+ * control works both as controlled React state and as a plain form field.
+ * Options are used as their own React keys, so they must be unique.
+ * @param {object} props - Component props.
+ * @param {string} props.name - Name of the hidden input.
+ * @param {string} props.value - Currently selected option.
+ * @param {string[]} props.options - Choices, rendered in order.
+ * @param {Function} props.onChange - Called with the raw option string.
+ * @returns {JSX.Element} The control.
  */
 export default function SegmentedControl({ name, value, options, onChange }) {
   return (

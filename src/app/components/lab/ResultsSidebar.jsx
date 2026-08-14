@@ -1,10 +1,26 @@
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+/** @file The collapsible test-results drawer beneath the code editor. */
+
 import { formatValue } from "./resultUtils";
 
 /**
- * Collapsible visible-test results: per-case status, IO blocks, and
- * debug hints.
- * @param {object} props Runner results and toggle state.
+ * Collapsible results drawer: per-case status, input/output, and debug hints.
+ * Shows **visible tests only**. Hidden tests are graded server-side on submit
+ * and deliberately never appear here — surfacing them would leak the grading
+ * criteria mid-assessment.
+ * Opens focused on the first *failed* case rather than the first case, since
+ * that's what the candidate needs; it falls back to the first when everything
+ * passes. `hasRun` distinguishes "not run yet" from "run and all failing", which
+ * otherwise look identical from the counts.
+ * @param {object} props - Component props.
+ * @param {object} props.activeProblem - Problem these results belong to.
+ * @param {string} props.explanationError - Message when the AI hint request failed.
+ * @param {object[]} props.failedResults - Failed cases, used for the explain request.
+ * @param {boolean} props.isExplaining - True while an AI explanation is in flight.
+ * @param {boolean} props.isOpen - Drawer state, owned by the parent.
+ * @param {Function} props.onToggle - Toggles the drawer.
+ * @param {object[]} props.visibleResults - Result rows for visible tests.
+ * @returns {JSX.Element} The drawer.
  */
 export default function ResultsSidebar({
   activeProblem,

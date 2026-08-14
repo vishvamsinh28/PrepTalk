@@ -1,10 +1,21 @@
 "use client";
 
+/** @file The two video tile variants: the local preview and a remote peer's feed. */
+
 import { useEffect, useRef } from "react";
 
 /**
- * Local video tile with name overlay.
- * @param {{ videoRef: object, userEmail: string, isSelf: boolean, streamReady: boolean }} props
+ * Local video tile with a name overlay.
+ * The `<video>` is muted when it's your own feed — unmuted local playback would
+ * loop your mic straight back into your speakers.
+ * The ref is owned by `useVideoRoom`, which attaches the stream; this component
+ * only renders the element.
+ * @param {object} props - Component props.
+ * @param {object} props.videoRef - Ref the hook binds the local stream to.
+ * @param {string} props.userEmail - Label shown on the tile.
+ * @param {boolean} props.isSelf - Mutes playback and switches the Local/Remote badge.
+ * @param {boolean} props.streamReady - False shows a "Connecting" hint.
+ * @returns {JSX.Element} The tile.
  */
 export function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
   return (
@@ -30,8 +41,23 @@ export function VideoTile({ videoRef, userEmail, isSelf, streamReady }) {
 }
 
 /**
- * Remote peer tile that binds the peer's MediaStream to a <video>.
- * @param {{ peer: object, peerId: string, userEmail: string, streamsRef: object }} props
+ * Remote peer tile that binds that peer's MediaStream to a `<video>`.
+ * Covers both arrival orders: the `stream` listener catches media that arrives
+ * after mount, and the `streamsRef` lookup catches media that already arrived
+ * before this tile rendered. Without the second path, a peer whose stream
+ * landed during negotiation would show a permanently black tile.
+ *
+ * KNOWN ISSUE: the effect registers `peer.on("stream")` with no cleanup, so a
+ * re-run (or a StrictMode double-mount) stacks duplicate listeners on the same
+ * peer. Harmless today because the handler is idempotent, but it should return
+ * `() => peer.off("stream", handler)`.
+ *
+ * @param {object} props - Component props.
+ * @param {object} props.peer - simple-peer instance for this participant.
+ * @param {string} props.peerId - Ably connection id, used to look up the stream.
+ * @param {string} props.userEmail - Label shown on the tile.
+ * @param {{current: object}} props.streamsRef - Map of already-received streams by peer id.
+ * @returns {JSX.Element} The tile.
  */
 export function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
   const ref = useRef();
@@ -43,6 +69,7 @@ export function PeerVideoTile({ peer, peerId, userEmail, streamsRef }) {
       }
     });
 
+    // Covers the case where the stream arrived before this tile mounted.
     if (streamsRef.current[peerId] && ref.current) {
       ref.current.srcObject = streamsRef.current[peerId];
     }

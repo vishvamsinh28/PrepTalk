@@ -1,11 +1,23 @@
 "use client";
 
+/** @file The interviewer's assessments index — the Lab admin landing view. */
+
 import { formatDate, formatDateTime } from "./adminUtils";
 
 /**
- * Assessments index: search, count, and hairline rows with pending/
- * completed figures.
- * @param {object} props List data and handlers.
+ * Assessments index with search, counts, and per-row actions.
+ * Fully controlled: `assessments` arrives already filtered by the parent, and
+ * `query`/`setQuery` are lifted so Export can operate on exactly what's on
+ * screen rather than the unfiltered set.
+ * @param {object} props - Component props.
+ * @param {object[]} props.assessments - Assessments to render, already filtered.
+ * @param {string} props.query - Current search text.
+ * @param {Function} props.setQuery - Search setter.
+ * @param {Function} props.onCreate - Starts the create flow.
+ * @param {Function} props.onDelete - Deletes an assessment.
+ * @param {Function} props.onExport - Exports the visible rows as CSV.
+ * @param {Function} props.onOpen - Opens an assessment's detail view.
+ * @returns {JSX.Element} The index.
  */
 export default function AdminTestList({ assessments, query, setQuery, onCreate, onDelete, onExport, onOpen }) {
   return (

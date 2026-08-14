@@ -3,11 +3,17 @@ import CreateSessionForm from "../components/CreateSessionForm";
 import SessionList from "../components/SessionList";
 import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
+/** @file `/interviewer` — the interviewer's workspace: create sessions, manage them, review reports. */
+
 import PageHeader, { SignedInAs, SectionHeading } from "../components/ui/PageHeader";
 
 /**
- * Interviewer workspace page: create-session form, session list, and
- * submitted reports. Server-gated to the Interviewer role.
+ * Interviewer workspace, gated to the Interviewer role.
+ * Interviewees reaching this URL get an access notice rather than a redirect,
+ * so a mistyped or shared link explains itself instead of bouncing silently.
+ * The session list is sticky beside the create form on wide screens, so a new
+ * session appears without scrolling away from what you just filled in.
+ * @returns {Promise<JSX.Element>} The workspace, or an auth notice.
  */
 export default async function InterviewerPage() {
   const userData = await getCurrentUser();

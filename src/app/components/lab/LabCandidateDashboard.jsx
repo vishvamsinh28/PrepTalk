@@ -6,12 +6,26 @@ import { runUserCodeInWorker } from "./sandboxRunner";
 import { toRunnableProblem, toTestResult } from "./candidateRunUtils";
 import AssessmentPicker from "./AssessmentPicker";
 import AssessmentScreen from "./AssessmentScreen";
+/**
+ * @file The candidate's Lab dashboard: pick an assessment, then take it under
+ * a timer with local test runs and a server-graded submit.
+ */
+
 import { createResults } from "./resultUtils";
 
 /**
- * Candidate lab: assessment picker plus the timed in-assessment flow
- * (local runs, server-graded submit, auto-submit at 0:00).
- * @param {{ initialAssessmentId?: string }} props
+ * Owns the candidate's assessment flow — picker, timer, local runs, submission.
+ * Two execution paths that must not be confused: `runTests` executes visible
+ * tests in a browser worker for instant feedback, while submitting sends the
+ * code to the server, which re-runs everything including hidden tests. Only the
+ * server result is a score.
+ * `hasAutoSubmitted` latches so the 0:00 auto-submit fires exactly once — the
+ * timer effect would otherwise re-trigger it on subsequent ticks.
+ * A deep-linked assessment is sorted to the top of the picker rather than
+ * auto-started, so the candidate chooses when the clock begins.
+ * @param {object} props - Component props.
+ * @param {string} [props.initialAssessmentId=""] - Assessment to surface first, from `?assessment=`.
+ * @returns {JSX.Element} The picker, or the assessment screen once started.
  */
 export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
   const [assessments, setAssessments] = useState([]);

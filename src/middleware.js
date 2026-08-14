@@ -1,13 +1,30 @@
+/**
+ * @file Edge middleware handling route-level redirects.
+ * This is a routing convenience, not the security boundary — it only inspects
+ * the cookie. Every page and API route re-verifies access on the server, so a
+ * forged or stale cookie gets past this and is caught there.
+ */
+
 import { NextResponse } from "next/server";
 import { verifyAuthToken } from "@/lib/token";
 
+/** Pages a signed-in user should be bounced away from. */
 const AUTH_PAGES = new Set(["/login", "/register"]);
+
+/** Prefixes requiring a session. Matched with `startsWith`, so `/session/:id` is covered. */
 const PROTECTED_PATHS = ["/dashboard", "/interviewer", "/interviewee", "/session", "/lab"];
 
 /**
- * Edge middleware: redirects logged-out users away from protected pages
- * and logged-in users away from the auth pages, based on the JWT cookie.
- * @param {import("next/server").NextRequest} request
+ * Redirects logged-out users away from protected pages, and logged-in users
+ * away from login and register.
+ * Runs on the edge runtime, which is why verification uses `jose` rather than a
+ * Node crypto library. An invalid token is treated exactly like no token —
+ * bounced from protected paths, allowed through elsewhere — so an expired
+ * session lands on login rather than an error.
+ * Note `/` is in the matcher but in neither list: the landing page stays
+ * reachable whether or not you're signed in.
+ * @param {import("next/server").NextRequest} request - Incoming request.
+ * @returns {Promise<import("next/server").NextResponse>} A redirect, or `next()` to continue.
  */
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
@@ -49,7 +66,9 @@ export async function middleware(request) {
 }
 
 /**
- * Paths the middleware runs on.
+ * Paths this middleware runs on.
+ * Deliberately excludes `/api/*` — route handlers do their own auth and return
+ * JSON, so a redirect there would break clients expecting a 401.
  */
 export const config = {
   matcher: ["/", "/login", "/register", "/dashboard/:path*", "/interviewer/:path*", "/interviewee/:path*", "/session/:path*", "/lab/:path*"],

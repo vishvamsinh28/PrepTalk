@@ -1,5 +1,9 @@
 /**
- * Mongoose model: one persisted chat message in a session.
+ * @file Mongoose model: one persisted chat message.
+ * `sender` is an email string rather than a User reference, so a message keeps
+ * its attribution even if the account is later removed.
+ * Messages are deleted in bulk when their session is deleted; there is no
+ * cascade, the session route does it explicitly.
  */
 import mongoose from "mongoose";
 

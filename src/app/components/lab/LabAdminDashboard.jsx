@@ -8,12 +8,26 @@ import { Toast } from "./AdminShared";
 import AdminTestBuilder from "./AdminTestBuilder";
 import AdminTestList from "./AdminTestList";
 import { blankProblem, customTemplate, roleTemplates } from "./adminTemplates";
+/**
+ * @file The interviewer's Lab dashboard. Owns all assessment data and CRUD, and
+ * switches between the four admin views.
+ */
+
 import { cloneProblem, templateToForm, toWholeNumber, validateAssessmentForm } from "./adminUtils";
 
 /**
- * Interviewer lab state machine: list → create → builder → detail,
- * owning assessments data and CRUD calls.
- * @param {{ initialAssessmentId?: string }} props
+ * State machine for the admin Lab: `list` → `create` → `builder` → `detail`.
+ * A single `view` string drives which child renders, and every piece of state
+ * lives here — the children are controlled and hold no data of their own.
+ * `initialAssessmentId` is applied in a second effect rather than at mount,
+ * because the assessments have to load before an id can be matched against
+ * them; a deep link to an assessment this account can't see is simply ignored,
+ * leaving the list view.
+ * `customTemplate` is prepended to the template list so "start blank" reads
+ * first in the picker.
+ * @param {object} props - Component props.
+ * @param {string} [props.initialAssessmentId=""] - Assessment to open on mount, from `?assessment=`.
+ * @returns {JSX.Element} The active admin view.
  */
 export default function LabAdminDashboard({ initialAssessmentId = "" }) {
   const [assessments, setAssessments] = useState([]);

@@ -1,9 +1,16 @@
+/** @file The landing hero — headline, primary CTA, and the rotating word. */
+
 import Link from "next/link";
 import RollingWord from "./RollingWord";
 
 /**
- * Landing hero: rolling accent word inside a serif claim, primary CTA,
- * and an anchor to the product band.
+ * Landing hero with a rotating accent word inside the headline.
+ * The `h1` carries an explicit `aria-label` because `RollingWord` keeps every
+ * word in the DOM at once — without it, assistive tech would read the headline
+ * as "Fail Rehearse Botch Survive the interview".
+ * Staggered `animationDelay` values cascade the entrance top to bottom; they're
+ * inline because each element needs its own offset.
+ * @returns {JSX.Element} The hero section.
  */
 export default function Hero() {
   return (

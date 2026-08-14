@@ -1,6 +1,16 @@
+/** @file The problem statement pane of the assessment screen. */
+
 /**
- * Problem statement panel in the assessment screen.
- * @param {{ problem: object }} props
+ * Renders the problem statement, its metadata, and the calling convention.
+ * The "Example" block is fixed boilerplate rather than per-problem content: it
+ * documents how the sandbox invokes `solve` — arrays are spread into arguments,
+ * anything else is passed whole — which is the single most common reason a
+ * correct-looking solution fails every test.
+ * `whitespace-pre-wrap` preserves the author's line breaks, since prompts are
+ * plain text rather than markdown.
+ * @param {object} props - Component props.
+ * @param {object} props.problem - Runnable problem with title, level, points, time, and prompt.
+ * @returns {JSX.Element} The statement pane.
  */
 export default function ProblemPanel({ problem }) {
   return (

@@ -1,3 +1,5 @@
+/** @file `/api/lab/assessments` — lists and creates coding assessments. */
+
 import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -5,11 +7,18 @@ import { findMissingIntervieweeEmails } from "@/lib/candidateUsers";
 import { assessmentIsExpired, normalizeLabAssessmentPayload, sanitizeAssessmentForUser } from "@/lib/labAccess";
 import LabAssessment from "@/models/LabAssessment";
 
+/** Roles allowed anywhere in the Lab. Anything else is a 403. */
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
 /**
- * GET /api/lab/assessments — lists assessments visible to the caller
- * (owned for interviewers, assigned for candidates). Auth: signed in.
+ * Lists assessments the caller owns (interviewer) or is assigned (interviewee).
+ * Candidates additionally only see unexpired ones, so a passed deadline removes
+ * the assessment from their list rather than showing an unusable entry. Every
+ * result goes through `sanitizeAssessmentForUser`, which strips hidden tests and
+ * other candidates' submissions.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ assessments }`
+ *   newest-first; 401 signed out; 403 for unknown roles; 500 otherwise.
  */
 export async function GET(req) {
   try {
@@ -34,8 +43,16 @@ export async function GET(req) {
 }
 
 /**
- * POST /api/lab/assessments — creates an assessment from the builder
- * payload. Auth: interviewer.
+ * Creates a coding assessment from the builder payload.
+ * Validation runs in a deliberate order — cheap shape checks first, then the
+ * database round-trip for candidate existence, so a malformed payload never
+ * costs a query. `durationMinutes` is recomputed from the problems rather than
+ * trusted from the body.
+ * @param {import("next/server").NextRequest} req - Body carries the test-builder payload.
+ * @returns {Promise<import("next/server").NextResponse>} 201 with the created
+ *   `{ assessment }`; 400 for a missing title, no candidates, no problems, an
+ *   invalid or past deadline, out-of-range duration, malformed test JSON, or
+ *   unregistered candidates; 401 signed out; 403 for non-interviewers; 500 otherwise.
  */
 export async function POST(req) {
   try {
@@ -84,6 +101,13 @@ export async function POST(req) {
   }
 }
 
+/**
+ * Finds the first test whose JSON won't parse, as a user-facing message.
+ * Checked at create time because the grader parses these at run time — an
+ * unparseable expectation would silently fail every candidate's submission.
+ * @param {object[]} problems - Normalized problems, each with a `tests` array.
+ * @returns {string} Message naming the offending problem and test, or `""` when all are valid.
+ */
 function findInvalidTest(problems) {
   for (const [problemIndex, problem] of problems.entries()) {
     if (!problem.tests.length) return `Problem ${problemIndex + 1} needs at least one test case.`;
@@ -97,11 +121,17 @@ function findInvalidTest(problems) {
   return "";
 }
 
+/**
+ * True when a string parses as JSON.
+ * @param {string} value - Raw `inputJson` or `expectedJson` from a test case.
+ * @returns {boolean} `true` when `JSON.parse` succeeds.
+ */
 function isValidJson(value) {
   try {
     JSON.parse(value);
     return true;
   } catch {
+    // Parse failure is the answer here, not an error to propagate.
     return false;
   }
 }

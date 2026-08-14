@@ -1,19 +1,12 @@
-/**
- * @file Server-only client for Gemini's generateContent endpoint, behind every
- * AI feature (prep guides, question banks, scorecard summaries, code
- * explanations). Callers get a parsed object, never raw model text.
- */
+/** @file Server-only Gemini client behind every AI feature. Callers get a parsed object, never raw model text. */
 
 /**
  * Extracts the first JSON object from a model response.
  * `responseMimeType: "application/json"` is a hint, not a guarantee — output
- * still arrives fenced or with preamble, so strip fences and slice first `{` to
- * last `}`.
- *
+ * still arrives fenced or with preamble, so slice first `{` to last `}`.
  * @param {string} text - Raw concatenated text from the response parts.
  * @returns {object} The parsed JSON object.
- * @throws {Error} When no brace pair is present, or the extracted span fails to
- *   parse (the `SyntaxError` message is folded in so the cause survives).
+ * @throws {Error} When no brace pair is present, or the span fails to parse.
  */
 function extractJson(text) {
   const cleaned = String(text ?? "").replace(/```json|```/g, "").trim();
@@ -34,13 +27,11 @@ function extractJson(text) {
 /**
  * Sends a prompt to Gemini and returns the JSON object it produced.
  * `temperature: 0.7` keeps regenerated question banks varied while holding the
- * JSON shape. No retry and no timeout — transient failures surface to the caller.
- *
- * @param {string} prompt - Must describe the exact JSON shape expected; nothing
- *   here validates the result against a schema.
+ * shape. No retry and no timeout — transient failures reach the caller.
+ * @param {string} prompt - Must describe the exact JSON shape; nothing here validates it.
  * @returns {Promise<object>} Parsed JSON from the first candidate.
- * @throws {Error} When `GEMINI_API` is unset, the call returns non-2xx, the
- *   response has no text (safety-filtered or truncated), or it holds no JSON.
+ * @throws {Error} When `GEMINI_API` is unset, the call is non-2xx, the response
+ *   has no text (filtered or truncated), or it holds no JSON.
  */
 export async function generateGeminiJson(prompt) {
   const apiKey = process.env.GEMINI_API;

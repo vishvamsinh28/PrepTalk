@@ -1,15 +1,22 @@
+/**
+ * @file Root layout. Loads fonts, gates the app to desktop widths, and mounts
+ * the shared nav — every route renders inside this.
+ */
+
 import "./globals.css";
 import { Instrument_Sans, Instrument_Serif } from "next/font/google";
 import DesktopOnly from "./components/DesktopOnly";
 import Navbar from "./components/Navbar";
 import { Analytics } from "@vercel/analytics/next";
 
+/** Body typeface, exposed as `--font-body` for Tailwind and globals.css. */
 const body = Instrument_Sans({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-body",
 });
 
+/** Display serif, exposed as `--font-display`. Used for titles and stat figures. */
 const display = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
@@ -33,9 +40,14 @@ export const metadata = {
 };
 
 /**
- * Root layout: loads fonts, gates the whole app to desktop widths,
- * and mounts the shared Navbar.
- * @param {{ children: React.ReactNode }} props
+ * Root layout wrapping every route.
+ * The desktop gate lives here rather than per page, so no route can leak onto a
+ * small screen by omission. `lg:contents` is what makes that free: the wrapper
+ * drops out of the box tree at desktop widths, so page layouts render as if it
+ * weren't there. `Navbar` decides for itself which routes it appears on.
+ * @param {object} props - Component props.
+ * @param {React.ReactNode} props.children - The active route's page.
+ * @returns {JSX.Element} The html document shell.
  */
 export default function RootLayout({ children }) {
   return (

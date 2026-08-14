@@ -4,6 +4,13 @@ import { useMemo, useState } from "react";
 import { postJson } from "@/lib/clientApi";
 import ScorecardSelect from "./ui/ScorecardSelect";
 
+/** @file The interviewer's scorecard, rendered in-room at the bottom of a session. */
+
+/**
+ * The five score dimensions as `[key, label]`.
+ * Keys must match `SCORE_KEYS` in the reports route — the server rejects the
+ * whole submission if any is missing.
+ */
 const scoreFields = [
   ["communication", "Communication"],
   ["technicalDepth", "Technical depth"],
@@ -13,9 +20,20 @@ const scoreFields = [
 ];
 
 /**
- * Interviewer scorecard: five score dimensions, recommendation,
- * notes, and optional AI summary generation.
- * @param {{ sessionId: string, session: object }} props
+ * Scorecard for five dimensions, a recommendation, notes, and an AI summary.
+ * Scores default to 3 (mid-scale) so a submitted card always carries a complete
+ * set — the API rejects partial scores outright rather than defaulting them.
+ * The AI summary is a two-step flow by design: the report must be saved first,
+ * since `/api/reports/summary` works from the stored record rather than the
+ * form, which is what keeps a candidate's feedback un-steerable from the client.
+ * `openSelect` is held here and passed down so only one `ScorecardSelect`
+ * dropdown can be open at a time.
+ * Submitting twice edits rather than duplicates — the endpoint upserts on
+ * (session, interviewee).
+ * @param {object} props - Component props.
+ * @param {string} props.sessionId - Session being scored.
+ * @param {object} props.session - Serialized session, supplying the interviewee list.
+ * @returns {JSX.Element} The scorecard form.
  */
 export default function InterviewScorecard({ sessionId, session }) {
   const interviewees = useMemo(() => session?.interviewees || [], [session]);
@@ -39,10 +57,21 @@ export default function InterviewScorecard({ sessionId, session }) {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [openSelect, setOpenSelect] = useState("");
 
+  /**
+   * Controlled-input handler for top-level fields, keyed on `name`.
+   * @param {React.ChangeEvent} event - Change event.
+   * @returns {void}
+   */
   const updateField = (event) => {
     setFormData((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
+  /**
+   * Updates one score dimension, leaving the other four alone.
+   * @param {string} name - Score key, e.g. `"communication"`.
+   * @param {number} value - New score, 1-5.
+   * @returns {void}
+   */
   const updateScore = (name, value) => {
     setFormData((current) => ({
       ...current,
@@ -50,6 +79,13 @@ export default function InterviewScorecard({ sessionId, session }) {
     }));
   };
 
+  /**
+   * Saves the scorecard and keeps the returned report for the summary step.
+   * The form is not cleared on success, so the interviewer can revise and
+   * resubmit — the endpoint upserts, so that edits rather than duplicates.
+   * @param {React.FormEvent} event - Submit event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");

@@ -4,13 +4,30 @@ import { useEffect, useState } from "react";
 import { formatDateTime, toWholeNumber } from "./adminUtils";
 import { buildAssessmentReport, createReportPdf, slugify, toDateTimeLocalValue, parseRecipientList, cloneAssessmentProblems } from "./assessmentReport";
 import EditableSection from "./EditableSection";
+/** @file Detail view for one assessment: edit it, invite candidates, read the report, export a PDF. */
+
 import ReportViewer from "./ReportViewer";
 
 /**
- * Assessment detail: header actions (report, PDF, link, delete),
- * editable sections, and assignment settings.
- * @param {{ assessment: object, notice: string, onBack: Function,
- *   onDelete: Function, onUpdate: Function }} props
+ * Assessment detail with editable sections, settings, and the submissions report.
+ * Unlike the builder, this keeps *draft* state (`settings`, `draftProblems`)
+ * cloned from the saved assessment, so edits are discardable until saved. The
+ * effect re-seeds those drafts whenever a different assessment arrives —
+ * without it, switching assessments would show the previous one's unsaved edits.
+ * `cloneAssessmentProblems` is what stops those drafts from writing through to
+ * the fetched object.
+ *
+ * NOTE: the settings form has no title or description field, which matches the
+ * PATCH endpoint — it pins both to their stored values and silently ignores a
+ * change. Renaming an assessment isn't possible from either side.
+ *
+ * @param {object} props - Component props.
+ * @param {object} props.assessment - Saved assessment, including submissions.
+ * @param {string} props.notice - Status message from the last save or delete.
+ * @param {Function} props.onBack - Returns to the assessments index.
+ * @param {Function} props.onDelete - Deletes this assessment.
+ * @param {Function} props.onUpdate - Persists the draft settings and sections.
+ * @returns {JSX.Element} The detail view.
  */
 export default function AdminAssessmentDetail({ assessment, notice, onBack, onDelete, onUpdate }) {
   const inviteLink = typeof window === "undefined" ? "" : `${window.location.origin}/lab?assessment=${assessment._id}`;
@@ -27,6 +44,8 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
   const inviteRecipients = parseRecipientList(settings.candidates);
   const report = buildAssessmentReport(assessment);
 
+  // Re-seed the drafts when a different assessment is opened, or the previous
+  // one's unsaved edits would carry over into it.
   useEffect(() => {
     setSettings({
       candidates: (assessment.candidates || []).join(", "),

@@ -1,7 +1,16 @@
-/*
- * Shared page header for the internal app: mono eyebrow, serif title,
- * one line of description, optional right-hand meta. Closes with a hairline
- * so pages start on the same rhythm as the landing sections.
+/** @file Shared page and section headers for the signed-in app. */
+
+/**
+ * Page header: mono eyebrow, serif title, description, optional right-hand meta.
+ * Closes with a hairline so every internal page starts on the same rhythm as
+ * the landing sections. Only `title` is required — the rest render conditionally
+ * so a bare header still collapses cleanly.
+ * @param {object} props - Component props.
+ * @param {string} [props.eyebrow] - Small uppercase label above the title.
+ * @param {string} props.title - Page title.
+ * @param {string} [props.description] - One line of context, capped at 62 characters wide.
+ * @param {React.ReactNode} [props.meta] - Right-aligned block, usually `SignedInAs`.
+ * @returns {JSX.Element} The header.
  */
 export default function PageHeader({ eyebrow, title, description, meta }) {
   return (
@@ -23,8 +32,12 @@ export default function PageHeader({ eyebrow, title, description, meta }) {
 }
 
 /**
- * Right-aligned signed-in email block for page headers.
- * @param {{ email?: string }} props
+ * Right-aligned "signed in as" block for the header's `meta` slot.
+ * Truncates rather than wrapping, so a long address can't push the header out
+ * of alignment.
+ * @param {object} props - Component props.
+ * @param {string} [props.email] - Signed-in email; renders blank while loading.
+ * @returns {JSX.Element} The block.
  */
 export function SignedInAs({ email }) {
   return (
@@ -36,8 +49,13 @@ export function SignedInAs({ email }) {
 }
 
 /**
- * Section heading: mono eyebrow, serif title, optional right action.
- * @param {{ eyebrow?: string, title: string, action?: React.ReactNode }} props
+ * Section heading, one type scale below `PageHeader`.
+ * Renders an `h2`, so pages keep a single `h1` from the page header.
+ * @param {object} props - Component props.
+ * @param {string} [props.eyebrow] - Small uppercase label above the title.
+ * @param {string} props.title - Section title.
+ * @param {React.ReactNode} [props.action] - Right-aligned control or count.
+ * @returns {JSX.Element} The heading.
  */
 export function SectionHeading({ eyebrow, title, action }) {
   return (

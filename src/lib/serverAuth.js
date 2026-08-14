@@ -1,8 +1,4 @@
-/**
- * @file Session lookup for server components, which have no request object and
- * must read Next's async `cookies()` store. Route handlers use
- * `getAuthPayloadFromRequest` in `@/lib/auth` instead.
- */
+/** @file Session lookup for server components, which have no request object. Route handlers use `getAuthPayloadFromRequest` instead. */
 
 import { cookies } from "next/headers";
 import { verifyAuthToken } from "@/lib/token";
@@ -14,9 +10,7 @@ const AUTH_COOKIE_NAME = "prepTalkToken";
  * Returns the signed-in user's claims inside a server component.
  * Reading cookies opts the route into dynamic rendering, so don't call this
  * from a page meant to be statically generated.
- *
- * @returns {Promise<import("@/lib/token").AuthTokenPayload|null>} Claims, or
- *   `null` when there's no valid session cookie.
+ * @returns {Promise<{id: string, email: string, role: string}|null>} Claims, or null when not signed in.
  */
 export async function getCurrentUser() {
   const cookieStore = await cookies();

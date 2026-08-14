@@ -1,6 +1,12 @@
 /**
- * Mongoose model: a Lab assessment — problems with test cases,
- * assigned candidates, deadline, and graded submissions.
+ * @file Mongoose model: a Lab coding assessment.
+ * Problems, their test cases, and every candidate submission are embedded in
+ * one document rather than split across collections — an assessment is always
+ * loaded whole, and the grader needs the tests alongside the results.
+ * Test `inputJson`/`expectedJson` stay strings and are parsed at run time, so a
+ * malformed case fails that test instead of blocking the save.
+ * `deadlineAt` is required, which is what makes the epoch-0 fallback in
+ * `assessmentIsExpired` safe for persisted documents.
  */
 import mongoose from "mongoose";
 

@@ -1,6 +1,9 @@
 /**
- * Mongoose model: a submitted scorecard — five score dimensions,
- * recommendation, notes, and optional AI summary.
+ * @file Mongoose model: a submitted interview scorecard.
+ * All five score dimensions are required and bounded 1-5 at the schema level,
+ * so a partial scorecard can never reach the database and skew the progress
+ * averages. One report per (session, interviewee) — the reports route upserts
+ * on that pair, so resubmitting edits rather than duplicates.
  */
 import mongoose from "mongoose";
 

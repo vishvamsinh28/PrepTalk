@@ -1,5 +1,13 @@
+/** @file The landing page's editorial statement section. */
+
 /**
- * Asymmetric editorial statement section on the landing page.
+ * Asymmetric statement section: headline left, supporting copy right.
+ * Uses an explicit 12-column grid with the copy pinned to columns 9-12, leaving
+ * a deliberate gutter between the two — the asymmetry is the design, not a
+ * layout accident.
+ * Static content, no props: it's prose, and lifting it into data would add
+ * indirection for one caller.
+ * @returns {JSX.Element} The section.
  */
 export default function Manifesto() {
   return (

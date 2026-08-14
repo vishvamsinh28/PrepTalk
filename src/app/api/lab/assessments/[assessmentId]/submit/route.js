@@ -1,3 +1,5 @@
+/** @file `POST /api/lab/assessments/:id/submit` — the authoritative grading path. Assigned candidate only. */
+
 import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -8,8 +10,18 @@ import LabAssessment from "@/models/LabAssessment";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
 /**
- * POST /api/lab/assessments/:id/submit — grades the candidate's
- * solutions server-side and stores the submission. Auth: assigned candidate.
+ * Grades a candidate's solutions server-side and records the submission.
+ * The attempt cap is enforced twice on purpose: the early `previous.length`
+ * check gives a fast, clear rejection, while the `$expr` filter on the update
+ * is what actually holds under concurrent submissions — two requests in flight
+ * would both pass the first check, and only one can win the second.
+ * Grading runs before the write, so a sandbox failure can't record a bogus score.
+ * @param {import("next/server").NextRequest} req - Body carries `{ solutions }`.
+ * @param {{ params: Promise<{ assessmentId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with a summary
+ *   `{ submission }` (no hidden-test detail); 400 on a malformed id; 401 signed
+ *   out; 403 for non-interviewees or non-assigned callers; 404 when missing;
+ *   410 past the deadline; 429 at 12 submits/hour or the 20-attempt cap; 500 otherwise.
  */
 export async function POST(req, props) {
   try {
@@ -98,6 +110,14 @@ export async function POST(req, props) {
   }
 }
 
+/**
+ * Bounds an untrusted solutions array before it reaches the grading sandbox.
+ * A non-integer `problemIndex` becomes -1, which matches no problem, so the
+ * entry is effectively discarded rather than grading against the wrong question.
+ * The 12k code cap mirrors the sandbox's own truncation.
+ * @param {unknown} value - Raw `solutions` from the request body.
+ * @returns {Array<{problemIndex: number, title: string, code: string}>} Up to 12 bounded entries.
+ */
 function normalizeSolutions(value) {
   if (!Array.isArray(value)) return [];
 

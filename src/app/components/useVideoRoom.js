@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * @file The video room hook. Owns local media, WebRTC peers, and Ably presence
+ * for one session. Peer construction lives in `videoRoomPeers`, device toggles
+ * in `videoRoomToggles`, and getUserMedia wrapping in `videoRoomMedia`; this
+ * file is the state and lifecycle that ties them together.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import * as Ably from "ably";
 import { useRouter } from "next/navigation";
@@ -13,10 +20,17 @@ import { createMediaToggles } from "./videoRoomToggles";
 import { createPeerHelpers } from "./videoRoomPeers";
 
 /**
- * All state and signaling for a session video room: local media,
- * peer connections, presence, and the leave/toggle handlers.
- * @param {string} sessionId
- * @param {string} userEmail
+ * Owns everything the video room needs: local media, peer connections,
+ * presence, and the leave/toggle handlers.
+ * State is mirrored into refs (`peersRef`, `streamRef`) because the Ably
+ * callbacks below outlive the render that created them and would otherwise read
+ * stale values.
+ * @param {string} sessionId - Session whose `video:` channel to join.
+ * @param {string} userEmail - Published in presence so peers can label tiles.
+ * @returns {{peers: object[], stream: MediaStream|null, mediaError: string,
+ *   audioEnabled: boolean, videoEnabled: boolean, participants: object[],
+ *   userVideo: object, streamsRef: object, toggleAudio: Function,
+ *   toggleVideo: Function, leaveRoom: Function}} Room state and controls.
  */
 export function useVideoRoom(sessionId, userEmail) {
   const router = useRouter();
@@ -43,6 +57,9 @@ export function useVideoRoom(sessionId, userEmail) {
     userEmail,
   });
 
+  // Acquires local media, then joins the room. Re-runs only when the session or
+  // identity changes; the cleanup fully tears down peers, tracks, and the Ably
+  // connection so a remount never leaves a ghost participant behind.
   useEffect(() => {
     let isMounted = true;
     let didSetupRealtime = false;
@@ -51,6 +68,13 @@ export function useVideoRoom(sessionId, userEmail) {
     ablyRef.current = ably;
     channelRef.current = channel;
 
+    /**
+     * Tears down a peer that left, clearing it from ref, state, and stream map.
+     * Destroying before filtering matters — an undestroyed peer keeps its
+     * RTCPeerConnection and transceivers alive after the tile disappears.
+     * @param {string} connectionId - Ably connection id of the departed peer.
+     * @returns {void}
+     */
     const removePeer = (connectionId) => {
       const peerObj = peersRef.current.find(p => p.peerId === connectionId);
       if (peerObj) {
@@ -102,6 +126,14 @@ export function useVideoRoom(sessionId, userEmail) {
       });
     };
 
+    /**
+     * Routes incoming offers and answers to the right peer.
+     * The guard drops anything addressed elsewhere, echoed back from us, or
+     * arriving before local media exists — a peer built without a stream would
+     * negotiate with no tracks and show a permanently black tile.
+     * @param {{name: string, data: object}} event - Ably `signal-offer` or `signal-answer`.
+     * @returns {void}
+     */
     const handleSignal = (event) => {
       const data = event.data;
       const selfId = connectionIdRef.current;
@@ -127,6 +159,12 @@ export function useVideoRoom(sessionId, userEmail) {
       }
     };
 
+    /**
+     * Resolves once the Ably connection is usable.
+     * Checked synchronously first, since a warm client may already be connected
+     * and `once("connected")` would then never fire.
+     * @returns {Promise<void>} Resolves on connect; rejects if the connection fails.
+     */
     const waitForConnection = () => {
       if (ably.connection.state === "connected") {
         return Promise.resolve();
@@ -138,6 +176,14 @@ export function useVideoRoom(sessionId, userEmail) {
       });
     };
 
+    /**
+     * Connects, subscribes to signalling and presence, then announces us.
+     * Order is load-bearing: subscriptions are attached *before* `presence.enter`
+     * so an offer from someone who sees us arrive is never missed. The
+     * `didSetupRealtime` latch guards against React StrictMode's double-invoke
+     * in development, which would otherwise enter presence twice.
+     * @returns {Promise<void>} Resolves once the room is fully joined.
+     */
     const setupRealtime = async () => {
       if (didSetupRealtime) return;
       didSetupRealtime = true;
@@ -155,6 +201,8 @@ export function useVideoRoom(sessionId, userEmail) {
       await syncPresence();
     };
 
+    // With both devices off we still need a stream object to negotiate against,
+    // hence the empty-stream branch rather than skipping getUserMedia entirely.
     const initialMediaRequest = { video: videoEnabled, audio: audioEnabled };
     const initialStreamPromise = videoEnabled || audioEnabled
       ? requestUserMedia(initialMediaRequest)

@@ -1,9 +1,8 @@
 /**
- * @file Server-side grading sandbox for lab submissions.
- * Candidate code runs in a `node:vm` context inside a worker thread — the vm
- * strips globals, the worker caps memory and survives an unkillable loop that
- * `vm`'s own timeout can't interrupt. Client-side `sandboxRunner.js` is for
- * practice runs only; scores that count are produced here.
+ * @file Server-side grading sandbox. Candidate code runs in a `node:vm` context
+ * inside a worker thread — the vm strips globals, the worker caps memory and
+ * survives loops the vm timeout can't interrupt. Client-side `sandboxRunner.js`
+ * is practice only; scores that count are produced here.
  */
 
 import { Worker } from "node:worker_threads";
@@ -11,23 +10,17 @@ import { Worker } from "node:worker_threads";
 /** Wall-clock budget for one `solve` call, enforced inside the vm. */
 const RUN_TIMEOUT_MS = 1000;
 
-/** Cap on serialized output, to stop a huge return value from pinning memory. */
+/** Cap on serialized output, so a huge return value can't pin memory. */
 const MAX_OUTPUT_CHARS = 8000;
 
-/**
- * Outer kill deadline. Slightly longer than `RUN_TIMEOUT_MS` so the vm's own
- * timeout normally fires first and reports a clean error; this only trips when
- * the vm timeout couldn't interrupt the code at all.
- */
+/** Outer kill deadline; only trips when the vm timeout couldn't interrupt the code. */
 const WORKER_TIMEOUT_MS = RUN_TIMEOUT_MS + 250;
 
 /**
- * Worker body, interpolated at module load and run with `eval: true`.
- * Written as a string because it needs its own thread and module scope. The vm
- * context blanks `fetch`, `process`, `require`, and both globals, and disables
- * codegen so `eval`/`new Function` can't be used to escape it. `microtaskMode:
- * "afterEvaluate"` drains pending microtasks, which is what makes the
- * "no async solve" check enforceable.
+ * Worker body, interpolated at load and run with `eval: true`. A string because
+ * it needs its own thread and module scope. The vm context blanks `fetch`,
+ * `process`, `require`, and both globals, and disables codegen so `eval` and
+ * `new Function` can't escape it.
  */
 const WORKER_SOURCE = `
   import vm from "node:vm";
@@ -93,30 +86,15 @@ const WORKER_SOURCE = `
 `;
 
 /**
- * Result of running one test case.
- * @typedef {object} TestRunResult
- * @property {boolean} ok - `false` when the code threw, timed out, or the
- *   sandbox died.
- * @property {*} [output] - Return value of `solve`, present only when `ok`.
- * @property {string} [error] - Failure message, present only when not `ok`.
- * @property {number} duration - Milliseconds elapsed, floored at 1.
- */
-
-/**
  * Grades a full submission: every test of every problem, with totals.
- * Problems the candidate didn't attempt still run (against `""`) so they score
- * zero rather than being skipped, keeping `maxScore` honest. Per-problem score
- * is pro-rated by tests passed.
- *
- * Sequential by design — running every test concurrently would let one
- * submission spawn dozens of workers at once.
- *
+ * Unattempted problems still run (against `""`) so they score zero rather than
+ * being skipped, keeping `maxScore` honest. Sequential by design — parallel
+ * tests would let one submission spawn dozens of workers at once.
  * @param {object} assessment - Assessment document with a `problems` array.
- * @param {Array<{problemIndex: number, code: string}>} [solutions=[]] - Candidate
- *   code per problem; entries without an integer `problemIndex` are ignored.
+ * @param {Array<{problemIndex: number, code: string}>} [solutions=[]] - Entries without an integer index are ignored.
  * @returns {Promise<{ maxScore: number, passedTests: number, problemResults: object[],
- *   runtimeMs: number, score: number, totalTests: number }>} Full breakdown.
- *   Hidden-test details are included — strip them before sending to a candidate.
+ *   runtimeMs: number, score: number, totalTests: number }>} Full breakdown, including
+ *   hidden-test detail — strip it before sending to a candidate.
  */
 export async function gradeLabAssessment(assessment, solutions = []) {
   const solutionByIndex = new Map();
@@ -182,18 +160,12 @@ export async function gradeLabAssessment(assessment, solutions = []) {
 
 /**
  * Runs one `solve` call in a throwaway worker and resolves with its outcome.
- * Never rejects — every failure path (throw, timeout, worker crash, early exit)
- * resolves to `{ ok: false, error }` so the grading loop never needs a catch.
- * The `settled` flag matters because those paths can race; first one wins and
- * the rest are ignored.
- *
- * A fresh worker per test is deliberate: it guarantees no state leaks between
- * test cases, at roughly 30-40ms startup each.
- *
+ * Never rejects — throw, timeout, crash, and early exit all resolve to
+ * `{ ok: false, error }`, so the grading loop needs no catch. A fresh worker per
+ * test guarantees no state leaks between cases, at ~30-40ms startup each.
  * @param {string} code - Candidate source, truncated to 12k chars.
- * @param {*} input - Parsed test input. An array is spread across `solve`'s
- *   parameters; anything else is passed as a single argument.
- * @returns {Promise<TestRunResult>} Always resolves, never rejects.
+ * @param {*} input - Parsed test input; an array is spread across `solve`'s params.
+ * @returns {Promise<{ok: boolean, output?: *, error?: string, duration: number}>} Always resolves.
  */
 function runSolve(code, input) {
   const started = Date.now();
@@ -255,9 +227,7 @@ function runSolve(code, input) {
 
 /**
  * Parses a stored test value, returning the raw string when it isn't JSON.
- * That fallback lets an author write `hello` instead of `"hello"` in the test
- * builder — the string is then compared as-is.
- *
+ * That fallback lets an author write `hello` instead of `"hello"`.
  * @param {string} value - `inputJson` or `expectedJson` from a test case.
  * @returns {*} Parsed value, or the original string when parsing fails.
  */
@@ -272,10 +242,8 @@ function parseJsonValue(value) {
 
 /**
  * Structural equality for test comparison, ignoring object key order.
- * Compares serialized forms, so it can't distinguish `undefined` from a missing
- * key and won't handle `NaN`, `Map`, `Set`, or cycles — none of which appear in
- * JSON-defined test cases.
- *
+ * Must stay in sync with `deepEqual` in `components/lab/resultUtils.js`, or a
+ * practice run and the graded run disagree on the same solution.
  * @param {*} left - Actual output from `solve`.
  * @param {*} right - Expected value from the test case.
  * @returns {boolean} `true` when structurally equal.
@@ -286,11 +254,8 @@ function deepEqual(left, right) {
 
 /**
  * Recursively sorts object keys so `JSON.stringify` is order-independent.
- * Without this, `{a:1,b:2}` and `{b:2,a:1}` would compare unequal and fail a
- * correct solution. Array order is preserved — that's significant.
- *
- * Pure: builds new objects rather than sorting in place.
- *
+ * Without this, `{a:1,b:2}` and `{b:2,a:1}` would fail a correct solution.
+ * Array order is preserved — that's significant. Pure: builds new objects.
  * @param {*} value - Any JSON-compatible value.
  * @returns {*} Same value with every object's keys in sorted order.
  */

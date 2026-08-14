@@ -1,16 +1,35 @@
 "use client";
 
+/** @file Custom select for the scorecard, where a native `<select>` can't be styled to match. */
+
 import { FaChevronDown } from "react-icons/fa";
 
 /**
- * Accessible custom select used by the scorecard. Only one instance
- * opens at a time via the shared openSelect id.
- * @param {{ id: string, value: any, options: any[], onChange: Function,
- *   openSelect: string, setOpenSelect: Function, compact?: boolean }} props
+ * Custom select with listbox semantics.
+ * Open state is lifted to the parent via `openSelect`/`setOpenSelect` rather
+ * than held locally, so opening one row automatically closes any other — with
+ * local state, several dropdowns could overlap at once.
+ * The `onMouseDown` preventDefault on each option is what makes selection work:
+ * without it the button's blur fires first, closing the list before the click
+ * lands. Blur still closes when focus genuinely leaves the group.
+ * @param {object} props - Component props.
+ * @param {string} props.id - Identity of this select, compared against `openSelect`.
+ * @param {*} props.value - Currently selected option.
+ * @param {any[]} props.options - Choices; used as their own keys, so must be unique.
+ * @param {Function} props.onChange - Called with the chosen option.
+ * @param {string} props.openSelect - Id of the currently open select, `""` for none.
+ * @param {Function} props.setOpenSelect - Setter for the shared open id.
+ * @param {boolean} [props.compact=false] - Tighter spacing for the per-dimension rows.
+ * @returns {JSX.Element} The select.
  */
 export default function ScorecardSelect({ id, value, options, onChange, openSelect, setOpenSelect, compact = false }) {
   const isOpen = openSelect === id;
 
+  /**
+   * Applies a choice and closes the list.
+   * @param {*} nextValue - Option the user picked.
+   * @returns {void}
+   */
   const chooseValue = (nextValue) => {
     onChange(nextValue);
     setOpenSelect("");

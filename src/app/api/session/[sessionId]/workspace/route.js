@@ -1,3 +1,9 @@
+/**
+ * @file `/api/session/:id/workspace` — the shared notes and code pad.
+ * Both roles read and write it; realtime mirroring happens over Ably, this is
+ * only the durable copy.
+ */
+
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -5,7 +11,13 @@ import { findSessionForUser } from "@/lib/sessionAccess";
 import { normalizeText } from "@/lib/validation";
 
 /**
- * GET /api/session/:id/workspace — shared notes/code. Auth: participants.
+ * Returns the session's saved workspace.
+ * Falls back to empty strings when the session has never been written to, so
+ * the client always gets both fields and never has to null-check them.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ workspace }`;
+ *   401 signed out; 404 when missing or not a participant; 500 otherwise.
  */
 export async function GET(req, props) {
   try {
@@ -25,8 +37,15 @@ export async function GET(req, props) {
 }
 
 /**
- * PATCH /api/session/:id/workspace — saves shared notes/code.
- * Auth: participants.
+ * Overwrites the session's workspace with the submitted notes and code.
+ * A last-write-wins replace, not a merge — two participants typing at once will
+ * clobber each other, which is why the client debounces and mirrors over Ably
+ * rather than relying on this endpoint for concurrency.
+ * @param {import("next/server").NextRequest} req - Body carries `{ notes, code }`.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with the saved
+ *   `{ workspace }` (notes capped at 20k chars, code at 40k); 401 signed out;
+ *   404 when missing or not a participant; 500 otherwise.
  */
 export async function PATCH(req, props) {
   try {

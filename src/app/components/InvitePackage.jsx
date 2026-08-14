@@ -1,7 +1,19 @@
 "use client";
 
+/** @file Post-create invite kit: join link, a prefilled mailto, and copy actions. */
+
 import { useState } from "react";
 
+/**
+ * Builds the invite link and email draft for a session.
+ * Returns empty strings during SSR, since the join URL is derived from
+ * `window.location.origin` — that keeps the app deployable at any host without
+ * a configured base URL, at the cost of the values being client-only.
+ * The mailto pre-addresses every assigned interviewee; body and subject are
+ * percent-encoded, so newlines survive into the mail client.
+ * @param {object|null} session - Session document, or null before one is created.
+ * @returns {{inviteUrl: string, emailBody: string, mailtoHref: string}} Invite parts.
+ */
 function buildInviteDetails(session) {
   if (!session || typeof window === "undefined") {
     return { inviteUrl: "", emailBody: "", mailtoHref: "" };
@@ -22,14 +34,28 @@ function buildInviteDetails(session) {
 }
 
 /**
- * Post-create invite kit: invite link, mailto draft, copy actions,
- * and an email preview.
- * @param {{ session: object }} props
+ * Shown after creating a session: invite link, mailto draft, and copy actions.
+ * The link is not a secret — access is checked server-side against the assigned
+ * interviewees, so forwarding it doesn't grant entry. The copy warns anyway,
+ * since sending it to the wrong person is still a wasted invite.
+ * @param {object} props - Component props.
+ * @param {object} props.session - The freshly created session.
+ * @returns {JSX.Element} The invite panel.
  */
 export default function InvitePackage({ session }) {
   const [copied, setCopied] = useState("");
   const inviteDetails = buildInviteDetails(session);
 
+  /**
+   * Copies text and flags which item was copied.
+   * The flag is never cleared, so the confirmation persists until the panel
+   * unmounts — deliberate, since it doubles as a record of what you already sent.
+   * @param {string} label - Which item was copied, shown in the confirmation.
+   * @param {string} text - Text to write to the clipboard.
+   * @returns {Promise<void>} Resolves once written; no-ops on empty text.
+   * @throws {Error} Propagates a clipboard rejection, which browsers raise when
+   *   the document isn't focused or the page isn't on a secure origin.
+   */
   const copyText = async (label, text) => {
     if (!text) return;
     await navigator.clipboard?.writeText(text);

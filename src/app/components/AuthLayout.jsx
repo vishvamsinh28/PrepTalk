@@ -1,6 +1,9 @@
+/** @file Shared two-panel shell wrapping the login and register forms. */
+
 import Link from "next/link";
 import PrepTalkLogo from "./PrepTalkLogo";
 
+/** Feature list shown in the pitch panel; decorative, not driven by data. */
 const inTheRoom = [
   "Live video rooms",
   "Shared code workspace",
@@ -8,9 +11,21 @@ const inTheRoom = [
   "Session reports",
 ];
 
-/*
+/**
  * Split auth shell: ink panel carries the pitch, canvas panel carries the form.
- * The panel collapses away under lg so the form gets the whole screen.
+ * The pitch panel is hidden below `lg` so the form gets the whole screen on
+ * mobile — which is why the logo appears twice, the second copy going
+ * `invisible` (not `hidden`) at `lg` so it still reserves layout space and
+ * keeps the alt-prompt right-aligned.
+ * A server component: it holds no state and is rendered by the auth pages.
+ * @param {object} props - Component props.
+ * @param {string} props.headline - Large serif headline in the pitch panel.
+ * @param {string} props.blurb - Supporting line under the headline.
+ * @param {string} props.altPrompt - Lead-in text, e.g. "New to PrepTalk?".
+ * @param {string} props.altLabel - Link text for the opposite auth page.
+ * @param {string} props.altHref - Link target for the opposite auth page.
+ * @param {React.ReactNode} props.children - The form to render in the right panel.
+ * @returns {JSX.Element} The auth shell.
  */
 export default function AuthLayout({
   headline,

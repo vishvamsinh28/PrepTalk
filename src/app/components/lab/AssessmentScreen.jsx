@@ -4,9 +4,26 @@ import CodeEditorPanel from "./CodeEditorPanel";
 import ProblemPanel from "./ProblemPanel";
 import ProblemRail from "./ProblemRail";
 import ResultsSidebar from "./ResultsSidebar";
+/** @file Layout shell for a candidate taking an assessment. Pure composition — no state of its own. */
+
 import { formatTime } from "./resultUtils";
 
-/* The in-assessment layout — extracted verbatim from LabCandidateDashboard. */
+/**
+ * Arranges the four panes of the assessment screen: rail, problem, editor, results.
+ * Holds no state — every value and handler comes from `LabCandidateDashboard`,
+ * which is why the prop list is long and destructured in one block rather than
+ * in the signature. Extracted purely to keep that dashboard readable.
+ * The problem/editor split is user-resizable: `problemPanelWidth` feeds a CSS
+ * custom property so dragging updates the grid without re-rendering children.
+ * @param {object} props - All state and handlers from `LabCandidateDashboard`.
+ * @param {object[]} props.problems - Runnable problems for the rail.
+ * @param {object} props.activeProblem - Currently open problem.
+ * @param {number} props.problemPanelWidth - Width in px of the statement pane.
+ * @param {Function} props.startResize - Pointer-down handler for the drag divider.
+ * @param {number} props.secondsRemaining - Countdown, formatted for the editor header.
+ * @param {string} props.submissionError - Banner text; falsy hides the banner.
+ * @returns {JSX.Element} The assessment layout.
+ */
 export default function AssessmentScreen(props) {
   const {
     submissionError, problems, activeProblem, setActiveProblemId, resultsByProblem,

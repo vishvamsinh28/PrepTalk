@@ -7,12 +7,23 @@ import InvitePackage from "./InvitePackage";
 import { buildSessionPayload, emptySessionForm } from "@/lib/sessionForm";
 import SegmentedControl from "./ui/SegmentedControl";
 
+/** @file The create-session form on the interviewer workspace. */
+
+/** Seniority options. Must match `LEVELS` in the session route. */
 const levels = ["Entry", "Mid", "Senior"];
+
+/** Interview formats. Must match `INTERVIEW_TYPES` in the session route. */
 const interviewTypes = ["Technical", "Behavioral", "Mixed"];
 
 /**
- * Create-session form: title, schedule, agenda, and invitees. On
- * success shows the InvitePackage and notifies the session list.
+ * Create-session form covering title, schedule, agenda, and invitees.
+ * On success it resets the form, renders `InvitePackage` for the new session,
+ * and dispatches `preptalk:sessions-updated` so the sibling `SessionList`
+ * refetches — the two have no shared parent state, so the window event is the
+ * link between them.
+ * Field-level validation is left to the server: `buildSessionPayload` only
+ * reshapes, and errors come back as messages to display.
+ * @returns {JSX.Element} The form, plus the invite panel after a create.
  */
 export default function CreateSessionForm() {
   const [formData, setFormData] = useState(emptySessionForm);
@@ -20,10 +31,23 @@ export default function CreateSessionForm() {
   const [isError, setIsError] = useState(false);
   const [createdSession, setCreatedSession] = useState(null);
 
+  /**
+   * Controlled-input handler keyed on the field's `name`.
+   * @param {React.ChangeEvent} e - Change event.
+   * @returns {void}
+   */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Grows a textarea to fit its content, up to a ceiling.
+   * Height resets to `auto` first so `scrollHeight` reflects the new content
+   * rather than the old height — otherwise the box only ever grows.
+   * @param {React.SyntheticEvent} event - Input event; `currentTarget` is the textarea.
+   * @param {number} [maxHeight=220] - Pixel ceiling, past which it scrolls.
+   * @returns {void}
+   */
   const autoGrow = (event, maxHeight = 220) => {
     event.currentTarget.style.height = "auto";
     const nextHeight = Math.min(event.currentTarget.scrollHeight, maxHeight);
@@ -31,6 +55,13 @@ export default function CreateSessionForm() {
     event.currentTarget.style.overflowY = event.currentTarget.scrollHeight > maxHeight ? "auto" : "hidden";
   };
 
+  /**
+   * Creates the session, then resets the form and announces the change.
+   * The form is only cleared on success, so a rejected submit keeps everything
+   * the interviewer typed.
+   * @param {React.FormEvent} e - Submit event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");

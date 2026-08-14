@@ -1,3 +1,10 @@
+/** @file Static mockup of the Lab code editor, used as landing-page artwork. */
+
+/**
+ * Pre-tokenised sample code: each line is an array of `{t, c}` spans (text and
+ * Tailwind colour). Hand-tokenised rather than run through a highlighter,
+ * which would ship a syntax library for one decorative snippet.
+ */
 const codeLines = [
   [
     { t: "function", c: "text-[#e4633f]" },
@@ -36,6 +43,7 @@ const codeLines = [
   [{ t: "}", c: "text-white/70" }],
 ];
 
+/** Sample test rows as `[name, status]`, showing the visible/hidden split. */
 const tests = [
   ["Sample 1", "passed"],
   ["Sample 2", "passed"],
@@ -46,6 +54,13 @@ const tests = [
  * Faithful recreation of the real Lab assessment screen
  * (see components/lab/ProblemPanel.jsx + CodeEditorPanel.jsx).
  * Swap the whole block for a captured screenshot when one exists.
+ */
+/**
+ * Hand-built recreation of the Lab editor, used as landing artwork.
+ * Same tradeoff as `InterviewScreen`: markup keeps it crisp and themeable, at
+ * the cost of drifting from the real `CodeEditorPanel` over time.
+ * Decorative — the surrounding copy carries the meaning.
+ * @returns {JSX.Element} The mockup.
  */
 export default function LabScreen() {
   return (

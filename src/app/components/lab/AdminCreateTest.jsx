@@ -2,13 +2,26 @@
 
 import { useState } from "react";
 import { SkillIcon } from "./AdminShared";
+/** @file Step one of creating an assessment: pick a template, preview it, continue to the builder. */
+
 import { sectionName, toWholeNumber } from "./adminUtils";
 
 /**
- * Template picker for a new assessment with live preview and
- * custom-assessment option.
- * @param {{ form: object, roleTemplates: object[], selectedTemplateId: string,
- *   onBack: Function, onChooseTemplate: Function, onContinue: Function }} props
+ * Template picker with a live preview of the selected template's sections.
+ * The custom option is filtered out of the searchable role list and pinned
+ * separately, so "start blank" stays reachable no matter what you search for.
+ * Search matches title and summary together, so a skill named only in the
+ * summary still finds its template.
+ * Nothing is persisted here — `onContinue` hands the expanded form to the
+ * builder, where it's still fully editable.
+ * @param {object} props - Component props.
+ * @param {object} props.form - Expanded form state for the selected template.
+ * @param {object[]} props.roleTemplates - Available templates, including the custom entry.
+ * @param {string} props.selectedTemplateId - Currently selected template.
+ * @param {Function} props.onBack - Returns to the assessments index.
+ * @param {Function} props.onChooseTemplate - Selects a template.
+ * @param {Function} props.onContinue - Advances to the builder.
+ * @returns {JSX.Element} The picker.
  */
 export default function AdminCreateTest({ form, roleTemplates, selectedTemplateId, onBack, onChooseTemplate, onContinue }) {
   const [roleQuery, setRoleQuery] = useState("");

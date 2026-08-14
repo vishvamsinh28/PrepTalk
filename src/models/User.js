@@ -1,6 +1,9 @@
 /**
- * Mongoose model: a PrepTalk account (username, email, bcrypt password
- * hash, and Interviewer/Interviewee role).
+ * @file Mongoose model: a PrepTalk account.
+ * `email` is the identity key used by every access check, which is why it's
+ * lowercased and uniquely indexed here — the index, not the pre-insert lookup
+ * in the register route, is what actually enforces uniqueness.
+ * `password` stores a bcrypt hash; nothing writes a plaintext value to it.
  */
 import mongoose from "mongoose";
 

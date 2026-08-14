@@ -1,13 +1,22 @@
 "use client";
 
+/** @file Video call UI. All state and signalling live in `useVideoRoom`. */
+
 import { useVideoRoom } from "./useVideoRoom";
 import { PeerVideoTile, VideoTile } from "./VideoTiles";
 import { FaMicrophone, FaMicrophoneSlash, FaPhoneSlash, FaVideo, FaVideoSlash } from "react-icons/fa";
 
 /**
- * Video call UI: local tile, peer tiles, and the mic/camera/leave
- * control bar. All logic lives in useVideoRoom.
- * @param {{ sessionId: string, userEmail: string }} props
+ * Video call UI: local tile, peer tiles, and the mic/camera/leave controls.
+ * Purely presentational — every piece of state and all signalling lives in
+ * `useVideoRoom`, so this file can be restyled without touching WebRTC.
+ * Peer display names fall back through three sources (signal payload, then
+ * presence, then a generic label) because a tile can render before presence
+ * data for that peer has arrived.
+ * @param {object} props - Component props.
+ * @param {string} props.sessionId - Session whose room to join.
+ * @param {string} props.userEmail - Local participant's email, shown on their tile.
+ * @returns {JSX.Element} The room UI, with a banner when media access failed.
  */
 export default function VideoRoom({ sessionId, userEmail }) {
   const {

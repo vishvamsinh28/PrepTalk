@@ -4,11 +4,19 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+/** @file `/login` — credential form. The cookie is set by the API; this only drives the redirect. */
+
 import AuthLayout from "../components/AuthLayout";
 
 /**
- * Login screen inside the split AuthLayout. Sets the JWT cookie via
- * /api/login, then replaces to /dashboard.
+ * Login screen inside the split auth shell.
+ * On success it pauses ~1s so the confirmation is readable, then `replace`s
+ * (not pushes) to `/dashboard` — back from the dashboard should not land on a
+ * login form you've already passed. `refresh()` clears the router cache so
+ * server components re-render with the new session.
+ * The error message comes straight from the API, which deliberately does not
+ * distinguish unknown email from wrong password.
+ * @returns {JSX.Element} The login page.
  */
 export default function LoginPage() {
   const router = useRouter();
@@ -23,10 +31,20 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  /**
+   * Controlled-input handler keyed on the field's `name`.
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Change event.
+   * @returns {void}
+   */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Submits credentials, then redirects on success.
+   * @param {React.FormEvent} e - Submit event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

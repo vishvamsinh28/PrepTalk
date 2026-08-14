@@ -1,3 +1,5 @@
+/** @file `POST /api/lab/explain` — asks Gemini why a candidate's failing tests failed. */
+
 import { json } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -7,14 +9,35 @@ import { isValidObjectId } from "@/lib/sessionAccess";
 import LabAssessment from "@/models/LabAssessment";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
+/** Cap on failing cases sent per request, bounding prompt size and cost. */
 const MAX_FAILED_CASES = 8;
+
+/** Cap on candidate code included in the prompt. */
 const MAX_CODE_CHARS = 6000;
+
+/** Roles allowed in the Lab. Anything else is a 403. */
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
+/**
+ * Coerces any value to a length-bounded string.
+ * Every field interpolated into the prompt passes through here, so a huge or
+ * non-string value can't blow up the request.
+ * @param {unknown} value - Raw value; nullish becomes `""`.
+ * @param {number} [max=1200] - Character cap.
+ * @returns {string} Bounded string.
+ */
 function safeString(value, max = 1200) {
   return String(value ?? "").slice(0, max);
 }
 
+/**
+ * Bounds the failing test cases before they go into the prompt.
+ * Values are re-stringified through `JSON.stringify` so the model sees the same
+ * literal form the candidate saw in the results panel.
+ * @param {unknown} value - Raw `failedCases` from the request body.
+ * @returns {Array<{name: string, input: string, expected: string, output: string, error: string}>}
+ *   Up to `MAX_FAILED_CASES` bounded cases.
+ */
 function normalizeCases(value) {
   if (!Array.isArray(value)) return [];
 
@@ -27,6 +50,13 @@ function normalizeCases(value) {
   }));
 }
 
+/**
+ * Bounds the model's explanations and drops incomplete entries.
+ * The client matches these back to results by `name`, so an entry missing a
+ * name is unusable and is filtered out rather than rendered unattached.
+ * @param {unknown} value - `explanations` from the parsed model response.
+ * @returns {Array<{name: string, explanation: string}>} Up to `MAX_FAILED_CASES` entries.
+ */
 function normalizeExplanations(value) {
   if (!Array.isArray(value)) return [];
 
@@ -39,6 +69,14 @@ function normalizeExplanations(value) {
     .slice(0, MAX_FAILED_CASES);
 }
 
+/**
+ * Builds the prompt asking for a short hint per failing test.
+ * Explicitly tells the model not to rewrite the solution — the point is to
+ * unblock the candidate, not to hand them the answer mid-assessment.
+ * @param {{ problem: object, code: string, failedCases: object[] }} input - Problem
+ *   from the database, the candidate's code, and their failing cases.
+ * @returns {string} Prompt requesting `{ explanations }`.
+ */
 function explanationPrompt({ problem, code, failedCases }) {
   return `
 Return only valid JSON.
@@ -66,8 +104,16 @@ ${JSON.stringify(failedCases, null, 2)}
 }
 
 /**
- * POST /api/lab/explain — asks Gemini to explain failing visible tests.
- * Rate limited. Auth: assessment participant.
+ * Explains a candidate's failing tests in one or two sentences each.
+ * Returns early with an empty list when nothing failed, avoiding a pointless
+ * model call. Interviewers may call this on an expired assessment (to review a
+ * candidate's work); interviewees may not.
+ * @param {import("next/server").NextRequest} req - Body carries
+ *   `{ assessmentId, problemIndex, code, failedCases }`.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ explanations }`;
+ *   400 on a bad assessment id or problem index; 401 signed out; 403 for unknown
+ *   roles or non-participants; 404 when missing; 410 past the deadline for
+ *   candidates; 429 at 20/hour; 500 when Gemini fails.
  */
 export async function POST(req) {
   try {

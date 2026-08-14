@@ -1,3 +1,5 @@
+/** @file `/api/session/:id/questions` — generates and clears the AI question bank. Session owner only. */
+
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -5,6 +7,15 @@ import { generateGeminiJson } from "@/lib/gemini";
 import { normalizePrepGuide } from "@/lib/aiOutput";
 import { findOwnedSession } from "@/lib/sessionAccess";
 
+/**
+ * Normalizes the model's question array into the stored shape.
+ * NOTE: near-duplicate of `normalizeQuestionList` in `@/lib/questionBank`, which
+ * also handles bare-string entries and has no 12-item cap. Worth collapsing into
+ * the shared helper — kept separate here only because the cap differs.
+ * @param {unknown} value - `questions` field from the parsed model response.
+ * @returns {Array<{category: string, skill: string, question: string, followUps: string[]}>}
+ *   Up to 12 questions; entries without question text are dropped.
+ */
 function normalizeQuestions(value) {
   if (!Array.isArray(value)) return [];
 
@@ -24,6 +35,13 @@ function normalizeQuestions(value) {
     .slice(0, 12);
 }
 
+/**
+ * Builds the prompt for the question bank and its companion prep guide.
+ * Asks for 10 but the normalizer caps at 12, leaving headroom for a model that
+ * over-delivers rather than truncating a good response.
+ * @param {object} session - Session document supplying role, level, and skills.
+ * @returns {string} Prompt requesting `{ questions, prepGuide }`.
+ */
 function questionPrompt(session) {
   return `
 Return only valid JSON for an interview question bank.
@@ -53,8 +71,14 @@ Generate 10 strong questions. Make them practical and role-specific.
 }
 
 /**
- * POST /api/session/:id/questions — generates the AI question bank.
- * Auth: owner.
+ * Generates the AI question bank and stores it on the session.
+ * Also refreshes the prep guide, since one generation produces both — the
+ * existing guide is passed as the fallback so a partial response can't blank it.
+ * Replaces any previous bank, which is the intended "regenerate" behaviour.
+ * @param {import("next/server").NextRequest} req - Authenticated request; body unused.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ questions, prepGuide }`;
+ *   401 signed out; 403 for non-interviewers; 404 when not owned; 500 when Gemini fails.
  */
 export async function POST(req, props) {
   try {
@@ -83,8 +107,13 @@ export async function POST(req, props) {
 }
 
 /**
- * DELETE /api/session/:id/questions — clears the question bank.
- * Auth: owner.
+ * Clears the question bank, leaving the prep guide intact.
+ * The two are generated together but cleared independently, so wiping questions
+ * doesn't cost the candidate their prep material.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ questions: [] }`;
+ *   401 signed out; 403 for non-interviewers; 404 when not owned; 500 otherwise.
  */
 export async function DELETE(req, props) {
   try {

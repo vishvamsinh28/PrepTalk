@@ -1,7 +1,14 @@
+/** @file The landing page's closing call to action. */
+
 import Link from "next/link";
 
 /**
- * Landing closer: serif claim with sign-up and login actions.
+ * Closing section: a serif claim with the sign-up action.
+ * Repeats the hero's CTA on purpose — it's the second conversion point, for
+ * readers who scrolled the whole page. Despite the older docstring this
+ * replaced, there's no login link here; that lives in the nav and footer.
+ * The only landing section without a bottom rule, since the footer follows.
+ * @returns {JSX.Element} The closing section.
  */
 export default function ClosingCta() {
   return (

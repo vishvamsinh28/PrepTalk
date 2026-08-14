@@ -1,9 +1,26 @@
+/** @file The candidate's code editor: a textarea over a highlighted mirror. */
+
 import { useRef } from "react";
 
 /**
- * Candidate code editor: light chrome, dark code surface with syntax
- * highlight overlay, and run/submit controls.
- * @param {object} props Editor state and handlers from the runner.
+ * Code editor with a syntax-highlight overlay and run/submit controls.
+ * Built as a transparent `<textarea>` layered over a highlighted `<pre>` mirror
+ * — the standard trick for styling code without a full editor dependency. It
+ * only holds while the two layers stay pixel-aligned, which is what `syncScroll`
+ * and the shared font metrics maintain.
+ * The timer is passed in pre-formatted so this component never re-renders on
+ * each tick for its own sake.
+ * @param {object} props - Component props.
+ * @param {string} props.activeProblemId - Which problem's code is being edited.
+ * @param {string} props.code - Current source.
+ * @param {string} props.formattedTime - Pre-formatted `mm:ss` countdown.
+ * @param {boolean} props.isRunning - Disables submit while tests run.
+ * @param {string} props.lineNumbers - Pre-rendered gutter text.
+ * @param {Function} props.onExit - Leaves the assessment.
+ * @param {Function} props.onSubmit - Submits for server grading.
+ * @param {Function} props.runTests - Runs visible tests locally.
+ * @param {Function} props.setCodeByProblem - Updates code for the active problem.
+ * @returns {JSX.Element} The editor pane.
  */
 export default function CodeEditorPanel({
   activeProblemId,
@@ -19,6 +36,14 @@ export default function CodeEditorPanel({
   const highlightRef = useRef(null);
   const lineRef = useRef(null);
 
+  /**
+   * Keeps the highlight mirror and line gutter aligned with the textarea.
+   * Without this the highlighted text visibly drifts from what you type as soon
+   * as the code scrolls. The gutter tracks vertical scroll only — it has no
+   * horizontal extent to match.
+   * @param {React.UIEvent} event - Scroll event from the textarea.
+   * @returns {void}
+   */
   const syncScroll = (event) => {
     if (highlightRef.current) {
       highlightRef.current.scrollTop = event.currentTarget.scrollTop;

@@ -1,6 +1,10 @@
 /**
- * Mongoose model: an interview session — agenda, schedule, invitees,
- * AI question bank, prep guide, and shared workspace.
+ * @file Mongoose model: an interview session.
+ * Holds the agenda, schedule, invitees, AI question bank, prep guide, and the
+ * shared workspace. `createdBy` and `interviewees` are lowercased emails, since
+ * every access check in `@/lib/sessionAccess` compares against that form.
+ * The workspace lives on the session rather than in its own collection because
+ * it is always read and written whole.
  */
 import mongoose from "mongoose";
 

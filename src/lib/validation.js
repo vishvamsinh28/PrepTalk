@@ -1,8 +1,7 @@
 /**
- * @file Input validation and normalization, in two layers. The `normalize*`
- * helpers coerce untrusted values into bounded, DB-safe primitives and never
- * throw; the zod schemas reject bodies outright with a user-facing message.
- * All schemas live here rather than inline per route so they stay in one place.
+ * @file Input validation in two layers: `normalize*` helpers coerce untrusted
+ * values into bounded primitives and never throw; the zod schemas reject bodies
+ * outright. All schemas live here rather than inline per route.
  */
 
 import { z } from "zod";
@@ -10,8 +9,7 @@ import { z } from "zod";
 /**
  * Normalizes any value to a trimmed, lowercased email string.
  * Lowercasing is what makes email usable as an identity key — every ownership
- * check across sessions and lab assessments compares against this form.
- *
+ * check compares against this form.
  * @param {unknown} value - Raw input; nullish becomes `""`.
  * @returns {string} Normalized email, or `""` when absent.
  */
@@ -21,11 +19,9 @@ export function normalizeEmail(value) {
 
 /**
  * Checks whether a value is a plausible email address.
- * Deliberately loose — one `@`, a dot in the domain, under the 254-char RFC
- * limit. Catches typos, not deliverability; only sending mail proves that.
- *
+ * Deliberately loose — catches typos, not deliverability.
  * @param {unknown} value - Raw input; normalized before testing.
- * @returns {boolean} `true` when it looks like an email.
+ * @returns {boolean} `true` when it looks like an email under 254 chars.
  */
 export function isValidEmail(value) {
   const email = normalizeEmail(value);
@@ -34,9 +30,7 @@ export function isValidEmail(value) {
 
 /**
  * Trims free text and truncates it to a maximum length.
- * Truncates rather than rejecting, so an over-long paste saves as much as fits
- * instead of failing the whole request.
- *
+ * Truncates rather than rejecting, so an over-long paste saves what fits.
  * @param {unknown} value - Raw input; nullish becomes `""`.
  * @param {number} [maxLength=1000] - Character cap applied after trimming.
  * @returns {string} Trimmed, truncated text.
@@ -47,15 +41,12 @@ export function normalizeText(value, maxLength = 1000) {
 
 /**
  * Normalizes a comma-separated string or array into a bounded list.
- * Accepts both shapes because these fields arrive as a comma-joined string from
- * text inputs and as an array from JSON clients. Blanks are dropped, so
- * trailing and doubled commas are harmless.
- *
+ * Accepts both shapes because these fields arrive as a joined string from text
+ * inputs and as an array from JSON clients. Blanks are dropped.
  * @param {unknown} value - Array, or comma-separated string.
  * @param {number} [maxItems=20] - Cap on entries kept.
  * @param {number} [maxItemLength=80] - Per-entry character cap.
- * @returns {string[]} Trimmed, non-empty entries. Not deduplicated — callers
- *   that need uniqueness wrap this in a `Set`.
+ * @returns {string[]} Trimmed, non-empty entries. Not deduplicated.
  */
 export function normalizeStringList(value, maxItems = 20, maxItemLength = 80) {
   const items = Array.isArray(value) ? value : String(value ?? "").split(",");
@@ -69,9 +60,7 @@ export function normalizeStringList(value, maxItems = 20, maxItemLength = 80) {
 /**
  * Normalizes a list of emails, silently dropping anything invalid.
  * Dropping rather than rejecting is intentional for invite fields — one typo
- * shouldn't fail the whole invite. `findMissingIntervieweeEmails` is what
- * surfaces the dropped addresses to the user.
- *
+ * shouldn't fail the whole invite; `findMissingIntervieweeEmails` surfaces them.
  * @param {unknown} value - Array, or comma-separated string of emails.
  * @param {number} [maxItems=25] - Cap on emails kept.
  * @returns {string[]} Valid, normalized emails.
@@ -82,8 +71,8 @@ export function normalizeEmailList(value, maxItems = 25) {
 
 /**
  * Email that is trimmed and lowercased before validation.
- * The `transform`-then-`pipe` order matters: normalizing first means
- * `" Bob@X.com "` passes rather than failing on whitespace or casing.
+ * The transform-then-pipe order matters: normalizing first means `" Bob@X.com "`
+ * passes rather than failing on whitespace or casing.
  */
 export const emailSchema = z
   .string({ error: "Email is required" })
@@ -91,9 +80,8 @@ export const emailSchema = z
   .pipe(z.string().regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Enter a valid email address").max(254));
 
 /**
- * Login body. Password is only checked for presence — length rules belong at
- * registration, and enforcing them here would tell an attacker which stored
- * passwords are short.
+ * Login body. Password is only checked for presence — enforcing length here
+ * would tell an attacker which stored passwords are short.
  */
 export const loginSchema = z.object({
   email: emailSchema,
@@ -101,9 +89,8 @@ export const loginSchema = z.object({
 });
 
 /**
- * Registration body. `role` uses `.catch()` rather than a default, so an
- * unrecognized or hostile value falls back to `"Interviewee"` (the lower
- * privilege) instead of failing the request.
+ * Registration body. `role` uses `.catch()` so an unrecognized or hostile value
+ * falls back to `"Interviewee"` (the lower privilege) instead of failing.
  */
 export const registerSchema = z.object({
   username: z
@@ -119,15 +106,12 @@ export const registerSchema = z.object({
 });
 
 /**
- * Runs a zod schema against a request body and flattens it to the API's
- * result contract, so handlers branch on `success` instead of try/catching.
- * Only the first issue is surfaced — enough to fix one field at a time, and it
- * avoids leaking the whole schema shape in an error response.
- *
+ * Runs a zod schema against a request body and flattens it to the API's result
+ * contract, so handlers branch on `success` instead of try/catching. Only the
+ * first issue is surfaced — enough to fix one field, without leaking the schema.
  * @param {import("zod").ZodType} schema - Schema to validate against.
  * @param {unknown} body - Parsed request body; non-objects are rejected early.
- * @returns {{ success: true, data: any } | { success: false, error: string }}
- *   `data` is the parsed and transformed output, not the raw input.
+ * @returns {{ success: true, data: any } | { success: false, error: string }} `data` is the transformed output.
  */
 export function parseWith(schema, body) {
   // Guard first: safeParse on a non-object produces a confusing message.

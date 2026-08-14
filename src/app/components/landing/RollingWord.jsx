@@ -1,12 +1,24 @@
 "use client";
 
+/** @file The hero's rotating word. Purely decorative — it conveys no information the copy doesn't. */
+
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+/** How long each word is held before rolling to the next. */
 const HOLD_MS = 3000;
 
-/*
- * Words roll up through a clipped slot. The slot's width eases to the active
- * word so the centred headline never sits off-centre, and there is no caret.
+/**
+ * Cycles words upward through a clipped slot.
+ * The slot's width animates to the active word so a centred headline doesn't
+ * jump as words of different lengths swap in. Measurement runs in
+ * `useLayoutEffect`, before paint, so the first frame is already the right size.
+ * Inactive words stay in the DOM (they're what's being scrolled through) but are
+ * `aria-hidden`, so a screen reader announces only the visible one.
+ * Honours `prefers-reduced-motion`: the interval never starts, leaving the first
+ * word static.
+ * @param {object} props - Component props.
+ * @param {string[]} props.words - Words to cycle; used as their own keys, so must be unique.
+ * @returns {JSX.Element} The animated slot.
  */
 export default function RollingWord({ words }) {
   const [index, setIndex] = useState(0);
@@ -14,6 +26,8 @@ export default function RollingWord({ words }) {
   const [step, setStep] = useState(0);
   const itemRefs = useRef([]);
 
+  // Re-measures on every word change and on resize, since both the slot width
+  // and the per-word step height depend on the rendered text.
   useLayoutEffect(() => {
     const measure = () => {
       const active = itemRefs.current[index];

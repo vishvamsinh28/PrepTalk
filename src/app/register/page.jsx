@@ -4,16 +4,24 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { postJson } from "@/lib/clientApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+/** @file `/register` — account creation. Registering does not sign you in. */
+
 import AuthLayout from "../components/AuthLayout";
 
+/** Selectable roles as `[value, description]`. Interviewee is listed first and is the default. */
 const roles = [
   ["Interviewee", "Join sessions, take screens"],
   ["Interviewer", "Create rooms, score people"],
 ];
 
 /**
- * Registration screen inside the split AuthLayout, with role choice
- * as radio cards. Redirects to /login on success.
+ * Registration screen with role choice as radio cards.
+ * Redirects to `/login` rather than straight into the app, because
+ * `/api/register` intentionally returns no session cookie — the user signs in
+ * explicitly afterwards.
+ * Role defaults to Interviewee, the lower privilege, matching the server's
+ * `.catch()` fallback if the value is ever missing or unrecognised.
+ * @returns {JSX.Element} The registration page.
  */
 export default function RegisterPage() {
   const router = useRouter();
@@ -30,10 +38,20 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  /**
+   * Controlled-input handler keyed on the field's `name`.
+   * @param {React.ChangeEvent<HTMLInputElement>} e - Change event.
+   * @returns {void}
+   */
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  /**
+   * Creates the account, then redirects to login on success.
+   * @param {React.FormEvent} e - Submit event.
+   * @returns {Promise<void>}
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");

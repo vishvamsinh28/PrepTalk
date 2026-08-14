@@ -1,8 +1,4 @@
-/**
- * @file Auth cookie lifecycle — signing session tokens and building the
- * `Set-Cookie` headers that carry them. Owns the cookie's name, lifetime, and
- * security flags so they're defined in exactly one place.
- */
+/** @file Auth cookie lifecycle — signs session tokens and builds the `Set-Cookie` headers. Owns the cookie name, lifetime, and security flags. */
 
 import { SignJWT } from "jose/jwt/sign";
 import { serialize } from "cookie";
@@ -19,11 +15,9 @@ const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * LOGIN_SESSION_DAYS;
 
 /**
  * Signs a session JWT carrying the user's id, email, and role.
- * Email and role are embedded so access checks run off the token without a DB
- * hit — the tradeoff is that a role change only applies at next login.
- *
- * @param {{ _id: object|string, email: string, role: string }} user - User doc
- *   or any object with those fields; `_id` is stringified.
+ * Email and role are embedded so access checks run without a DB hit — the
+ * tradeoff is that a role change only applies at next login.
+ * @param {{ _id: object|string, email: string, role: string }} user - `_id` is stringified.
  * @returns {Promise<string>} HS256-signed JWT.
  * @throws {Error} When `JWT_SECRET` is missing or `user._id` is nullish.
  */
@@ -40,11 +34,10 @@ export async function signAuthToken(user) {
 
 /**
  * Reads and verifies the auth cookie on a route-handler request.
- * Collapses missing, expired, and tampered tokens into a single `null` — route
- * handlers answer 401 for all three and must not leak which it was.
- *
+ * Collapses missing, expired, and tampered tokens into one `null` — handlers
+ * answer 401 for all three and must not leak which it was.
  * @param {import("next/server").NextRequest} req - Request whose cookie jar is read.
- * @returns {Promise<import("@/lib/token").AuthTokenPayload|null>} Claims, or `null`.
+ * @returns {Promise<{id: string, email: string, role: string}|null>} Claims, or null.
  */
 export async function getAuthPayloadFromRequest(req) {
   const token = req.cookies.get(AUTH_COOKIE_NAME)?.value;
@@ -59,9 +52,8 @@ export async function getAuthPayloadFromRequest(req) {
 
 /**
  * Serializes the httpOnly cookie that logs a user in.
- * `httpOnly` keeps the token away from XSS, `sameSite: strict` blocks CSRF, and
- * `secure` is off in development so local HTTP still works.
- *
+ * `httpOnly` blocks XSS reads, `sameSite: strict` blocks CSRF, and `secure` is
+ * off in development so local HTTP still works.
  * @param {string} token - Signed JWT from `signAuthToken`.
  * @returns {string} `Set-Cookie` header value.
  */
@@ -81,8 +73,7 @@ export function createAuthCookie(token) {
 /**
  * Serializes an already-expired cookie, logging the user out.
  * Name and `path` must match `createAuthCookie` or the browser keeps the
- * original cookie and the logout silently fails.
- *
+ * original and the logout silently fails.
  * @returns {string} `Set-Cookie` header value that clears `prepTalkToken`.
  */
 export function clearAuthCookie() {

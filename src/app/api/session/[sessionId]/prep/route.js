@@ -1,3 +1,5 @@
+/** @file `/api/session/:id/prep` — generates and clears the candidate-facing prep guide. Session owner only. */
+
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
@@ -5,6 +7,13 @@ import { generateGeminiJson } from "@/lib/gemini";
 import { normalizePrepGuide } from "@/lib/aiOutput";
 import { findOwnedSession } from "@/lib/sessionAccess";
 
+/**
+ * Builds the prep-guide prompt from the session's role, level, and agenda.
+ * Every field has a fallback so a sparsely filled session still produces a
+ * usable guide rather than a prompt full of `undefined`.
+ * @param {object} session - Session document.
+ * @returns {string} Prompt requesting `{ prepGuide }`.
+ */
 function prepPrompt(session) {
   return `
 Return only valid JSON:
@@ -22,7 +31,13 @@ Agenda: ${(session.agenda || []).map((item) => `${item.title} ${item.minutes} mi
 }
 
 /**
- * POST /api/session/:id/prep — generates the AI prep guide. Auth: owner.
+ * Generates the prep guide and stores it on the session.
+ * The existing guide is passed to `normalizePrepGuide` as the fallback, so a
+ * malformed response leaves the previous guide in place rather than blanking it.
+ * @param {import("next/server").NextRequest} req - Authenticated request; body unused.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ prepGuide }`;
+ *   401 signed out; 403 for non-interviewers; 404 when not owned; 500 when Gemini fails.
  */
 export async function POST(req, props) {
   try {
@@ -48,7 +63,11 @@ export async function POST(req, props) {
 }
 
 /**
- * DELETE /api/session/:id/prep — clears the prep guide. Auth: owner.
+ * Clears the prep guide, leaving the question bank intact.
+ * @param {import("next/server").NextRequest} req - Authenticated request.
+ * @param {{ params: Promise<{ sessionId: string }> }} props - Route params; awaited per Next 15.
+ * @returns {Promise<import("next/server").NextResponse>} 200 with `{ prepGuide: "" }`;
+ *   401 signed out; 403 for non-interviewers; 404 when not owned; 500 otherwise.
  */
 export async function DELETE(req, props) {
   try {

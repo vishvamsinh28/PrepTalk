@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { deleteJson, getJson } from "@/lib/clientApi";
 
+/** @file Interview reports list. Same component for both roles; the API decides what's in it. */
+
+/** Display names for the five score keys. Order here drives render order. */
 const scoreLabels = {
   communication: "Communication",
   technicalDepth: "Technical depth",
@@ -12,8 +15,12 @@ const scoreLabels = {
 };
 
 /**
- * Submitted interview reports as hairline rows: scores, strengths,
- * improvements, and optional AI summary.
+ * Lists interview reports — written by the caller, or received by them.
+ * Role is never checked here: the API returns the right set and tells the
+ * client whether deletion is allowed via `canDeleteReports`, so the permission
+ * rule lives in exactly one place. Hiding the control is presentation only;
+ * the endpoint re-checks authorship.
+ * @returns {JSX.Element} The list, its empty state, or a loading line.
  */
 export default function ReportList() {
   const [reports, setReports] = useState([]);
@@ -37,6 +44,13 @@ export default function ReportList() {
     fetchReports();
   }, []);
 
+  /**
+   * Deletes a report after confirming, then drops it from the list.
+   * Removes locally rather than refetching, so the list doesn't flash. A failed
+   * delete leaves the row in place, which is the honest outcome.
+   * @param {object} report - Report to delete.
+   * @returns {Promise<void>}
+   */
   const deleteReport = async (report) => {
     if (!window.confirm(`Delete report for ${report.intervieweeEmail}?`)) return;
 

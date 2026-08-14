@@ -2,8 +2,17 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+/** @file Fixed top navigation for signed-in pages. Renders nothing on the landing and auth routes. */
+
 import PrepTalkLogo from "./PrepTalkLogo";
 
+/**
+ * Home route for a role, used by the logo button.
+ * Falls back to `/dashboard` while the role is still loading, so the logo is
+ * never a dead click.
+ * @param {string|null} role - Role from `/api/user`, or null before it resolves.
+ * @returns {string} Path to navigate to.
+ */
 function getRoleHome(role) {
   if (role === "Interviewer") return "/interviewer";
   if (role === "Interviewee") return "/interviewee";
@@ -11,8 +20,13 @@ function getRoleHome(role) {
 }
 
 /**
- * Fixed app navigation for signed-in pages: role-aware links and
- * logout (clears cookie, then replace+refresh to purge cached pages).
+ * App navigation for signed-in pages, with role-aware links and logout.
+ * Fetches its own role rather than taking it as a prop, because it's mounted
+ * once in the root layout and has no server-rendered parent to pass it down.
+ * Links stay hidden until that resolves, so nothing flashes for logged-out users.
+ * Logout does `replace` then `refresh`: clearing the cookie alone leaves
+ * already-visited authenticated pages in the router cache, still rendering.
+ * @returns {JSX.Element|null} The nav, or null on `/`, `/login`, and `/register`.
  */
 export default function Navbar() {
   const pathname = usePathname();
@@ -29,7 +43,9 @@ export default function Navbar() {
         const data = await response.json();
         setUserRole(data.role);
       } catch (error) {
-        console.error("User not logged in");
+        // A 401 already returned above, so reaching here means the request
+        // itself failed — log the cause rather than assuming "logged out".
+        console.error("Could not resolve current user:", error);
       }
     };
 
@@ -55,6 +71,9 @@ export default function Navbar() {
     }
   };
 
+  // Landing and auth pages carry their own branding, so the app nav is omitted.
+  // Placed after the hooks above — an early return before them would break the
+  // rules of hooks on navigation between a nav and no-nav route.
   if (["/login", "/register", "/"].includes(pathname)) return null;
 
   const interviewPath = userRole === "Interviewer" ? "/interviewer" : "/interviewee";

@@ -1,10 +1,23 @@
 "use client";
 
+/** @file The question rail down the left of the assessment screen. */
+
 import { FaCheck, FaTimes } from "react-icons/fa";
 
 /**
- * Question rail: one button per problem with pass/fail state.
- * @param {object} props
+ * One button per problem, showing pass/fail once the candidate has run tests.
+ * The number is replaced by a tick or cross rather than sitting beside one, so
+ * the rail stays narrow — the position still identifies the question.
+ * "Passed" requires at least one result *and* all of them passing, so an
+ * unattempted problem shows its number rather than a misleading tick.
+ * Only reflects locally run *visible* tests; hidden tests are graded on submit
+ * and never change these icons.
+ * @param {object} props - Component props.
+ * @param {object[]} props.problems - Runnable problems, in order.
+ * @param {string} props.activeProblemId - Currently open problem.
+ * @param {Function} props.onSelect - Called with a problem id on click.
+ * @param {Object<string, object[]>} props.resultsByProblem - Latest run results, keyed by problem id.
+ * @returns {JSX.Element} The rail.
  */
 export default function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) {
   return (

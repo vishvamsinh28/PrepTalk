@@ -3,12 +3,27 @@
 import { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { sectionName, sanitizeWholeNumberInput } from "./adminUtils";
+/** @file One collapsible section (problem) in the assessment editor. */
+
 import { SkillIcon } from "./AdminShared";
 
 /**
- * Collapsible section editor in assessment detail: name, minutes,
- * prompt, starter code, and the test-case table.
- * @param {object} props Section data and mutation callbacks.
+ * Collapsible editor for one section: name, minutes, prompt, starter code, tests.
+ * Only the first section starts expanded, so a long assessment opens as a
+ * scannable list rather than a wall of forms.
+ * Fully controlled — every edit goes up through `onUpdate`/`onUpdateTest`, so
+ * the parent holds the single source of truth and this keeps no draft copy that
+ * could drift.
+ * Numeric input is filtered through `sanitizeWholeNumberInput`, which permits a
+ * transiently empty field while the user retypes.
+ * @param {object} props - Component props.
+ * @param {object} props.problem - Section being edited.
+ * @param {number} props.problemIndex - Position, used for the label and default open state.
+ * @param {Function} props.onAddTest - Appends a blank test case.
+ * @param {Function} props.onRemoveTest - Removes a test case by index.
+ * @param {Function} props.onUpdate - Merges a partial patch into the section.
+ * @param {Function} props.onUpdateTest - Merges a partial patch into one test case.
+ * @returns {JSX.Element} The section editor.
  */
 export default function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpdate, onUpdateTest }) {
   const [open, setOpen] = useState(problemIndex === 0);

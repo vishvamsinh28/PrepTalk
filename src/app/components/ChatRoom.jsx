@@ -3,16 +3,33 @@
 import { useEffect, useState, useRef } from "react";
 import * as Ably from "ably";
 import { motion, AnimatePresence } from "framer-motion";
+/** @file Session chat. Reads over Ably, writes through the API so messages are persisted. */
+
 import { getJson, postJson } from "@/lib/clientApi";
 
+/**
+ * Deduplicates presence members down to a list of emails.
+ * Ably reports one member per *connection*, so the same person in two tabs
+ * appears twice — the Set collapses them to one name in the active line.
+ * @param {Array<{clientId: string}>} members - Raw Ably presence members.
+ * @returns {string[]} Unique, non-empty client ids (emails).
+ */
 function uniqueUsers(members) {
   return [...new Set(members.map((member) => member.clientId).filter(Boolean))];
 }
 
 /**
- * Realtime session chat over Ably: presence line, message list, and
- * composer with Enter-to-send.
- * @param {{ sessionId: string, userEmail: string }} props
+ * Realtime session chat: presence line, message list, and Enter-to-send composer.
+ * Subscribes to the Ably `chat:` channel but *publishes through the API*, since
+ * the issued token grants subscribe and presence only — the server persists each
+ * message and fans it out. That's why sending optimistically appends the saved
+ * message: the sender's own publish echo isn't guaranteed to come back.
+ * Both the append paths dedupe on `_id`, so a message arriving twice (echo plus
+ * POST response) renders once.
+ * @param {object} props - Component props.
+ * @param {string} props.sessionId - Session whose chat channel to join.
+ * @param {string} props.userEmail - Used to right-align and label own messages.
+ * @returns {JSX.Element} The chat panel.
  */
 export default function ChatRoom({ sessionId, userEmail }) {
   const [message, setMessage] = useState("");
@@ -77,6 +94,13 @@ export default function ChatRoom({ sessionId, userEmail }) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /**
+   * Sends the composed message and appends the saved copy.
+   * Clears the input before awaiting so typing stays responsive — the tradeoff
+   * is that a failed send loses the text, which is why the error is logged
+   * rather than silently swallowed.
+   * @returns {Promise<void>}
+   */
   const handleSendMessage = async () => {
     if (message.trim() === "") return;
 

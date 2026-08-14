@@ -1,3 +1,8 @@
+/**
+ * @file `/session/:id` — the live interview room. Composes video, chat, tools,
+ * the shared workspace, and (for interviewers) the scorecard.
+ */
+
 import { connectDB } from "@/lib/db";
 import Session from "@/models/Session";
 import { getCurrentUser } from "@/lib/serverAuth";
@@ -9,6 +14,12 @@ import SessionTools from "@/app/components/SessionTools";
 import SharedWorkspace from "@/app/components/SharedWorkspace";
 import { isValidObjectId, userCanAccessSession } from "@/lib/sessionAccess";
 
+/**
+ * Shown for a malformed id or a session that no longer exists.
+ * Deliberately identical in both cases, so a probing user can't distinguish
+ * "never existed" from "exists but isn't yours".
+ * @returns {JSX.Element} The not-found notice.
+ */
 function SessionMissing() {
   return (
     <div className="app-shell flex min-h-screen items-center justify-center px-8">
@@ -24,8 +35,14 @@ function SessionMissing() {
 }
 
 /**
- * Live interview room: video, chat, session tools, shared workspace,
- * and (for the interviewer) the scorecard. Server-checks access.
+ * Renders the interview room after checking access server-side.
+ * Access is verified here rather than trusted from the client, since this page
+ * passes session data straight into the tree. The scorecard is mounted only for
+ * interviewers — and the API enforces that too, so hiding it is UX, not
+ * security.
+ * @param {object} props - Page props.
+ * @param {Promise<{sessionId: string}>} props.params - Route params; awaited per Next 15.
+ * @returns {Promise<JSX.Element>} The room, or a not-found/denied notice.
  */
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
@@ -46,6 +63,8 @@ export default async function SessionRoom(props) {
     return <SessionMissing />;
   }
 
+  // Mongoose documents can't cross the server/client boundary — ObjectIds and
+  // Dates aren't serializable as props — so flatten to plain JSON first.
   const sessionData = JSON.parse(JSON.stringify(session));
 
   if (!userCanAccessSession(session, user)) {

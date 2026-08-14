@@ -1,8 +1,16 @@
+/** @file The landing page footer. Only appears on `/`; app pages have no footer. */
+
 import Link from "next/link";
 import PrepTalkLogo from "../PrepTalkLogo";
 
 /**
- * Dark landing footer: wordmark, product anchors, account links.
+ * Dark footer with the wordmark, product anchors, and account links.
+ * The logo renders without its own word so the wordmark can be styled to the
+ * dark ground; `PrepTalkLogo`'s first mark inherits `currentColor`, so it
+ * inverts here for free.
+ * The copyright year is computed at render — on a static page that means build
+ * time, so a long-lived deployment will show a stale year.
+ * @returns {JSX.Element} The footer.
  */
 export default function LandingFooter() {
   return (

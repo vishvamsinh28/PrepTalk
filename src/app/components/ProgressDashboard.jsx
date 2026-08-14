@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
 import { SectionHeading } from "./ui/PageHeader";
 
+/** @file Score averages block, shown on the dashboard for both roles. */
+
+/** Display names for the five score keys. Order here drives render order. */
 const labels = {
   communication: "Communication",
   technicalDepth: "Technical depth",
@@ -13,7 +16,13 @@ const labels = {
 };
 
 /**
- * Score averages across submitted reports as serif stat figures.
+ * Score averages across the caller's reports, as serif stat figures.
+ * The API decides whose reports count — written for interviewers, received for
+ * interviewees — so this component needs no role prop.
+ * A failed fetch leaves `progress` null and falls through to the same empty
+ * state as "no reports yet", which understates the problem but avoids putting
+ * an error banner on the dashboard for a non-critical panel.
+ * @returns {JSX.Element} The averages section, its empty state, or a loading line.
  */
 export default function ProgressDashboard() {
   const [progress, setProgress] = useState(null);

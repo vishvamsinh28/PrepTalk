@@ -1,6 +1,22 @@
 "use client";
 
-/* The assigned-assessments list view — extracted verbatim from LabCandidateDashboard. */
+/** @file The candidate's assigned-assessments list, shown before an attempt starts. */
+
+/**
+ * Lists assigned assessments with a start action for each.
+ * Takes both `assessments` and `sortedAssessments`: the sorted list is what
+ * renders, while the raw list backs the deep-link check — a `?assessment=` id
+ * that isn't in it means the candidate followed an invite meant for a different
+ * account, which is worth saying explicitly rather than showing an empty list.
+ * Stateless; `LabCandidateDashboard` owns the data and the start handler.
+ * @param {object} props - Component props.
+ * @param {object[]} props.assessments - Unsorted assessments, used for the deep-link check.
+ * @param {object[]} props.sortedAssessments - Display order.
+ * @param {string} props.initialAssessmentId - Deep-linked id from the URL, or `""`.
+ * @param {string} props.submitMessage - Confirmation from a just-completed submission.
+ * @param {Function} props.onStart - Called with an assessment to begin it.
+ * @returns {JSX.Element} The picker.
+ */
 export default function AssessmentPicker({
   assessments,
   sortedAssessments,
