@@ -140,7 +140,15 @@ export function useVideoRoom(sessionId, userEmail) {
       if (!selfId || data.to !== selfId || data.from === selfId || !streamRef.current) return;
 
       if (event.name === "signal-offer") {
-        if (peersRef.current.find(p => p.peerId === data.from)) return;
+        // An offer from a peer we already have is a *renegotiation* — the other
+        // side added or removed a track (camera/mic toggle) after connecting.
+        // Feeding it to the existing peer is what applies the new track;
+        // dropping it silently leaves their tile black forever.
+        const existing = peersRef.current.find(p => p.peerId === data.from);
+        if (existing) {
+          existing.peer.signal(data.signal);
+          return;
+        }
 
         const peer = addPeer(data.signal, data.from, streamRef.current);
         const peerData = { peerId: data.from, peer, userEmail: data.userEmail };
