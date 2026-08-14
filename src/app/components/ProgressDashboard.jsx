@@ -50,11 +50,11 @@ export default function ProgressDashboard() {
           </p>
         </div>
       ) : (
-        <dl className="grid grid-cols-2 border-t border-rule sm:grid-cols-5">
+        <dl className="flex flex-wrap gap-x-16 gap-y-6 border-t border-rule pt-8">
           {Object.entries(labels).map(([key, label]) => (
-            <div key={key} className="border-b border-r border-rule px-5 py-6 last:border-r-0">
+            <div key={key}>
               <dt className="app-eyebrow">{label}</dt>
-              <dd className="landing-serif mt-3 text-[2.5rem] leading-none text-ink">
+              <dd className="landing-serif mt-2 text-[2.25rem] leading-none text-ink">
                 {averages[key] ?? 0}
                 <span className="ml-1 align-baseline text-base text-ink-soft">/5</span>
               </dd>

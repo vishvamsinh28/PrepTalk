@@ -1,4 +1,4 @@
-import { FaCheck, FaChevronDown, FaChevronUp, FaTimes } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { formatValue } from "./resultUtils";
 
 export default function ResultsSidebar({
@@ -17,47 +17,64 @@ export default function ResultsSidebar({
   const firstResult = visibleResults.find((result) => result.status === "failed") || visibleResults[0];
 
   return (
-    <section className={`border-t border-white/10 bg-[#1e1a17] transition-all ${isOpen ? "h-[22rem] sm:h-[26rem]" : "h-[3.4rem] sm:h-[3.8rem]"} overflow-hidden`}>
-      <button onClick={onToggle} className="flex h-[3.4rem] w-full items-center justify-between border-b border-white/10 px-4 text-left sm:h-[3.8rem] sm:px-6">
-        <span className="inline-flex items-center gap-3 text-lg font-semibold sm:text-xl">
-          {isOpen ? <FaChevronDown /> : <FaChevronUp />}
-          Test Results
+    <section
+      className={`border-t border-rule transition-all ${
+        isOpen ? "h-[21rem] sm:h-[24rem]" : "h-12"
+      } overflow-hidden`}
+    >
+      <button
+        onClick={onToggle}
+        className="flex h-12 w-full items-center justify-between border-b border-rule px-5 text-left"
+      >
+        <span className="inline-flex items-center gap-3 text-sm font-semibold text-ink">
+          {isOpen ? <FaChevronDown className="text-ink-soft" /> : <FaChevronUp className="text-ink-soft" />}
+          Test results
         </span>
-        <span className="text-sm font-semibold text-white/50">Visible tests</span>
+        <span className="app-eyebrow">Visible tests</span>
       </button>
 
-      <div className="grid h-[18.6rem] min-h-0 grid-cols-1 overflow-hidden sm:h-[22.2rem] md:grid-cols-[14rem_minmax(0,1fr)]">
-        <aside className="hidden border-r border-white/10 p-4 md:block">
-          <div className="mb-4 border-b border-white/10 text-lg font-semibold">
-            <span className="inline-block border-b-2 border-[#e4633f] pb-3">Visible Cases</span>
-          </div>
-          <div className="grid gap-2">
+      <div className="grid h-[18rem] min-h-0 grid-cols-1 overflow-hidden sm:h-[21rem] md:grid-cols-[13rem_minmax(0,1fr)]">
+        <aside className="hidden border-r border-rule px-5 py-4 md:block">
+          <p className="app-eyebrow">Visible cases</p>
+          <ul className="mt-3">
             {visibleResults.map((test, index) => (
-              <div key={test.name} className={`flex items-center gap-3 rounded-[3px] px-3 py-3 text-base ${test.status === "failed" ? "bg-accent/15" : ""}`}>
-                {test.status === "passed" ? <FaCheck className="text-[#9db87f]" /> : test.status === "failed" ? <FaTimes className="text-[#e4633f]" /> : <span className="h-3 w-3 rounded-full border border-white/25" />}
-                Test Case {index + 1}
-              </div>
+              <li
+                key={test.name}
+                className={`flex items-baseline gap-3 border-t border-rule py-2.5 text-sm first:border-t-0 ${
+                  test.status === "failed" ? "text-accent" : "text-ink"
+                }`}
+              >
+                <span className="app-eyebrow w-8 shrink-0">
+                  {test.status === "passed" ? "pass" : test.status === "failed" ? "fail" : "—"}
+                </span>
+                Test case {index + 1}
+              </li>
             ))}
-          </div>
+          </ul>
         </aside>
 
-        <main className="min-h-0 overflow-y-auto p-3 sm:p-4">
+        <main className="min-h-0 overflow-y-auto px-5 py-4">
           {hasRun && (
-            <div className={`mb-3 rounded-[3px] px-4 py-3 text-base font-semibold sm:text-xl ${allPassed ? "bg-[#9db87f]/15 text-[#9db87f]" : "bg-accent/15 text-[#e4633f]"}`}>
-              {allPassed ? <FaCheck className="mr-3 inline text-[#9db87f]" /> : <FaTimes className="mr-3 inline text-[#e4633f]" />}
-              {allPassed ? "All visible test cases passed" : `${visibleFailed} failed · ${visiblePassed} passed`}
-            </div>
+            <p
+              className={`mb-4 border-l-2 pl-3 text-sm font-medium ${
+                allPassed ? "border-emerald-700 text-emerald-700" : "border-accent text-accent"
+              }`}
+            >
+              {allPassed
+                ? "All visible test cases passed"
+                : `${visibleFailed} failed · ${visiblePassed} passed`}
+            </p>
           )}
 
           {firstResult ? (
             <div className="grid gap-4">
-              <ResultBlock title="Compiler Message">
+              <ResultBlock title="Compiler message">
                 {firstResult.status === "idle" ? "Run code to see compiler output." : firstResult.error || (firstResult.status === "passed" ? "Accepted" : "Wrong Answer")}
               </ResultBlock>
               <ResultBlock title="Input">
                 {formatValue(firstResult.input)}
               </ResultBlock>
-              <ResultBlock title="Expected Output">
+              <ResultBlock title="Expected output">
                 {formatValue(firstResult.expected)}
               </ResultBlock>
               {firstResult.status !== "idle" && (
@@ -66,14 +83,14 @@ export default function ResultsSidebar({
                 </ResultBlock>
               )}
               {failedResults.length > 0 && (
-                <ResultBlock title={isExplaining ? "Generating explanation..." : "Debug Hint"}>
+                <ResultBlock title={isExplaining ? "Generating explanation…" : "Debug hint"}>
                   {failedResults[0]?.insight || explanationError || "Compare your output with the expected value above."}
                 </ResultBlock>
               )}
-              {explanationError && !failedResults.length && <ResultBlock title="Explanation Error">{explanationError}</ResultBlock>}
+              {explanationError && !failedResults.length && <ResultBlock title="Explanation error">{explanationError}</ResultBlock>}
             </div>
           ) : (
-            <div className="rounded-[3px] border border-white/10 p-5 text-white/50">No visible test cases for this question.</div>
+            <p className="py-6 text-sm text-ink-soft">No visible test cases for this question.</p>
           )}
         </main>
       </div>
@@ -83,11 +100,9 @@ export default function ResultsSidebar({
 
 function ResultBlock({ title, children }) {
   return (
-    <section className="rounded-[3px] border border-white/10 bg-white/5">
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <h3 className="font-semibold">{title}</h3>
-      </div>
-      <pre className="max-h-64 min-h-14 overflow-auto whitespace-pre-wrap break-words p-4 font-mono text-base text-white/85 [overflow-wrap:anywhere]">{children}</pre>
+    <section className="border-t border-rule pt-3">
+      <h3 className="app-eyebrow">{title}</h3>
+      <pre className="mt-2 max-h-56 min-h-6 overflow-auto whitespace-pre-wrap break-words font-mono text-[13px] leading-5 text-ink [overflow-wrap:anywhere]">{children}</pre>
     </section>
   );
 }

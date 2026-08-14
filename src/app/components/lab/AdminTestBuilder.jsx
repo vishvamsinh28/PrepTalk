@@ -25,7 +25,7 @@ export default function AdminTestBuilder({
     <main className="relative z-10 mx-auto w-full max-w-7xl overflow-x-hidden text-sm [&_.field-control]:min-h-10 [&_.field-control]:px-3 [&_.field-control]:py-2 [&_textarea.field-control]:min-h-20">
       <BuilderHeader title={form.title} onBack={onBack} onCreate={onCreate} isSubmitting={isSubmitting} />
       <section className="grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
-        <div className="flex min-w-0 flex-col rounded-[4px] border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+        <div className="flex min-w-0 flex-col lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
           <div className="shrink-0 flex flex-col gap-3 border-b border-rule px-4 py-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:px-8 sm:py-5">
             <div className="flex flex-wrap items-baseline gap-3">
               <span className="app-eyebrow">Duration</span>
@@ -64,7 +64,7 @@ export default function AdminTestBuilder({
           </div>
         </div>
 
-        <aside className="panel min-w-0 self-start overflow-x-hidden rounded-[4px] p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem] lg:overflow-y-auto">
+        <aside className="min-w-0 self-start overflow-x-hidden border-t border-rule pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem] lg:overflow-y-auto">
           <label className="field-group">
             <span className="field-label">Role</span>
             <input value={form.title.replace(" Hiring Test", "")} onChange={(event) => onSetForm({ ...form, title: `${event.target.value} Hiring Test` })} className="field-surface field-control" />
@@ -148,7 +148,7 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
         )}
       </div>
       {open && (
-        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-[4px] border border-rule bg-white p-3 sm:p-4">
+        <div className="ml-1.5 mt-4 grid min-w-0 gap-4 overflow-x-hidden border-l border-rule pb-2 pl-6">
           <div className="grid min-w-0 gap-3 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -172,26 +172,53 @@ function ProblemBuilder({ problem, problemIndex, canDelete, onAddTest, onRemove,
             <button onClick={onAddTest} className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink">Add case</button>
           </div>
           <div className="grid min-w-0 gap-2">
+            {/* One header row for the whole list — labels don't repeat per case */}
+            <div className="hidden xl:grid xl:grid-cols-[1fr_1.15fr_1.15fr_8.5rem_3.5rem] xl:gap-3">
+              <span className="app-eyebrow">Case name</span>
+              <span className="app-eyebrow">Input JSON</span>
+              <span className="app-eyebrow">Expected JSON</span>
+              <span className="app-eyebrow">Visible</span>
+              <span aria-hidden="true" />
+            </div>
             {problem.tests.map((test, testIndex) => (
-              <div key={testIndex} className="grid min-w-0 gap-2 rounded-[4px] border border-rule bg-black/5 p-3 xl:grid-cols-[1fr_1.15fr_1.15fr_auto_auto]">
-                <label className="field-group">
-                  <span className="field-label">Case name</span>
-                  <input value={test.name} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
+              <div key={testIndex} className="grid min-w-0 items-center gap-3 xl:grid-cols-[1fr_1.15fr_1.15fr_8.5rem_3.5rem]">
+                <input
+                  value={test.name}
+                  onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })}
+                  aria-label="Case name"
+                  className="field-surface min-h-11 w-full px-3 py-2 text-sm"
+                />
+                <input
+                  value={test.inputJson}
+                  onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })}
+                  aria-label="Input JSON"
+                  className="field-surface min-h-11 w-full px-3 py-2 font-mono text-sm"
+                />
+                <input
+                  value={test.expectedJson}
+                  onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })}
+                  aria-label="Expected JSON"
+                  className="field-surface min-h-11 w-full px-3 py-2 font-mono text-sm"
+                />
+                <label className="flex items-center gap-2.5 text-xs font-medium text-ink">
+                  <input
+                    type="checkbox"
+                    checked={test.visible}
+                    onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })}
+                    className="field-toggle"
+                  />
+                  <span className="xl:hidden">Visible to candidate</span>
                 </label>
-                <label className="field-group">
-                  <span className="field-label">Input JSON</span>
-                  <input value={test.inputJson} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control font-mono" />
-                </label>
-                <label className="field-group">
-                  <span className="field-label">Expected JSON</span>
-                  <input value={test.expectedJson} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control font-mono" />
-                </label>
-                <label className="flex items-center gap-3 rounded-[3px] border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
-                  <input type="checkbox" checked={test.visible} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
-                  Visible to candidate
-                </label>
-                {problem.tests.length > 1 && (
-                  <button onClick={() => onRemoveTest(testIndex)} className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent xl:mt-8" title="Delete test case">Delete</button>
+                {problem.tests.length > 1 ? (
+                  <button
+                    onClick={() => onRemoveTest(testIndex)}
+                    className="justify-self-start text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                    title="Delete test case"
+                  >
+                    Delete
+                  </button>
+                ) : (
+                  <span aria-hidden="true" />
                 )}
               </div>
             ))}

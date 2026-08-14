@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { postJson } from "@/lib/clientApi";
-import { FaCheckCircle, FaChevronDown, FaExclamationTriangle } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 
 const scoreFields = [
   ["communication", "Communication"],
@@ -89,16 +89,16 @@ export default function InterviewScorecard({ sessionId, session }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 text-left">
       {message && (
-        <div
-          className={`flex items-center gap-2 rounded-[4px] p-3 text-sm ${
+        <p
+          role={isError ? "alert" : "status"}
+          className={`border-l-2 px-4 py-3 text-sm ${
             isError
-              ? "border border-red-300/30 bg-red-500/10 text-red-100"
-              : "border border-emerald-600/40 bg-emerald-500/10 text-emerald-700"
+              ? "border-accent bg-accent/5 text-accent"
+              : "border-emerald-700 bg-emerald-50 text-emerald-700"
           }`}
         >
-          {isError ? <FaExclamationTriangle /> : <FaCheckCircle />}
           {message}
-        </div>
+        </p>
       )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -127,9 +127,9 @@ export default function InterviewScorecard({ sessionId, session }) {
         </label>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-5">
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-5">
         {scoreFields.map(([name, label]) => (
-          <label key={name} className="rounded-[4px] border border-rule bg-white p-3">
+          <label key={name} className="block">
             <span className="field-label min-h-8 text-xs">{label}</span>
             <ScorecardSelect
               id={name}

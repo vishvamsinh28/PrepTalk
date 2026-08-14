@@ -17,7 +17,7 @@ export default function AdminCreateTest({ form, roleTemplates, selectedTemplateI
       >
         &larr; Back to assessments
       </button>
-      <section className="grid min-w-0 overflow-visible rounded-[4px] border border-rule bg-white shadow-xl lg:h-[calc(100vh-11rem)] lg:max-h-[43rem] lg:grid-cols-[minmax(0,1.45fr)_minmax(22rem,0.85fr)] lg:overflow-hidden">
+      <section className="grid min-w-0 overflow-visible lg:h-[calc(100vh-11rem)] lg:max-h-[43rem] lg:grid-cols-[minmax(0,1.45fr)_minmax(22rem,0.85fr)] lg:overflow-hidden">
         <div className="flex min-h-0 min-w-0 flex-col p-3 sm:p-4 lg:p-5">
           <p className="app-eyebrow">New assessment</p>
           <h1 className="app-h2 mt-3">Start from a template, or blank</h1>
@@ -82,7 +82,7 @@ export default function AdminCreateTest({ form, roleTemplates, selectedTemplateI
           </div>
         </div>
 
-        <aside className="min-w-0 border-t border-rule bg-white p-3 sm:p-4 lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-5">
+        <aside className="min-w-0 border-t border-rule p-3 pt-6 sm:p-4 lg:overflow-y-auto lg:border-l lg:border-t-0 lg:p-5 lg:pl-10">
           <div className="flex items-center justify-between gap-4 border-b border-rule pb-4">
             <div>
               <p className="app-eyebrow">Preview</p>

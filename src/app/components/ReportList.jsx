@@ -92,11 +92,11 @@ export default function ReportList() {
             </div>
           </div>
 
-          <dl className="mt-5 grid grid-cols-2 border-t border-rule sm:grid-cols-5">
+          <dl className="mt-5 flex flex-wrap gap-x-12 gap-y-4">
             {Object.entries(report.scores || {}).map(([name, score]) => (
-              <div key={name} className="border-b border-r border-rule py-3 pr-4 last:border-r-0">
+              <div key={name}>
                 <dt className="app-eyebrow">{scoreLabels[name] || name}</dt>
-                <dd className="landing-serif mt-1.5 text-2xl leading-none text-ink">
+                <dd className="landing-serif mt-1 text-[1.5rem] leading-none text-ink">
                   {score}
                   <span className="ml-0.5 text-sm text-ink-soft">/5</span>
                 </dd>

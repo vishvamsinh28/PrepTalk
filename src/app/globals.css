@@ -9,7 +9,6 @@
   --color-accent: #c0341a;
   --color-accent-light: #e4633f;
   --color-night: #151311;
-  --color-night-soft: #221e1a;
 }
 
 :root {
@@ -19,9 +18,6 @@
   --ink-soft: #6b655d;
   --rule: #ddd7cb;
   --accent: #c0341a;
-  /* Editor and video surfaces stay dark on purpose — see .code-surface */
-  --code-bg: #07101d;
-  --code-chrome: #08111f;
 }
 
 * {
@@ -149,7 +145,7 @@ select {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  border-radius: 4px;
+  border-radius: 2px;
   background: var(--ink);
   padding: 0.7rem 1.25rem;
   font-size: 0.9375rem;
@@ -172,8 +168,8 @@ select {
   justify-content: center;
   gap: 0.5rem;
   border: 1px solid var(--rule);
-  border-radius: 4px;
-  background: #ffffff;
+  border-radius: 2px;
+  background: transparent;
   padding: 0.7rem 1.25rem;
   font-size: 0.9375rem;
   font-weight: 500;
@@ -185,15 +181,10 @@ select {
   border-color: rgba(21, 19, 17, 0.35);
 }
 
-/* Editor / terminal surfaces stay dark on purpose */
-.code-surface {
-  background: var(--code-bg);
-  color: #e2e8f0;
-}
-
 .field-surface {
   border: 1px solid var(--rule);
-  background: #ffffff;
+  border-radius: 2px;
+  background: transparent;
   color: var(--ink);
   line-height: 1.4;
   transition:
@@ -212,8 +203,8 @@ select {
 
 .field-surface:focus {
   border-color: var(--accent);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.12);
+  background: transparent;
+  box-shadow: none;
   outline: none;
 }
 
@@ -224,9 +215,7 @@ select {
   -webkit-text-fill-color: var(--ink);
   caret-color: var(--ink);
   border-color: var(--accent);
-  box-shadow:
-    0 0 0 1000px #ffffff inset,
-    0 0 0 3px rgba(192, 52, 26, 0.12);
+  box-shadow: 0 0 0 1000px var(--bg-ink) inset;
   transition: background-color 9999s ease-in-out 0s;
 }
 
@@ -267,7 +256,7 @@ select {
 .field-control {
   min-height: 3rem;
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 2px;
   padding: 0.78rem 0.9rem;
   font-size: 0.95rem;
 }
@@ -275,27 +264,6 @@ select {
 textarea.field-control {
   overflow-y: auto;
   resize: none;
-}
-
-.field-select {
-  appearance: none;
-  background-color: #ffffff;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
-    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
-  background-position:
-    calc(100% - 1.05rem) 50%,
-    calc(100% - 0.78rem) 50%;
-  background-repeat: no-repeat;
-  background-size: 0.34rem 0.34rem, 0.34rem 0.34rem;
-  padding-right: 2.3rem;
-}
-
-.field-select:hover {
-  background-color: #fffefb;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--ink) 50%),
-    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
 }
 
 .field-toggle {
@@ -343,63 +311,6 @@ textarea.field-control {
 .field-toggle:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.16);
-}
-
-.form-section {
-  border: 1px solid var(--rule);
-  background: #fffefb;
-  border-radius: 1rem;
-  padding: 1rem;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 0.45rem;
-  color: var(--ink);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.055em;
-  text-transform: uppercase;
-}
-
-.form-help {
-  margin-top: 0.4rem;
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-/* Was a cyan/blue gradient — now the editorial serif used for page titles */
-.gradient-text {
-  font-family: var(--font-display), "Iowan Old Style", Georgia, serif;
-  font-weight: 400;
-  letter-spacing: -0.018em;
-  color: var(--ink);
-}
-
-.lab-light .light-field .field-label {
-  color: var(--ink);
-}
-
-.lab-light .light-field .field-surface {
-  border-color: var(--rule);
-  background: #ffffff;
-  color: var(--ink);
-  box-shadow: none;
-}
-
-.lab-light .light-field .field-surface::placeholder {
-  color: #9c958a;
-}
-
-.lab-light .light-field .field-surface:focus {
-  border-color: var(--accent);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(192, 52, 26, 0.12);
-}
-
-.lab-dark textarea {
-  color-scheme: dark;
 }
 
 .problem-copy ul {

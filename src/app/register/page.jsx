@@ -146,7 +146,7 @@ export default function RegisterPage() {
                 className={`cursor-pointer rounded-[4px] border px-3 py-2.5 transition-colors ${
                   formData.role === value
                     ? "border-accent bg-accent/5"
-                    : "border-rule bg-white hover:border-ink/30"
+                    : "border-rule bg-transparent hover:border-ink/30"
                 }`}
               >
                 <span className="flex items-center gap-2">

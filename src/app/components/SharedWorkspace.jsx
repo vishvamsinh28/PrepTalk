@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as Ably from "ably";
 import { getJson, patchJson } from "@/lib/clientApi";
-import { FaCode, FaEraser, FaSave } from "react-icons/fa";
 
 export default function SharedWorkspace({ sessionId }) {
   const [workspace, setWorkspace] = useState({ notes: "", code: "" });
@@ -117,40 +116,27 @@ export default function SharedWorkspace({ sessionId }) {
   };
 
   return (
-    <section className="panel rounded-[4px] p-5 sm:p-6">
-      <div className="mb-5 grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+    <section>
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-rule pb-4">
         <div>
           <p className="app-eyebrow">Workspace</p>
-          <h2 className="mt-1 text-2xl font-semibold text-ink">Whiteboard & coding pad</h2>
+          <h2 className="app-h2 mt-3">Whiteboard & coding pad</h2>
         </div>
-        <div className="grid gap-2 sm:grid-cols-2">
-          <button
-            onClick={clearWorkspace}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-rose-600/40 bg-rose-50 px-4 py-2.5 font-bold text-rose-700"
-          >
-            <FaEraser />
-            Clear all
-          </button>
-          <button
-            onClick={() => saveWorkspace(workspace)}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] bg-ink px-5 py-2.5 font-semibold text-canvas"
-          >
-            <FaSave />
-            Save
-          </button>
-        </div>
+        {/* Autosaves on a debounce — the status line is the real save indicator */}
+        <p className="app-eyebrow" role="status">
+          {status || "Autosaves as you type"}
+        </p>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <label className="field-group">
-          <span className="field-label">
-            Shared notes
+      <div className="mt-6 grid gap-x-10 gap-y-6 lg:grid-cols-2">
+        <label className="block">
+          <span className="mb-2 flex items-baseline justify-between">
+            <span className="text-sm font-medium text-ink">Shared notes</span>
             <button
               type="button"
               onClick={() => clearWorkspaceField("notes")}
-              className="inline-flex items-center gap-1 rounded-[3px] border border-rule bg-black/5 px-2 py-1 text-xs font-bold text-ink"
+              className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
             >
-              <FaEraser />
               Clear
             </button>
           </span>
@@ -160,21 +146,19 @@ export default function SharedWorkspace({ sessionId }) {
               setWorkspace({ ...workspace, notes: event.target.value });
               autoGrow(event);
             }}
-            placeholder="Capture decisions, hints, diagrams, or feedback..."
-            className="field-surface field-control max-h-80 min-h-36 transition"
+            placeholder="Capture decisions, hints, diagrams, or feedback…"
+            className="field-surface max-h-80 min-h-36 w-full rounded-[4px] p-4 text-sm leading-[1.6]"
           />
         </label>
 
-        <label className="field-group">
-          <span className="field-label justify-start">
-            <FaCode />
-            Code pad
+        <label className="block">
+          <span className="mb-2 flex items-baseline justify-between">
+            <span className="text-sm font-medium text-ink">Code pad</span>
             <button
               type="button"
               onClick={() => clearWorkspaceField("code")}
-              className="ml-auto inline-flex items-center gap-1 rounded-[3px] border border-rule bg-black/5 px-2 py-1 text-xs font-bold text-ink"
+              className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
             >
-              <FaEraser />
               Clear
             </button>
           </span>
@@ -184,13 +168,26 @@ export default function SharedWorkspace({ sessionId }) {
               setWorkspace({ ...workspace, code: event.target.value });
               autoGrow(event);
             }}
-            placeholder="Write pseudocode, SQL, JavaScript, or system design notes..."
-            className="field-surface field-control max-h-80 min-h-36 font-mono text-sm transition"
+            placeholder="Pseudocode, SQL, JavaScript, or system design notes…"
+            className="max-h-80 min-h-36 w-full rounded-[4px] bg-[#151311] p-4 font-mono text-sm leading-[1.6] text-[#f4f1ea] outline-none placeholder:text-white/35"
           />
         </label>
       </div>
 
-      {status && <p className="mt-3 text-sm text-ink-soft">{status}</p>}
+      <div className="mt-4 flex items-center gap-5 text-[13px]">
+        <button
+          onClick={() => saveWorkspace(workspace)}
+          className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+        >
+          Save now
+        </button>
+        <button
+          onClick={clearWorkspace}
+          className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+        >
+          Clear all
+        </button>
+      </div>
     </section>
   );
 }

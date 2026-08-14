@@ -119,7 +119,7 @@ export default function CreateSessionForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="panel w-full p-8"
+      className="w-full"
     >
       <div className="mb-8 border-b border-rule pb-6">
         <p className="app-eyebrow">New interview</p>
@@ -350,7 +350,7 @@ function SegmentedControl({ name, value, options, onChange }) {
             } ${
               isActive
                 ? "bg-ink font-medium text-canvas"
-                : "bg-white text-ink-soft hover:bg-black/[0.03] hover:text-ink"
+                : "bg-transparent text-ink-soft hover:bg-black/[0.03] hover:text-ink"
             }`}
           >
             {option}

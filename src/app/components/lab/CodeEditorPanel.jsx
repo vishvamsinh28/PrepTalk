@@ -1,5 +1,4 @@
 import { useRef } from "react";
-import { FaClock, FaCode, FaPlay } from "react-icons/fa";
 
 export default function CodeEditorPanel({
   activeProblemId,
@@ -26,35 +25,42 @@ export default function CodeEditorPanel({
   };
 
   return (
-    <section className="grid h-[34rem] min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-[#151311] lg:h-full lg:grid-rows-[4rem_minmax(0,1fr)]">
-      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-white/10 bg-[#1e1a17] px-3 py-3 sm:px-4 lg:flex-nowrap lg:px-5 lg:py-0">
-        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="inline-flex items-center gap-2 font-semibold text-white"><FaCode className="text-[#e4633f]" /> Editor</span>
-          <span className="hidden rounded-[4px] border border-white/10 bg-white/8 px-4 py-2 text-sm font-bold text-white/85 sm:inline-flex">
-            JavaScript
-          </span>
-          <span className="hidden text-xs font-semibold text-white/50 md:inline">
-            Keep the function name <code className="text-[#e4633f]">solve</code>.
+    <section className="grid h-[30rem] min-h-0 min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden lg:h-full lg:grid-rows-[3rem_minmax(0,1fr)]">
+      {/* Light chrome — only the code surface below is dark */}
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-rule px-4 py-2 lg:flex-nowrap lg:py-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="text-sm font-semibold text-ink">Editor</span>
+          <span className="chip hidden sm:inline-flex">JavaScript</span>
+          <span className="hidden text-[13px] text-ink-soft md:inline">
+            Keep the function name <code className="font-mono text-ink">solve</code>.
           </span>
         </div>
-        <div className="flex min-w-0 flex-1 shrink-0 items-center justify-end gap-2 sm:flex-none">
-          <span className="inline-flex items-center gap-1.5 rounded-[3px] border border-[#9db87f]/40 bg-[#9db87f]/15 px-2.5 py-2 font-mono text-xs font-semibold text-[#9db87f] sm:text-sm">
-            <FaClock /> {formattedTime}
-          </span>
-          <button onClick={onExit} className="rounded-[3px] border border-accent/40 bg-accent/15 px-3 py-2 text-xs font-bold text-[#e4633f] sm:text-sm">
+        <div className="flex min-w-0 flex-1 shrink-0 items-center justify-end gap-4 sm:flex-none">
+          <span className="app-eyebrow tabular-nums">{formattedTime}</span>
+          <button
+            onClick={onExit}
+            className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+          >
             Exit
           </button>
-          <button onClick={onSubmit} disabled={isRunning} className="rounded-[3px] bg-accent px-3 py-2 text-xs font-semibold text-white disabled:opacity-60 sm:text-sm">
+          <button
+            onClick={onSubmit}
+            disabled={isRunning}
+            className="btn-ink px-4 py-1.5 text-sm"
+          >
             Submit
           </button>
         </div>
       </div>
 
       <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] overflow-hidden">
-        <div className="grid min-h-0 min-w-0 grid-cols-[3rem_minmax(0,1fr)] overflow-hidden lg:grid-cols-[3.5rem_minmax(0,1fr)]">
-          <div ref={lineRef} className="min-h-0 select-none overflow-hidden border-r border-white/10 bg-[#1e1a17] py-3 text-right font-mono text-xs leading-6 text-white/40 sm:text-sm lg:leading-7">
+        <div className="grid min-h-0 min-w-0 grid-cols-[3rem_minmax(0,1fr)] overflow-hidden">
+          <div
+            ref={lineRef}
+            className="min-h-0 select-none overflow-hidden border-r border-white/10 bg-[#1e1a17] py-3 text-right font-mono text-xs leading-6 text-white/35"
+          >
             {lineNumbers.map((line) => (
-              <div key={line} className="px-2 sm:px-3">
+              <div key={line} className="px-2.5">
                 {line}
               </div>
             ))}
@@ -63,7 +69,7 @@ export default function CodeEditorPanel({
             <pre
               ref={highlightRef}
               aria-hidden="true"
-              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre p-3 font-mono text-sm leading-6 sm:text-base lg:leading-7"
+              className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre p-3 font-mono text-sm leading-6"
             >
               <code>{highlightJavaScript(code)}</code>
             </pre>
@@ -78,23 +84,22 @@ export default function CodeEditorPanel({
               onScroll={syncScroll}
               spellCheck={false}
               wrap="off"
-              className="relative h-full min-h-0 w-full resize-none overflow-auto whitespace-pre bg-transparent p-3 font-mono text-sm leading-6 text-transparent caret-[#e4633f] outline-none selection:bg-[#e4633f]/30 sm:text-base lg:leading-7"
+              className="relative h-full min-h-0 w-full resize-none overflow-auto whitespace-pre bg-transparent p-3 font-mono text-sm leading-6 text-transparent caret-[#e4633f] outline-none selection:bg-[#e4633f]/30"
               aria-label="Code editor"
             />
           </div>
         </div>
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#1e1a17] px-3 py-3 sm:px-4 lg:px-5">
-          <div className="flex min-w-0 flex-wrap items-center gap-x-4 gap-y-2 text-xs font-semibold text-white/50 sm:text-sm">
-            <span>{lineNumbers.length} lines</span>
-            <span>Visible tests run locally. Final score is graded on the server. Do not rename <code className="text-[#e4633f]">solve</code>.</span>
-          </div>
+        <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-rule px-4 py-2.5">
+          <span className="min-w-0 text-[13px] text-ink-soft">
+            {lineNumbers.length} lines · Visible tests run locally. Final score is graded
+            on the server.
+          </span>
           <button
             onClick={() => runTests(false)}
             disabled={isRunning}
-            className="inline-flex shrink-0 items-center gap-2 rounded-[4px] border border-[#9db87f]/40 bg-[#9db87f]/15 px-4 py-2 text-sm font-semibold text-[#9db87f] disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-quiet shrink-0 px-4 py-1.5 text-sm disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <FaPlay />
-            {isRunning ? "Running..." : "Run Code"}
+            {isRunning ? "Running…" : "Run code"}
           </button>
         </footer>
       </div>

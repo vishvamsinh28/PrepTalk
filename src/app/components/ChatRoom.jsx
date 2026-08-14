@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from "react";
 import * as Ably from "ably";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPaperPlane, FaUsers } from "react-icons/fa";
 import { getJson, postJson } from "@/lib/clientApi";
 
 function uniqueUsers(members) {
@@ -76,67 +75,62 @@ export default function ChatRoom({ sessionId, userEmail }) {
   };
 
   return (
-    <div className="relative z-10 flex h-120 w-full flex-col">
-      <div className="mb-4 flex items-center rounded-[4px] border border-rule bg-white p-3 text-sm text-ink-soft">
-        <FaUsers className="mr-2 text-accent" />
-        <strong className="mr-2 text-ink">Active:</strong>
-        {activeUsers.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {activeUsers.map((user, idx) => (
-              <span key={idx} className="rounded-[4px] border border-accent bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent">
-                {user}
-              </span>
-            ))}
-          </div>
+    <div className="flex h-[30rem] w-full flex-col">
+      <p className="app-eyebrow shrink-0">
+        {activeUsers.length > 0 ? `Active · ${activeUsers.join(", ")}` : "Nobody else here yet"}
+      </p>
+
+      <div className="mt-4 min-h-0 flex-1 overflow-y-auto border-t border-rule">
+        {messages.length === 0 ? (
+          <p className="py-10 text-center text-sm text-ink-soft">
+            No messages yet. Say hello.
+          </p>
         ) : (
-          <span className="text-ink-soft">No users online</span>
+          <ul className="space-y-4 py-4">
+            <AnimatePresence>
+              {messages.map((msg, index) => {
+                const isSelf = msg.sender === userEmail;
+                return (
+                  <motion.li
+                    key={msg._id || index}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className={isSelf ? "pl-10 text-right" : "pr-10"}
+                  >
+                    <p className="app-eyebrow">{isSelf ? "You" : msg.sender}</p>
+                    <p
+                      className={`mt-1 inline-block max-w-full whitespace-pre-wrap break-words rounded-[4px] px-3 py-2 text-left text-sm leading-[1.5] ${
+                        isSelf ? "bg-ink text-canvas" : "border border-rule bg-white text-ink"
+                      }`}
+                    >
+                      {msg.message}
+                    </p>
+                  </motion.li>
+                );
+              })}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </ul>
         )}
       </div>
 
-      <div className="mb-4 min-h-0 flex-1 space-y-3 overflow-y-auto rounded-[4px] border border-rule bg-white p-4 custom-scroll">
-        <AnimatePresence>
-          {messages.map((msg, index) => (
-            <motion.div
-            key={msg._id || index}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              className={`flex ${
-                msg.sender === userEmail ? "justify-end" : "justify-start"
-              }`}
-            >
-              <div
-                className={`px-3 py-2 rounded-[4px] text-sm ${
-                  msg.sender === userEmail
-                    ? "rounded-br-none bg-ink font-semibold text-canvas"
-                    : "rounded-bl-none border border-rule bg-black/5 text-ink"
-                }`}
-              >
-                <strong className="mb-1 block text-xs opacity-70">
-                  {msg.sender === userEmail ? "You" : msg.sender}
-                </strong>
-                {msg.message}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-        <div ref={messagesEndRef} />
-      </div>
-
-      <div className="flex">
+      <div className="mt-4 flex shrink-0 gap-2 border-t border-rule pt-4">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Type your message..."
-          className="field-surface min-w-0 grow rounded-l-lg border-r-0 px-4 py-3 transition"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSendMessage();
+            }
+          }}
+          placeholder="Type your message…"
+          className="field-surface min-w-0 grow rounded-[4px] px-4 py-2.5 text-sm"
         />
-        <button
-          onClick={handleSendMessage}
-          className="rounded-r-lg bg-ink px-5 py-3 text-canvas transition hover:brightness-110"
-          aria-label="Send message"
-        >
-          <FaPaperPlane />
+        <button onClick={handleSendMessage} className="btn-ink shrink-0 px-5 py-2.5 text-sm">
+          Send
         </button>
       </div>
     </div>

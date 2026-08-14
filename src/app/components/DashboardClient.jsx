@@ -7,14 +7,10 @@ const roleCopy = {
   Interviewer: {
     description:
       "Create sessions, run live interviews, and submit structured reports on what you saw.",
-    href: "/interviewer",
-    label: "Open interviewer workspace",
   },
   Interviewee: {
     description:
       "Join the interviews assigned to you and read the report after each session.",
-    href: "/interviewee",
-    label: "Open interviewee workspace",
   },
 };
 
@@ -22,18 +18,16 @@ export default function DashboardClient({ userData }) {
   const role = userData?.role;
   const copy = roleCopy[role];
 
+  // Two rows, two real destinations — the old list had four links to one page
   const shortcuts =
     role === "Interviewer"
       ? [
-          ["Create an interview", "Set the role, level, and agenda", "/interviewer#create-session"],
-          ["Manage sessions", "Invites, prep material, and links", "/interviewer#sessions"],
-          ["Open the Lab", "Build and assign coding screens", "/lab"],
-          ["Review reports", "Scorecards you've submitted", "/interviewer#reports"],
+          ["Interview workspace", "Create sessions, send invites, review reports", "/interviewer"],
+          ["The Lab", "Build and assign coding screens", "/lab"],
         ]
       : [
-          ["Join an interview", "Sessions assigned to you", "/interviewee"],
-          ["Practice in the Lab", "Timed coding assessments", "/lab"],
-          ["View feedback", "Reports from past rounds", "/interviewee#reports"],
+          ["Interview workspace", "Assigned sessions and your feedback", "/interviewee"],
+          ["The Lab", "Timed coding assessments", "/lab"],
         ];
 
   return (
@@ -71,11 +65,6 @@ export default function DashboardClient({ userData }) {
               ))}
             </ul>
 
-            {copy && (
-              <a href={copy.href} className="btn-ink mt-8">
-                {copy.label}
-              </a>
-            )}
           </section>
 
           <aside>

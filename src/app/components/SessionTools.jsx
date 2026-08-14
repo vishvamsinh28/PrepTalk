@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { deleteJson, postJson } from "@/lib/clientApi";
-import { FaCalendarAlt, FaEnvelope, FaEraser, FaLink, FaMagic, FaQuestionCircle } from "react-icons/fa";
 
 function normalizeQuestionList(value) {
   if (!Array.isArray(value)) return [];
@@ -96,116 +95,158 @@ export default function SessionTools({ sessionId, session, userRole }) {
   const isInterviewer = userRole === "Interviewer";
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-      <div className="panel rounded-[4px] p-5">
-        <p className="mb-2 app-eyebrow">Agenda</p>
-        <h2 className="mb-4 text-2xl font-semibold text-ink">Session flow</h2>
-        <div className="space-y-3">
-          {(session.agenda || []).length > 0 ? session.agenda.map((item, index) => (
-            <div key={`${item.title}-${index}`} className="flex items-center justify-between gap-4 rounded-[4px] border border-rule bg-white p-3">
-              <span className="font-bold text-ink">{item.title}</span>
-              <span className="rounded-[4px] bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{item.minutes} min</span>
-            </div>
-          )) : (
-            <p className="text-sm text-ink-soft">No agenda added yet.</p>
-          )}
+    <section className="grid gap-x-16 gap-y-14 lg:grid-cols-[0.8fr_1.2fr]">
+      <div>
+        <div className="border-b border-rule pb-4">
+          <p className="app-eyebrow">Agenda</p>
+          <h2 className="app-h2 mt-3">Session flow</h2>
         </div>
 
-        <div className="mt-5 rounded-[4px] border border-rule bg-black/5 p-4">
-          <p className="mb-2 flex items-center gap-2 font-bold text-ink">
-            <FaCalendarAlt />
-            Schedule
-          </p>
-          <p className="text-sm text-ink-soft">
-            {session.scheduledAt ? new Date(session.scheduledAt).toLocaleString() : "No time scheduled"}
-            {session.durationMinutes ? ` · ${session.durationMinutes} min` : ""}
-          </p>
-        </div>
+        {(session.agenda || []).length > 0 ? (
+          <ul>
+            {session.agenda.map((item, index) => (
+              <li
+                key={`${item.title}-${index}`}
+                className="row-hair flex items-baseline justify-between gap-6 px-1 py-4 first:border-t-0"
+              >
+                <span className="text-[15px] font-medium text-ink">{item.title}</span>
+                <span className="app-eyebrow shrink-0">{item.minutes} min</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="py-5 text-sm text-ink-soft">No agenda added yet.</p>
+        )}
+
+        <dl className="mt-2 border-t border-rule pt-4 text-sm">
+          <div className="flex gap-3">
+            <dt className="text-ink-soft">Scheduled</dt>
+            <dd className="text-ink">
+              {session.scheduledAt ? new Date(session.scheduledAt).toLocaleString() : "No time set"}
+              {session.durationMinutes ? ` · ${session.durationMinutes} min` : ""}
+            </dd>
+          </div>
+        </dl>
 
         {isInterviewer && inviteUrl && (
-          <div className="mt-5 space-y-3">
-            <button onClick={copyInvite} className="flex w-full items-center justify-center gap-2 rounded-[4px] border border-accent bg-accent/10 px-4 py-3 font-bold text-accent">
-              <FaLink />
-              {copiedInvite ? "Link copied" : "Copy assigned-user link"}
-            </button>
-            <a href={mailtoHref} className="flex w-full items-center justify-center gap-2 rounded-[4px] bg-ink px-4 py-3 font-semibold text-canvas">
-              <FaEnvelope />
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a href={mailtoHref} className="btn-ink">
               Draft email invite
             </a>
+            <button
+              onClick={copyInvite}
+              className="text-sm text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+            >
+              {copiedInvite ? "Link copied" : "Copy assigned-user link"}
+            </button>
           </div>
         )}
       </div>
 
-      <div className="panel rounded-[4px] p-5">
-        <div className="mb-4 grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+      <div>
+        <div className="flex flex-wrap items-end justify-between gap-4 border-b border-rule pb-4">
           <div>
-            <p className="app-eyebrow">AI assistant</p>
-            <h2 className="mt-1 text-2xl font-semibold text-ink">Question bank</h2>
+            <p className="app-eyebrow">Question bank</p>
+            <h2 className="app-h2 mt-3">Something to ask</h2>
           </div>
           {isInterviewer && (
-            <div className="grid gap-2 sm:grid-cols-2 xl:w-[28rem]">
-              <button onClick={generateQuestions} disabled={!!loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] bg-ink px-4 py-3 text-sm font-semibold text-canvas disabled:opacity-70">
-                <FaMagic />
-                {loading === "questions" ? "Generating..." : "Generate questions"}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={generateQuestions}
+                disabled={!!loading}
+                className="btn-ink px-4 py-2 text-sm"
+              >
+                {loading === "questions" ? "Generating…" : "Generate questions"}
               </button>
-              <button onClick={generatePrep} disabled={!!loading} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-rule bg-black/5 px-4 py-3 text-sm font-bold text-ink disabled:opacity-70">
-                <FaQuestionCircle />
-                {loading === "prep" ? "Generating..." : "Prep guide"}
-              </button>
-              <button onClick={clearQuestions} disabled={!!loading || questions.length === 0} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-rose-600/40 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700 disabled:opacity-50">
-                <FaEraser />
-                {loading === "clear-questions" ? "Clearing..." : "Clear questions"}
-              </button>
-              <button onClick={clearPrep} disabled={!!loading || !prepGuide} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-[4px] border border-rule bg-black/5 px-4 py-3 text-sm font-bold text-ink disabled:opacity-50">
-                <FaEraser />
-                {loading === "clear-prep" ? "Clearing..." : "Clear prep"}
+              <button
+                onClick={generatePrep}
+                disabled={!!loading}
+                className="btn-quiet px-4 py-2 text-sm"
+              >
+                {loading === "prep" ? "Generating…" : "Prep guide"}
               </button>
             </div>
           )}
         </div>
 
-        <div className="max-h-168 overflow-y-auto pr-1">
+        <div className="max-h-[42rem] overflow-y-auto pr-1">
           {prepGuide && (
-            <div className="mb-5 rounded-[4px] border border-accent bg-accent/10 p-4">
-              <p className="mb-2 font-semibold text-accent">Interviewee prep</p>
-              <p className="whitespace-pre-wrap text-sm leading-6 text-ink">{prepGuide}</p>
+            <div className="mt-5 border-l-2 border-accent pl-4">
+              <p className="app-eyebrow">Interviewee prep</p>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-[1.7] text-ink-soft">
+                {prepGuide}
+              </p>
             </div>
           )}
 
           {isInterviewer ? (
-            <div className="grid gap-3">
-              {questions.length > 0 ? questions.map((item, index) => (
-                <article key={`${item.question}-${index}`} className="rounded-[4px] border border-rule bg-white p-4">
-                  <div className="mb-3 flex items-start gap-3">
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-[4px] bg-accent/10 text-sm font-semibold text-accent">
-                      {index + 1}
+            questions.length > 0 ? (
+              <ol className="mt-2">
+                {questions.map((item, index) => (
+                  <li
+                    key={`${item.question}-${index}`}
+                    className="row-hair grid grid-cols-[2.5rem_1fr] gap-2 px-1 py-5 first:border-t-0"
+                  >
+                    <span className="app-eyebrow pt-1 text-accent">
+                      {String(index + 1).padStart(2, "0")}
                     </span>
                     <div className="min-w-0">
-                      <div className="mb-2 flex flex-wrap gap-2">
-                        <span className="rounded-[4px] bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">{item.category || "General"}</span>
-                        {item.skill && <span className="rounded-[4px] bg-accent/10 px-3 py-1 text-xs font-bold text-accent">{item.skill}</span>}
-                      </div>
-                      <p className="break-words font-bold leading-6 text-ink">{item.question}</p>
+                      <p className="break-words text-[15px] font-medium leading-[1.55] text-ink">
+                        {item.question}
+                      </p>
+                      <p className="app-eyebrow mt-2">
+                        {item.category || "General"}
+                        {item.skill ? ` · ${item.skill}` : ""}
+                      </p>
+                      {item.followUps?.length > 0 && (
+                        <ul className="mt-3 space-y-1.5 text-sm leading-[1.6] text-ink-soft">
+                          {item.followUps.map((followUp) => (
+                            <li key={followUp} className="flex gap-3">
+                              <span className="mt-2.5 h-px w-3 shrink-0 bg-rule" />
+                              {followUp}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                  </div>
-                  {item.followUps?.length > 0 && (
-                    <ul className="ml-11 space-y-1 text-sm leading-6 text-ink-soft">
-                      {item.followUps.map((followUp) => <li key={followUp}>- {followUp}</li>)}
-                    </ul>
-                  )}
-                </article>
-              )) : (
-              <p className="rounded-[4px] border border-rule bg-white p-4 text-sm text-ink-soft">
-                Generate an AI question bank for this role, level, and skill set.
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="py-5 text-sm text-ink-soft">
+                Generate a question bank for this role, level, and skill set.
               </p>
-              )}
-            </div>
+            )
           ) : (
-            <p className="rounded-[4px] border border-rule bg-white p-4 text-sm text-ink-soft">
-              Your interviewer controls the question bank. Use this area to review the prep guide and agenda before the call.
+            <p className="py-5 text-sm text-ink-soft">
+              Your interviewer controls the question bank. Review the prep guide and
+              agenda here before the call.
             </p>
           )}
         </div>
+
+        {isInterviewer && (questions.length > 0 || prepGuide) && (
+          <div className="mt-4 flex gap-5 border-t border-rule pt-4 text-[13px]">
+            {questions.length > 0 && (
+              <button
+                onClick={clearQuestions}
+                disabled={!!loading}
+                className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent disabled:opacity-50"
+              >
+                {loading === "clear-questions" ? "Clearing…" : "Clear questions"}
+              </button>
+            )}
+            {prepGuide && (
+              <button
+                onClick={clearPrep}
+                disabled={!!loading}
+                className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent disabled:opacity-50"
+              >
+                {loading === "clear-prep" ? "Clearing…" : "Clear prep"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

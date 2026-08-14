@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FaChevronRight, FaClock, FaDownload, FaEnvelope, FaPlus, FaShareAlt, FaTrash } from "react-icons/fa";
+import { FaChevronRight } from "react-icons/fa";
 import { SkillIcon } from "./AdminShared";
 import { formatDateTime, sanitizeWholeNumberInput, sectionName, toWholeNumber } from "./adminUtils";
 
@@ -94,39 +94,50 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
   return (
     <main className="relative z-10 mx-auto w-full max-w-7xl min-w-0 overflow-x-hidden text-sm [&_.field-control]:min-h-10 [&_.field-control]:px-3 [&_.field-control]:py-2 [&_textarea.field-control]:min-h-20">
       <div>
-        <button onClick={onBack} className="mb-4 text-sm text-accent">Assessments <FaChevronRight className="mx-2 inline text-xs text-ink-soft" /> {assessment.title}</button>
+        <button onClick={onBack} className="mb-6 text-sm text-ink-soft transition-colors hover:text-ink">&larr; Assessments</button>
         <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <h1 className="max-w-4xl text-2xl font-semibold leading-tight text-ink sm:text-3xl lg:text-4xl">{assessment.title}</h1>
+          <h1 className="app-title max-w-4xl">{assessment.title}</h1>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-2 lg:justify-end">
-            <button onClick={() => navigator.clipboard?.writeText(inviteLink)} className="inline-flex items-center justify-center gap-2 rounded-[4px] border border-rule bg-black/5 px-3 py-2 text-sm font-semibold text-ink"><FaShareAlt /> Copy link</button>
             <button
               onClick={() => setShowReport(!showReport)}
               aria-expanded={showReport}
-              className={`inline-flex items-center justify-center gap-2 rounded-[4px] border px-3 py-2 text-sm font-semibold transition ${showReport ? "border-accent bg-accent/10 text-accent" : "border-rule bg-black/5 text-ink hover:border-rule"}`}
+              className="btn-quiet px-4 py-2 text-sm"
             >
-              <span className={`h-2.5 w-2.5 rounded-full ${showReport ? "bg-cyan-200" : "bg-slate-500"}`} />
               {showReport ? "Hide report" : "View report"}
             </button>
-            <button onClick={exportPdf} className="inline-flex items-center justify-center gap-2 rounded-[4px] border border-accent bg-accent/10 px-3 py-2 text-sm font-semibold text-accent"><FaDownload /> Export PDF</button>
-            <button onClick={onDelete} className="grid place-items-center rounded-[4px] border border-rose-600/40 bg-rose-50 px-3 py-2 text-rose-700"><FaTrash /></button>
+            <button onClick={exportPdf} className="btn-quiet px-4 py-2 text-sm">
+              Export PDF
+            </button>
+            <button
+              onClick={() => navigator.clipboard?.writeText(inviteLink)}
+              className="px-2 text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+            >
+              Copy link
+            </button>
+            <button
+              onClick={onDelete}
+              className="px-2 text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+            >
+              Delete
+            </button>
           </div>
         </div>
         {notice && (
-          <div className="mt-4 rounded-[4px] border border-emerald-600/40 bg-emerald-50 px-4 py-3 font-bold text-emerald-700">
+          <div className="mt-4 border-l-2 border-emerald-700 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
             {notice}
           </div>
         )}
         <section className="mt-5 grid min-w-0 items-start gap-4 lg:mt-6 lg:grid-cols-[minmax(0,1fr)_24rem]">
-          <div className="flex min-w-0 flex-col rounded-[4px] border border-rule bg-white shadow-xl lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+          <div className="flex min-w-0 flex-col lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
             <div className="shrink-0 flex flex-col gap-3 border-b border-rule px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
               <div>
                 <p><span className="font-semibold text-ink">Duration:</span> <span className="ml-3 text-base text-ink-soft">{draftProblems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 0), 0)} mins</span></p>
                 <p className="mt-1.5 text-xs font-semibold text-ink-soft sm:text-sm">Deadline: {formatDateTime(assessment.deadlineAt)}</p>
               </div>
-              <span className="inline-flex items-center gap-2 text-emerald-700"><span className="h-3 w-3 rounded-full bg-emerald-300" /> Active</span>
+              <span className="app-eyebrow inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-emerald-700" /> Active</span>
             </div>
             <div className="min-h-0 flex-1 overflow-auto p-3 sm:p-5">
-              <h2 className="mb-4 text-xl font-semibold text-ink sm:text-2xl">Sections ({draftProblems.length})</h2>
+              <h2 className="app-h2 mb-5">Sections ({draftProblems.length})</h2>
               {draftProblems.map((problem, index) => (
                 <EditableSection
                   key={index}
@@ -140,11 +151,11 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               ))}
             </div>
           </div>
-          <aside className="panel min-w-0 overflow-auto rounded-[4px] p-4 sm:p-5 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
-            <h2 className="font-semibold text-ink">Role</h2>
+          <aside className="min-w-0 overflow-auto border-t border-rule pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0 lg:sticky lg:top-28 lg:h-[calc(100vh-15rem)] lg:max-h-[44rem]">
+            <h2 className="app-h3">Role</h2>
             <p className="mt-2 text-ink-soft">{assessment.title.replace(" Hiring Test", "")}</p>
-            <section className="mt-5 rounded-[4px] border border-rule bg-black/5 p-3 sm:p-4">
-              <h2 className="font-semibold text-ink">Assignment settings</h2>
+            <section className="mt-8 border-t border-rule pt-6">
+              <h2 className="app-h3">Assignment settings</h2>
               <label className="field-group mt-4">
                 <span className="field-label">Candidate emails</span>
                 <textarea
@@ -178,22 +189,22 @@ export default function AdminAssessmentDetail({ assessment, notice, onBack, onDe
               </button>
               {inviteRecipients.length > 0 && (
                 <a href={`mailto:${inviteRecipients.join(",")}?subject=${encodeURIComponent(`PrepTalk Lab assessment: ${assessment.title}`)}&body=${encodeURIComponent(`Open your assigned Lab here:\n${inviteLink}`)}`} className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-[4px] bg-ink px-4 py-2.5 font-semibold text-canvas">
-                  <FaEnvelope /> Send invite to all
+                  Send invite to all
                 </a>
               )}
             </section>
             <h2 className="mt-5 font-semibold text-ink">Core skills</h2>
             <div className="mt-3 flex flex-wrap gap-2">
-              {coreSkills.map((skill) => <span key={skill} className="rounded-full border border-rule bg-black/5 px-2.5 py-1 text-xs font-semibold text-ink">{skill}</span>)}
+              {coreSkills.map((skill) => <span key={skill} className="chip">{skill}</span>)}
               {coreSkills.length === 0 && <span className="text-sm text-ink-soft">No core skills added.</span>}
             </div>
             <h2 className="mt-5 font-semibold text-ink">Candidates</h2>
-            <div className="mt-3 rounded-[4px] border border-rule bg-black/5 px-4 py-4">
+            <div className="mt-3 border-t border-rule pt-4">
               <div className="text-3xl font-semibold text-ink">{candidates.length}</div>
               <div className="mt-1 text-sm font-semibold text-ink-soft">assigned candidate{candidates.length === 1 ? "" : "s"}</div>
             </div>
             <h2 className="mt-5 font-semibold text-ink">Submissions</h2>
-            <div className="mt-3 rounded-[4px] border border-rule bg-black/5 px-4 py-4">
+            <div className="mt-3 border-t border-rule pt-4">
               <div className="text-3xl font-semibold text-ink">{submissions.length}</div>
               <div className="mt-1 text-sm font-semibold text-ink-soft">submission{submissions.length === 1 ? "" : "s"} received</div>
             </div>
@@ -218,10 +229,10 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
           <span className="block truncate text-base font-semibold text-ink">{sectionName(problem, problemIndex)}</span>
           <span className="text-sm text-ink-soft">{tests.length} test case{tests.length === 1 ? "" : "s"}</span>
         </span>
-        <span className="hidden shrink-0 text-ink-soft sm:inline"><FaClock className="mr-2 inline" />{problem.timeLimitMinutes} mins</span>
+        <span className="hidden shrink-0 text-ink-soft sm:inline">{problem.timeLimitMinutes} mins</span>
       </button>
       {open && (
-        <div className="mt-4 grid min-w-0 gap-3 overflow-x-hidden rounded-[4px] border border-rule bg-white p-3 sm:p-4">
+        <div className="ml-1.5 mt-4 grid min-w-0 gap-4 overflow-x-hidden border-l border-rule pb-2 pl-6">
           <div className="grid min-w-0 gap-3 md:grid-cols-3">
             <label className="field-group md:col-span-2">
               <span className="field-label">Section name</span>
@@ -242,32 +253,62 @@ function EditableSection({ problem, problemIndex, onAddTest, onRemoveTest, onUpd
           </label>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="font-semibold text-ink">Test cases</h3>
-            <button onClick={onAddTest} className="inline-flex items-center gap-2 rounded-[3px] border border-accent bg-accent/10 px-3 py-2 text-sm font-bold text-accent"><FaPlus /> Add case</button>
+            <button
+              onClick={onAddTest}
+              className="text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
+            >
+              Add case
+            </button>
           </div>
           <div className="max-h-[24rem] overflow-auto pr-1">
             <div className="grid min-w-0 gap-2">
+              {/* One header row for the whole list — labels don't repeat per case */}
+              <div className="hidden xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_8.5rem_3.5rem] xl:gap-3">
+                <span className="app-eyebrow">Case name</span>
+                <span className="app-eyebrow">Input JSON</span>
+                <span className="app-eyebrow">Expected JSON</span>
+                <span className="app-eyebrow">Visible</span>
+                <span aria-hidden="true" />
+              </div>
               {tests.map((test, testIndex) => (
-                <div key={testIndex} className="grid min-w-0 gap-2 rounded-[4px] border border-rule bg-black/5 p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_auto_auto]">
-                  <label className="field-group min-w-0">
-                    <span className="field-label">Case name</span>
-                    <input value={test.name || ""} onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })} className="field-surface field-control" />
+                <div key={testIndex} className="grid min-w-0 items-center gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)_minmax(0,1.1fr)_8.5rem_3.5rem]">
+                  <input
+                    value={test.name || ""}
+                    onChange={(event) => onUpdateTest(testIndex, { name: event.target.value })}
+                    aria-label="Case name"
+                    className="field-surface min-h-11 w-full min-w-0 px-3 py-2 text-sm"
+                  />
+                  <input
+                    value={test.inputJson || ""}
+                    onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })}
+                    aria-label="Input JSON"
+                    className="field-surface min-h-11 w-full min-w-0 px-3 py-2 font-mono text-sm"
+                  />
+                  <input
+                    value={test.expectedJson || ""}
+                    onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })}
+                    aria-label="Expected JSON"
+                    className="field-surface min-h-11 w-full min-w-0 px-3 py-2 font-mono text-sm"
+                  />
+                  <label className="flex items-center gap-2.5 text-xs font-medium text-ink">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(test.visible)}
+                      onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })}
+                      className="field-toggle"
+                    />
+                    <span className="xl:hidden">Visible</span>
                   </label>
-                  <label className="field-group min-w-0">
-                    <span className="field-label">Input JSON</span>
-                    <textarea value={test.inputJson || ""} onChange={(event) => onUpdateTest(testIndex, { inputJson: event.target.value })} className="field-surface field-control min-h-14 font-mono text-sm" />
-                  </label>
-                  <label className="field-group min-w-0">
-                    <span className="field-label">Expected JSON</span>
-                    <textarea value={test.expectedJson || ""} onChange={(event) => onUpdateTest(testIndex, { expectedJson: event.target.value })} className="field-surface field-control min-h-14 font-mono text-sm" />
-                  </label>
-                  <label className="flex items-center gap-3 rounded-[3px] border border-rule bg-white px-3 py-2 text-xs font-bold text-ink xl:mt-6">
-                    <input type="checkbox" checked={Boolean(test.visible)} onChange={(event) => onUpdateTest(testIndex, { visible: event.target.checked })} className="field-toggle" />
-                    Visible
-                  </label>
-                  {tests.length > 1 && (
-                    <button onClick={() => onRemoveTest(testIndex)} className="grid h-10 w-10 place-items-center rounded-[3px] border border-rose-600/40 bg-rose-50 text-rose-700 xl:mt-6" title="Delete test case">
-                      <FaTrash />
+                  {tests.length > 1 ? (
+                    <button
+                      onClick={() => onRemoveTest(testIndex)}
+                      className="justify-self-start text-[13px] text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-accent hover:decoration-accent"
+                      title="Delete test case"
+                    >
+                      Delete
                     </button>
+                  ) : (
+                    <span aria-hidden="true" />
                   )}
                 </div>
               ))}
@@ -303,7 +344,7 @@ function ReportViewer({ report }) {
     <section className="mt-6 flex min-w-0 flex-col rounded-[4px] border border-rule bg-white p-3 shadow-xl sm:p-6 lg:h-[46rem]">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-semibold text-ink">Submission report</h2>
+          <h2 className="app-h2">Submission report</h2>
           <p className="mt-2 text-ink-soft">{report.submissions.length} submission{report.submissions.length === 1 ? "" : "s"} captured. Select one report to inspect.</p>
         </div>
         <label className="w-full sm:min-w-72 sm:w-auto">
