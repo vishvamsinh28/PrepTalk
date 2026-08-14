@@ -85,10 +85,17 @@ export async function POST(req) {
     if (!isValidObjectId(body.assessmentId)) return json({ message: "Valid assessmentId is required" }, 400);
 
     await connectDB();
-    const assessment = await LabAssessment.findById(body.assessmentId).select("createdBy candidates deadlineAt");
+    const assessment = await LabAssessment.findById(body.assessmentId).select("createdBy candidates deadlineAt problems");
     if (!assessment) return json({ message: "Assessment not found" }, 404);
     if (!userCanAccessAssessment(assessment, user)) return json({ message: "Forbidden" }, 403);
     if (user.role === "Interviewee" && assessmentIsExpired(assessment)) return json({ message: "This assessment deadline has passed." }, 410);
+
+    // Read the problem statement from the stored assessment rather than the
+    // request body — the body is candidate-controlled and would otherwise let
+    // them steer the prompt with text that was never part of the assessment.
+    const problemIndex = Number.isInteger(body.problemIndex) ? body.problemIndex : -1;
+    const problem = assessment.problems?.[problemIndex];
+    if (!problem) return json({ message: "Valid problemIndex is required" }, 400);
 
     const failedCases = normalizeCases(body.failedCases);
 
@@ -98,7 +105,7 @@ export async function POST(req) {
 
     const result = await generateGeminiJson(
       explanationPrompt({
-        problem: body.problem || {},
+        problem,
         code: safeString(body.code, MAX_CODE_CHARS),
         failedCases,
       })

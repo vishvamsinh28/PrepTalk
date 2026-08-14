@@ -18,6 +18,13 @@ export default function SharedWorkspace({ sessionId }) {
   const connectionIdRef = useRef("");
   const saveTimerRef = useRef(null);
   const skipNextSaveRef = useRef(false);
+  // Mirrors `workspace` so an in-flight save can tell, at resolve time, whether
+  // the user typed while it was away.
+  const latestWorkspaceRef = useRef(workspace);
+
+  useEffect(() => {
+    latestWorkspaceRef.current = workspace;
+  }, [workspace]);
 
   useEffect(() => {
     let isMounted = true;
@@ -68,6 +75,15 @@ export default function SharedWorkspace({ sessionId }) {
     };
   }, [sessionId]);
 
+  /**
+   * Persists the workspace and mirrors it to the other participant.
+   * If the user typed while the request was in flight, the server echo is
+   * discarded rather than applied — adopting it would silently overwrite the
+   * newer keystrokes, and the debounce has already queued a save for them.
+   * @param {{ notes: string, code: string }} [nextWorkspace] - Snapshot to save.
+   * @param {boolean} [publish=true] - Whether to broadcast the saved copy.
+   * @returns {Promise<void>}
+   */
   const saveWorkspace = async (nextWorkspace = workspace, publish = true) => {
     setStatus("Saving...");
     try {
@@ -75,6 +91,17 @@ export default function SharedWorkspace({ sessionId }) {
         ...nextWorkspace,
       });
       const savedWorkspace = data.workspace || nextWorkspace;
+      const current = latestWorkspaceRef.current;
+      const supersededByLocalEdit =
+        current?.notes !== nextWorkspace.notes || current?.code !== nextWorkspace.code;
+
+      if (supersededByLocalEdit) {
+        // Newer local text wins; its own debounced save is already pending, and
+        // publishing this stale copy would push it to the other participant.
+        setStatus("Unsaved changes");
+        return;
+      }
+
       skipNextSaveRef.current = true;
       setWorkspace(savedWorkspace);
       setStatus("Saved");

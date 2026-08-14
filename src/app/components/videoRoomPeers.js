@@ -63,11 +63,5 @@ export function createPeerHelpers({ channelRef, connectionIdRef, streamsRef, use
     return peer;
   }
 
-  const leaveRoom = () => {
-    channelRef.current?.presence.leave().catch(() => {});
-    ablyRef.current?.close();
-    streamRef.current?.getTracks().forEach(track => track.stop());
-    router.push("/dashboard");
-  };
   return { shouldInitiatePeer, createPeer, addPeer };
 }

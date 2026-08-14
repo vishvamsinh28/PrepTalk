@@ -42,6 +42,14 @@ export async function POST(req) {
 
     return json({ message: "User registered successfully" }, 201);
   } catch (error) {
+    // A concurrent signup can slip between the findOne above and this save.
+    // The unique index on email is what actually enforces uniqueness, so
+    // translate its duplicate-key error into the same 400 the check returns
+    // rather than reporting a server fault the user can't act on.
+    if (error?.code === 11000) {
+      return json({ message: "User already exists" }, 400);
+    }
+
     console.error(error);
     return serverError("Registration failed");
   }

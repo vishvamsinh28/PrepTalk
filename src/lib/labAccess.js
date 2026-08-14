@@ -183,20 +183,12 @@ function normalizeSkillList(value) {
 }
 
 /**
- * Parses the deadline into a Date.
- *
- * NOTE: both branches return `parsed`, so an unparseable input yields an
- * `Invalid Date` rather than being rejected or defaulted. Mongoose then fails
- * the cast on save. Left as-is because changing it changes behaviour — decide
- * whether an invalid deadline should default or 400, then collapse the branch.
- *
+ * Parses the deadline into a Date, passing `Invalid Date` through unchanged.
+ * Validation is the caller's job — both lab routes reject an unparseable
+ * deadline with a 400 before this value ever reaches mongoose.
  * @param {unknown} value - Raw deadline, usually an ISO string.
  * @returns {Date} Parsed date, possibly `Invalid Date`.
  */
 function normalizeDeadline(value) {
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return parsed;
-  }
-  return parsed;
+  return new Date(value);
 }

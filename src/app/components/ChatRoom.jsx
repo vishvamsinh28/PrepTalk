@@ -28,7 +28,14 @@ export default function ChatRoom({ sessionId, userEmail }) {
 
     getJson(`/api/messages?sessionId=${encodeURIComponent(sessionId)}`)
       .then((data) => {
-        if (isMounted) setMessages(data.messages);
+        if (!isMounted) return;
+        // Merge rather than replace: a realtime message can land before this
+        // history request resolves, and assigning would drop it.
+        const history = Array.isArray(data?.messages) ? data.messages : [];
+        setMessages((prev) => {
+          const seen = new Set(history.map((msg) => msg._id));
+          return [...history, ...prev.filter((msg) => !seen.has(msg._id))];
+        });
       })
       .catch((error) => console.error("Error fetching messages:", error));
 
@@ -39,9 +46,16 @@ export default function ChatRoom({ sessionId, userEmail }) {
       });
     };
 
+    // Ably invokes this as a bare callback, so nothing downstream catches a
+    // rejection — presence.get() throws once the connection closes (including
+    // on unmount), which would otherwise surface as an unhandled rejection.
     const updatePresence = async () => {
-      const members = await channel.presence.get();
-      if (isMounted) setActiveUsers(uniqueUsers(members));
+      try {
+        const members = await channel.presence.get();
+        if (isMounted) setActiveUsers(uniqueUsers(members));
+      } catch (error) {
+        if (isMounted) console.error("Error reading chat presence:", error);
+      }
     };
 
     channel.subscribe("message", handleMessage);

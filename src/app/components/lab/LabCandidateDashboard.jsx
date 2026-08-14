@@ -125,7 +125,7 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
     try {
       const response = await postJson("/api/lab/explain", {
         assessmentId: activeAssessment._id,
-        problem: { title: activeProblem.title, prompt: activeProblem.prompt },
+        problemIndex: activeProblem.index,
         code: currentCode,
         failedCases,
       });

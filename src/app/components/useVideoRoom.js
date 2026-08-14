@@ -62,7 +62,20 @@ export function useVideoRoom(sessionId, userEmail) {
       delete streamsRef.current[connectionId];
     };
 
+    // Ably invokes this as a bare callback, so a rejection has no caller to
+    // catch it. presence.get() throws whenever the connection drops or closes,
+    // including on unmount, so the boundary lives here rather than inline —
+    // wrapping applyPresence's body would push its loop past three levels.
     const syncPresence = async () => {
+      try {
+        await applyPresence();
+      } catch (error) {
+        if (isMounted) console.error("Unable to sync video presence:", error);
+      }
+    };
+
+    /** Reads current presence, updates participants, and dials any new peers. */
+    const applyPresence = async () => {
       const members = await channel.presence.get();
       const selfId = connectionIdRef.current;
       const remoteMembers = members.filter((member) => member.connectionId !== selfId);
@@ -183,6 +196,18 @@ export function useVideoRoom(sessionId, userEmail) {
       ably.close();
     };
   }, [sessionId, userEmail]);
+
+  /**
+   * Leaves presence, closes the connection, stops local tracks, then routes
+   * back to the dashboard. Lives here rather than in `createPeerHelpers`
+   * because it needs `ablyRef`, `streamRef`, and the router from this scope.
+   */
+  const leaveRoom = () => {
+    channelRef.current?.presence.leave().catch(() => {});
+    ablyRef.current?.close();
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    router.push("/dashboard");
+  };
 
   const { toggleAudio, toggleVideo } = createMediaToggles({
     stream,
