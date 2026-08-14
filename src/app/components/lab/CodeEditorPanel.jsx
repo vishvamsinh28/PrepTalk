@@ -1,5 +1,10 @@
 import { useRef } from "react";
 
+/**
+ * Candidate code editor: light chrome, dark code surface with syntax
+ * highlight overlay, and run/submit controls.
+ * @param {object} props Editor state and handlers from the runner.
+ */
 export default function CodeEditorPanel({
   activeProblemId,
   code,

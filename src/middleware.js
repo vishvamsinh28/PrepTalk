@@ -4,6 +4,11 @@ import { verifyAuthToken } from "@/lib/token";
 const AUTH_PAGES = new Set(["/login", "/register"]);
 const PROTECTED_PATHS = ["/dashboard", "/interviewer", "/interviewee", "/session", "/lab"];
 
+/**
+ * Edge middleware: redirects logged-out users away from protected pages
+ * and logged-in users away from the auth pages, based on the JWT cookie.
+ * @param {import("next/server").NextRequest} request
+ */
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
   const isAuthPage = AUTH_PAGES.has(pathname);
@@ -43,6 +48,9 @@ export async function middleware(request) {
   }
 }
 
+/**
+ * Paths the middleware runs on.
+ */
 export const config = {
   matcher: ["/", "/login", "/register", "/dashboard/:path*", "/interviewer/:path*", "/interviewee/:path*", "/session/:path*", "/lab/:path*"],
 };

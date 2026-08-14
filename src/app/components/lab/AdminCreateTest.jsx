@@ -4,6 +4,12 @@ import { useState } from "react";
 import { SkillIcon } from "./AdminShared";
 import { sectionName, toWholeNumber } from "./adminUtils";
 
+/**
+ * Template picker for a new assessment with live preview and
+ * custom-assessment option.
+ * @param {{ form: object, roleTemplates: object[], selectedTemplateId: string,
+ *   onBack: Function, onChooseTemplate: Function, onContinue: Function }} props
+ */
 export default function AdminCreateTest({ form, roleTemplates, selectedTemplateId, onBack, onChooseTemplate, onContinue }) {
   const [roleQuery, setRoleQuery] = useState("");
   const visibleTemplates = roleTemplates.filter((template) => `${template.title} ${template.summary}`.toLowerCase().includes(roleQuery.toLowerCase()));

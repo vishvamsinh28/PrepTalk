@@ -5,6 +5,11 @@ import { FaChevronRight } from "react-icons/fa";
 import { Metric, SkillIcon } from "./AdminShared";
 import { sanitizeWholeNumberInput, sectionName, toWholeNumber } from "./adminUtils";
 
+/**
+ * Assessment builder: collapsible sections with test-case table rows
+ * plus the assignment sidebar.
+ * @param {object} props Builder state and mutation callbacks.
+ */
 export default function AdminTestBuilder({
   form,
   isSubmitting,

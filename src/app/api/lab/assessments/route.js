@@ -7,6 +7,10 @@ import LabAssessment from "@/models/LabAssessment";
 
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
+/**
+ * GET /api/lab/assessments — lists assessments visible to the caller
+ * (owned for interviewers, assigned for candidates). Auth: signed in.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -29,6 +33,10 @@ export async function GET(req) {
   }
 }
 
+/**
+ * POST /api/lab/assessments — creates an assessment from the builder
+ * payload. Auth: interviewer.
+ */
 export async function POST(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

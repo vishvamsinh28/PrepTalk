@@ -1,3 +1,7 @@
+/**
+ * Mongoose model: a PrepTalk account (username, email, bcrypt password
+ * hash, and Interviewer/Interviewee role).
+ */
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema({

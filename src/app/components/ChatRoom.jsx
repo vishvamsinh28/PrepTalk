@@ -9,6 +9,11 @@ function uniqueUsers(members) {
   return [...new Set(members.map((member) => member.clientId).filter(Boolean))];
 }
 
+/**
+ * Realtime session chat over Ably: presence line, message list, and
+ * composer with Enter-to-send.
+ * @param {{ sessionId: string, userEmail: string }} props
+ */
 export default function ChatRoom({ sessionId, userEmail }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);

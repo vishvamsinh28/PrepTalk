@@ -14,6 +14,11 @@ const roleCopy = {
   },
 };
 
+/**
+ * Signed-in dashboard: role-aware shortcuts, account details, and
+ * score averages.
+ * @param {{ userData: { email?: string, role?: string } }} props
+ */
 export default function DashboardClient({ userData }) {
   const role = userData?.role;
   const copy = roleCopy[role];

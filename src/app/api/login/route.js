@@ -2,24 +2,27 @@ import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { createAuthCookie, signAuthToken } from "@/lib/auth";
-import { json, serverError } from "@/lib/api";
-import { isValidEmail, normalizeEmail } from "@/lib/validation";
+import { badRequest, json, serverError } from "@/lib/api";
+import { loginSchema, parseWith } from "@/lib/validation";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
+/**
+ * POST /api/login — verifies credentials and sets the httpOnly JWT
+ * cookie. Rate limited per IP+email.
+ */
 export async function POST(req) {
   try {
-    const { email, password } = await req.json();
-    const cleanEmail = normalizeEmail(email);
+    const body = await req.json().catch(() => null);
+    const parsed = parseWith(loginSchema, body);
+    if (!parsed.success) return badRequest(parsed.error);
+
+    const { email: cleanEmail, password } = parsed.data;
     const limiter = rateLimit({
       key: `login:${getClientIp(req)}:${cleanEmail || "unknown"}`,
       limit: 8,
       windowMs: 15 * 60 * 1000,
     });
     if (limiter.limited) return rateLimitResponse();
-
-    if (!isValidEmail(cleanEmail) || !password) {
-      return json({ message: "Email and password are required" }, 400);
-    }
 
     await connectDB();
 

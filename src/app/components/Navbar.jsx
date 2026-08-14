@@ -10,6 +10,10 @@ function getRoleHome(role) {
   return "/dashboard";
 }
 
+/**
+ * Fixed app navigation for signed-in pages: role-aware links and
+ * logout (clears cookie, then replace+refresh to purge cached pages).
+ */
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();

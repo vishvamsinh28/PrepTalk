@@ -5,6 +5,10 @@ import InterviewReport from "@/models/InterviewReport";
 
 const scoreKeys = ["communication", "technicalDepth", "problemSolving", "confidence", "roleFit"];
 
+/**
+ * GET /api/progress — per-dimension score averages across the caller's
+ * reports. Auth: signed-in user.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

@@ -23,6 +23,10 @@ function SessionMissing() {
   );
 }
 
+/**
+ * Live interview room: video, chat, session tools, shared workspace,
+ * and (for the interviewer) the scorecard. Server-checks access.
+ */
 export default async function SessionRoom(props) {
   const { sessionId } = await props.params;
 

@@ -1,3 +1,7 @@
+/**
+ * Mongoose model: a Lab assessment — problems with test cases,
+ * assigned candidates, deadline, and graded submissions.
+ */
 import mongoose from "mongoose";
 
 const LabTestCaseSchema = new mongoose.Schema(

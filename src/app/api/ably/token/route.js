@@ -4,6 +4,10 @@ import { connectDB } from "@/lib/db";
 import { json, serverError } from "@/lib/api";
 import { findSessionForUser } from "@/lib/sessionAccess";
 
+/**
+ * GET /api/ably/token?sessionId= — issues a scoped Ably token for the
+ * session's channels. Auth: session participants only.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

@@ -11,6 +11,10 @@ const roles = [
   ["Interviewer", "Create rooms, score people"],
 ];
 
+/**
+ * Registration screen inside the split AuthLayout, with role choice
+ * as radio cards. Redirects to /login on success.
+ */
 export default function RegisterPage() {
   const router = useRouter();
 

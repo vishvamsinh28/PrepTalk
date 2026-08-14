@@ -1,6 +1,10 @@
 import Link from "next/link";
 import RollingWord from "./RollingWord";
 
+/**
+ * Landing hero: rolling accent word inside a serif claim, primary CTA,
+ * and an anchor to the product band.
+ */
 export default function Hero() {
   return (
     <section className="border-b border-rule px-10 pb-28 pt-32">

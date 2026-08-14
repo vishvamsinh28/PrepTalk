@@ -1,3 +1,7 @@
+/**
+ * Mongoose model: a submitted scorecard — five score dimensions,
+ * recommendation, notes, and optional AI summary.
+ */
 import mongoose from "mongoose";
 
 const ScoreSchema = new mongoose.Schema(

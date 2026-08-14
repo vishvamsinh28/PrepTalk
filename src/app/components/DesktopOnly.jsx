@@ -1,5 +1,8 @@
 import PrepTalkLogo from "./PrepTalkLogo";
 
+/**
+ * Full-screen gate shown below lg viewports — the app is desktop-only.
+ */
 export default function DesktopOnly() {
   return (
     <div className="flex min-h-screen flex-col justify-between bg-canvas px-6 py-10 lg:hidden">

@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { deleteJson, getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 
+/**
+ * Interviewer's sessions as hairline rows with join, invite, and
+ * delete actions. Listens for preptalk:sessions-updated.
+ * @param {{ compact?: boolean }} props
+ */
 export default function SessionList({ compact = false }) {
   const router = useRouter();
   const [sessions, setSessions] = useState([]);

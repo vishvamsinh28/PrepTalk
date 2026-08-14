@@ -1,6 +1,9 @@
 import Link from "next/link";
 import PrepTalkLogo from "../PrepTalkLogo";
 
+/**
+ * Dark landing footer: wordmark, product anchors, account links.
+ */
 export default function LandingFooter() {
   return (
     <footer className="bg-night px-10 py-16 text-canvas">

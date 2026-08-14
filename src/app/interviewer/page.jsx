@@ -5,6 +5,10 @@ import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
 import PageHeader, { SignedInAs, SectionHeading } from "../components/ui/PageHeader";
 
+/**
+ * Interviewer workspace page: create-session form, session list, and
+ * submitted reports. Server-gated to the Interviewer role.
+ */
 export default async function InterviewerPage() {
   const userData = await getCurrentUser();
 

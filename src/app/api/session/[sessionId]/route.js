@@ -6,6 +6,10 @@ import Session from "@/models/Session";
 import Message from "@/models/Message";
 import InterviewReport from "@/models/InterviewReport";
 
+/**
+ * DELETE /api/session/:id — deletes a session with its messages and
+ * reports. Auth: session owner.
+ */
 export async function DELETE(req, props) {
   try {
     const { sessionId } = await props.params;

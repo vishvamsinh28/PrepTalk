@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Left-rule status callout for admin actions.
+ * @param {{ tone: "success"|"error", text: string }} props
+ */
 export function Toast({ tone, text }) {
   const classes =
     tone === "success"
@@ -25,6 +29,10 @@ export function SkillIcon({ index }) {
   );
 }
 
+/**
+ * Bordered stat cell: mono label over serif value.
+ * @param {{ label: string, value: React.ReactNode }} props
+ */
 export function Metric({ label, value }) {
   return (
     <div className="border-r border-rule px-4 py-3 last:border-r-0">

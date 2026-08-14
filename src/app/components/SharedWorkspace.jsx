@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import * as Ably from "ably";
 import { getJson, patchJson } from "@/lib/clientApi";
 
+/**
+ * Realtime shared notes + dark code pad, autosaved on a debounce and
+ * synced over Ably.
+ * @param {{ sessionId: string }} props
+ */
 export default function SharedWorkspace({ sessionId }) {
   const [workspace, setWorkspace] = useState({ notes: "", code: "" });
   const [status, setStatus] = useState("");

@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { FaCheck, FaTimes } from "react-icons/fa";
 import { getJson, postJson } from "@/lib/clientApi";
-import CodeEditorPanel from "./CodeEditorPanel";
-import ProblemPanel from "./ProblemPanel";
-import ResultsSidebar from "./ResultsSidebar";
 import { runUserCodeInWorker } from "./sandboxRunner";
-import { createResults, deepEqual, fallbackInsight, formatTime } from "./resultUtils";
+import { toRunnableProblem, toTestResult } from "./candidateRunUtils";
+import AssessmentPicker from "./AssessmentPicker";
+import AssessmentScreen from "./AssessmentScreen";
+import { createResults } from "./resultUtils";
 
+/**
+ * Candidate lab: assessment picker plus the timed in-assessment flow
+ * (local runs, server-graded submit, auto-submit at 0:00).
+ * @param {{ initialAssessmentId?: string }} props
+ */
 export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
   const [assessments, setAssessments] = useState([]);
   const [activeAssessment, setActiveAssessment] = useState(null);
@@ -213,195 +217,39 @@ export default function LabCandidateDashboard({ initialAssessmentId = "" }) {
 
   if (activeAssessment && activeProblem) {
     return (
-      <div className="app-shell relative min-h-screen overflow-x-hidden px-3 pb-5 pt-24 text-ink sm:px-5 lg:overflow-hidden">
-        <div className="soft-grid absolute inset-0 opacity-60" />
-        {submissionError && (
-          <div className="relative z-10 mx-auto mb-4 max-w-[96rem] rounded-[4px] border border-rose-600/40 bg-rose-50 px-5 py-3 font-bold text-rose-700">
-            {submissionError}
-          </div>
-        )}
-        <div className="relative z-10 mx-auto grid max-w-[96rem] overflow-visible rounded-[4px] border border-rule lg:h-[calc(100vh-7rem)] lg:grid-cols-[5.75rem_1fr] lg:overflow-hidden">
-          <ProblemRail problems={problems} activeProblemId={activeProblem.id} onSelect={setActiveProblemId} resultsByProblem={resultsByProblem} />
-          <main
-            className="grid min-h-0 min-w-0 lg:grid-cols-[var(--problem-panel-width)_0.5rem_minmax(0,1fr)]"
-            style={{ "--problem-panel-width": `${problemPanelWidth}px` }}
-          >
-            <ProblemPanel problem={activeProblem} panelWidth={problemPanelWidth} />
-            <button
-              onPointerDown={startResize}
-              className="hidden cursor-col-resize border-x border-rule transition hover:bg-accent/10 lg:block"
-              aria-label="Resize problem and editor panels"
-              title="Drag to resize panels"
-            />
-            <section className="grid min-h-0 min-w-0 grid-rows-[auto_auto] overflow-visible lg:grid-rows-[minmax(0,1fr)_auto] lg:overflow-hidden">
-              <CodeEditorPanel
-                activeProblemId={activeProblem.id}
-                code={currentCode}
-                formattedTime={formatTime(secondsRemaining)}
-                isRunning={isRunning}
-                lineNumbers={lineNumbers}
-                onExit={stopAssessment}
-                onSubmit={() => submitFullAssessment()}
-                runTests={runTests}
-                setCodeByProblem={setCodeByProblem}
-              />
-              <ResultsSidebar
-                activeProblem={activeProblem}
-                explanationError={explanationError}
-                failedResults={failedResults}
-                isExplaining={isExplaining}
-                isOpen={showResults}
-                onToggle={() => setShowResults(!showResults)}
-                visibleResults={visibleResults}
-              />
-            </section>
-          </main>
-        </div>
-      </div>
+      <AssessmentScreen
+        submissionError={submissionError}
+        problems={problems}
+        activeProblem={activeProblem}
+        setActiveProblemId={setActiveProblemId}
+        resultsByProblem={resultsByProblem}
+        problemPanelWidth={problemPanelWidth}
+        startResize={startResize}
+        currentCode={currentCode}
+        secondsRemaining={secondsRemaining}
+        isRunning={isRunning}
+        lineNumbers={lineNumbers}
+        stopAssessment={stopAssessment}
+        submitFullAssessment={submitFullAssessment}
+        runTests={runTests}
+        setCodeByProblem={setCodeByProblem}
+        explanationError={explanationError}
+        failedResults={failedResults}
+        isExplaining={isExplaining}
+        showResults={showResults}
+        setShowResults={setShowResults}
+        visibleResults={visibleResults}
+      />
     );
   }
 
   return (
-    <div className="app-shell relative min-h-screen overflow-hidden px-5 pb-16 pt-24 text-ink">
-      <div className="soft-grid absolute inset-0 opacity-60" />
-      <main className="relative z-10 mx-auto max-w-6xl">
-        <header className="border-b border-rule pb-8">
-          <p className="app-eyebrow">PrepTalk Lab</p>
-          <h1 className="app-title mt-4">Assigned assessments</h1>
-          <p className="mt-4 max-w-[58ch] text-[15px] leading-[1.7] text-ink-soft">
-            Start an assigned coding assessment when you are ready.
-          </p>
-        </header>
-        {submitMessage && (
-          <p className="mt-6 border-l-2 border-emerald-700 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-            {submitMessage}
-          </p>
-        )}
-        <div className="max-h-[calc(100vh-22rem)] min-h-[18rem] overflow-auto pr-2">
-          {initialAssessmentId && !assessments.some((assessment) => assessment._id === initialAssessmentId) && (
-            <p className="mt-6 border-l-2 border-accent bg-accent/5 px-4 py-3 text-sm text-accent">
-              The invited assessment was not found for this account. Make sure you are
-              logged in with the assigned candidate email.
-            </p>
-          )}
-          <ul>
-            {sortedAssessments.map((assessment) => (
-              <li
-                key={assessment._id}
-                className="row-hair flex flex-wrap items-center justify-between gap-x-10 gap-y-4 px-1 py-7 first:border-t-0"
-              >
-                <div className="min-w-0">
-                  <h2 className="app-h3">{assessment.title}</h2>
-                  <p className="app-eyebrow mt-2">
-                    {assessment.durationMinutes} min · {assessment.problems?.length || 0}{" "}
-                    sections · Due {formatCandidateDeadline(assessment.deadlineAt)}
-                  </p>
-                  <CandidateStatus assessment={assessment} />
-                </div>
-                <button onClick={() => startAssessment(assessment)} className="btn-ink shrink-0">
-                  {(assessment.submissions?.length || 0) > 0 ? "Retry assessment" : "Start assessment"}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {assessments.length === 0 && (
-            <p className="border-b border-rule py-14 text-center text-sm text-ink-soft">
-              No assigned assessments yet. Your interviewer will send one through.
-            </p>
-          )}
-        </div>
-      </main>
-    </div>
+    <AssessmentPicker
+      assessments={assessments}
+      sortedAssessments={sortedAssessments}
+      initialAssessmentId={initialAssessmentId}
+      submitMessage={submitMessage}
+      onStart={startAssessment}
+    />
   );
-}
-
-function CandidateStatus({ assessment }) {
-  const latest = [...(assessment.submissions || [])].sort((left, right) => new Date(right.submittedAt) - new Date(left.submittedAt))[0];
-
-  if (!latest) {
-    return <span className="chip mt-3">Pending</span>;
-  }
-
-  const passed = Number(latest.passedTests) || 0;
-  const total = Number(latest.totalTests) || 0;
-  const allPassed = total > 0 && passed === total;
-
-  return (
-    <span className={`chip mt-3 ${allPassed ? "border-emerald-700/40 text-emerald-700" : "chip-accent"}`}>
-      Submitted · {passed}/{total} tests passed
-    </span>
-  );
-}
-
-function formatCandidateDeadline(value) {
-  if (!value) return "no deadline";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "no deadline";
-  return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-}
-
-function ProblemRail({ problems, activeProblemId, onSelect, resultsByProblem }) {
-  return (
-    <aside className="border-b border-rule lg:grid lg:grid-rows-[3rem_1fr] lg:border-b-0 lg:border-r">
-      <div className="hidden place-items-center border-b border-rule px-4 lg:grid">
-        <span className="app-eyebrow" title="Questions">
-          Qs
-        </span>
-      </div>
-      <div className="flex gap-2 overflow-x-auto px-3 py-3 text-center lg:grid lg:content-start lg:gap-3 lg:overflow-visible lg:py-5">
-        {problems.map((problem, index) => {
-          const results = resultsByProblem[problem.id] || [];
-          const failed = results.some((result) => result.status === "failed");
-          const passed = results.length > 0 && results.every((result) => result.status === "passed");
-          return (
-            <div key={problem.id}>
-              <button
-                onClick={() => onSelect(problem.id)}
-                className={`grid h-10 min-w-14 place-items-center rounded-[3px] border px-3 text-sm font-semibold lg:h-12 lg:w-full lg:min-w-0 lg:px-0 ${
-                  activeProblemId === problem.id ? "border-accent bg-accent/5 text-ink" : "border-transparent text-ink-soft hover:border-rule hover:bg-black/[0.03]"
-                }`}
-              >
-                {passed ? <FaCheck className="text-emerald-700" /> : failed ? <FaTimes className="text-accent" /> : `Q${index + 1}`}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </aside>
-  );
-}
-
-function toRunnableProblem(problem, index) {
-  return {
-    id: problem._id || `${problem.title}-${index}`,
-    index,
-    title: problem.title,
-    level: problem.difficulty,
-    points: problem.points,
-    time: `${problem.timeLimitMinutes} min`,
-    prompt: problem.prompt,
-    starter: problem.starterCode,
-    tests: (problem.tests || []).map((test) => ({
-      name: test.name,
-      input: parseJsonValue(test.inputJson),
-      expected: parseJsonValue(test.expectedJson),
-      visible: test.visible,
-    })),
-  };
-}
-
-function parseJsonValue(value) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return value;
-  }
-}
-
-function toTestResult(test, result) {
-  if (!result.ok) {
-    return { ...test, duration: result.duration, error: result.error || "Runtime error", output: null, status: "failed", insight: fallbackInsight(test, null, result.error) };
-  }
-  const passed = deepEqual(result.output, test.expected);
-  return { ...test, duration: result.duration, error: "", output: result.output, status: passed ? "passed" : "failed", insight: passed ? "" : fallbackInsight(test, result.output, "") };
 }

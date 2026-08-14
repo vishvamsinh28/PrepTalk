@@ -52,6 +52,10 @@ Generate 10 strong questions. Make them practical and role-specific.
 `;
 }
 
+/**
+ * POST /api/session/:id/questions — generates the AI question bank.
+ * Auth: owner.
+ */
 export async function POST(req, props) {
   try {
     const { sessionId } = await props.params;
@@ -78,6 +82,10 @@ export async function POST(req, props) {
   }
 }
 
+/**
+ * DELETE /api/session/:id/questions — clears the question bank.
+ * Auth: owner.
+ */
 export async function DELETE(req, props) {
   try {
     const { sessionId } = await props.params;

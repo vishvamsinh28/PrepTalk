@@ -1,3 +1,8 @@
+/**
+ * Expands a role template into builder form state.
+ * @param {object} template
+ * @returns {object}
+ */
 export function templateToForm(template) {
   return {
     title: `${template.title} Hiring Test`,
@@ -10,27 +15,59 @@ export function templateToForm(template) {
   };
 }
 
+/**
+ * Deep-ish clone of a problem for safe editing.
+ * @param {object} problem
+ * @returns {object}
+ */
 export function cloneProblem(problem) {
   return { ...problem, tests: problem.tests.map((test) => ({ ...test })) };
 }
 
+/**
+ * Keeps only digits from a numeric text input.
+ * @param {string} value
+ * @returns {string}
+ */
 export function sanitizeWholeNumberInput(value) {
   return String(value).replace(/[^\d]/g, "");
 }
 
+/**
+ * Parses a positive integer with fallback.
+ * @param {unknown} value
+ * @param {number} fallback
+ * @returns {number}
+ */
 export function toWholeNumber(value, fallback) {
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+/**
+ * Display name for a section, falling back to its index.
+ * @param {object} problem
+ * @param {number} index
+ * @returns {string}
+ */
 export function sectionName(problem, index) {
   return problem.title?.trim() || `Section ${index + 1}`;
 }
 
+/**
+ * Splits comma-separated skills into a bounded list.
+ * @param {string} value
+ * @returns {string[]}
+ */
 export function parseSkillList(value) {
   return [...new Set(String(value || "").split(",").map((skill) => skill.trim()).filter(Boolean))].slice(0, 12);
 }
 
+/**
+ * Locale date string for a date-ish value.
+ * @param {unknown} value
+ * @returns {string}
+ */
 export function formatDate(value) {
   if (!value) return "Today";
   const date = new Date(value);
@@ -38,6 +75,11 @@ export function formatDate(value) {
   return date.toLocaleDateString(undefined, { year: "numeric", month: "2-digit", day: "2-digit" });
 }
 
+/**
+ * Locale date+time string for a date-ish value.
+ * @param {unknown} value
+ * @returns {string}
+ */
 export function formatDateTime(value) {
   if (!value) return "No deadline";
   const date = new Date(value);
@@ -45,6 +87,11 @@ export function formatDateTime(value) {
   return date.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
 }
 
+/**
+ * Returns a user-facing error for an invalid builder form, or "".
+ * @param {object} form
+ * @returns {string}
+ */
 export function validateAssessmentForm(form) {
   if (!form.title.trim()) return "Test title is required.";
   if (!form.candidates.split(",").map((email) => email.trim()).filter(Boolean).length) {

@@ -33,6 +33,10 @@ function parseAgenda(agenda) {
     .slice(0, 20);
 }
 
+/**
+ * POST /api/session — creates an interview session (agenda, schedule,
+ * invitees). Auth: interviewer.
+ */
 export async function POST(req) {
   try {
     const {

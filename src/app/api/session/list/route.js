@@ -3,6 +3,10 @@ import Session from "@/models/Session";
 import { json, serverError } from "@/lib/api";
 import { getAuthPayloadFromRequest } from "@/lib/auth";
 
+/**
+ * GET /api/session/list — sessions the caller owns or is invited to.
+ * Auth: signed in.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

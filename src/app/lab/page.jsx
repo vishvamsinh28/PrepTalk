@@ -4,6 +4,10 @@ import LabClient from "../components/LabClient";
 
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
+/**
+ * Lab entry page: renders the admin or candidate lab experience based
+ * on the caller's role.
+ */
 export default async function LabPage({ searchParams }) {
   const userData = await getCurrentUser();
   const params = await searchParams;

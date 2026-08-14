@@ -1,3 +1,6 @@
+/**
+ * Asymmetric editorial statement section on the landing page.
+ */
 export default function Manifesto() {
   return (
     <section className="border-b border-rule px-10 py-32">

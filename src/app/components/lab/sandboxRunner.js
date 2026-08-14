@@ -1,3 +1,10 @@
+/**
+ * Runs candidate code against one test input in a sandboxed Web Worker
+ * with blocked globals and a timeout.
+ * @param {string} code
+ * @param {unknown} input
+ * @returns {Promise<{ ok: boolean, output?: unknown, error?: string, duration: number }>}
+ */
 export function runUserCodeInWorker(code, input, timeoutMs = 900) {
   return new Promise((resolve) => {
     const workerSource = `
@@ -26,7 +33,11 @@ export function runUserCodeInWorker(code, input, timeoutMs = 900) {
             configurable: false,
             writable: false
           });
-        } catch (error) {}
+        } catch (error) {
+          // Some globals are non-configurable and cannot be shadowed; the rest
+          // of the sandbox hardening still applies.
+          console.warn("sandbox: could not shadow global", key, error.message);
+        }
       }
 
       globalThis.onmessage = async (event) => {

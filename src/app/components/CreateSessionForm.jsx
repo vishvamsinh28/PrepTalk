@@ -3,47 +3,22 @@
 import { useState } from "react";
 import { postJson } from "@/lib/clientApi";
 import { motion } from "framer-motion";
+import InvitePackage from "./InvitePackage";
+import { buildSessionPayload, emptySessionForm } from "@/lib/sessionForm";
+import SegmentedControl from "./ui/SegmentedControl";
 
-const defaultAgenda = "Warm-up - 5 min\nCore questions - 35 min\nCandidate questions - 10 min\nFeedback - 10 min";
 const levels = ["Entry", "Mid", "Senior"];
 const interviewTypes = ["Technical", "Behavioral", "Mixed"];
 
-function buildInviteDetails(session) {
-  if (!session || typeof window === "undefined") {
-    return { inviteUrl: "", emailBody: "", mailtoHref: "" };
-  }
-
-  const inviteUrl = `${window.location.origin}/session/${session._id}`;
-  const interviewees = session.interviewees || [];
-  const scheduledText = session.scheduledAt
-    ? `Time: ${new Date(session.scheduledAt).toLocaleString()}\n`
-    : "";
-  const emailBody = `Hi,\n\nYou are invited to a PrepTalk interview session.\n\nSession: ${session.title}\nRole: ${session.role || "General"}\nLevel: ${session.level || "Entry"}\nType: ${session.interviewType || "Mixed"}\n${scheduledText}Join link: ${inviteUrl}\n\nPlease use the link above to join the session.\n\nThanks.`;
-
-  return {
-    inviteUrl,
-    emailBody,
-    mailtoHref: `mailto:${interviewees.join(",")}?subject=${encodeURIComponent(`PrepTalk interview: ${session.title}`)}&body=${encodeURIComponent(emailBody)}`,
-  };
-}
-
+/**
+ * Create-session form: title, schedule, agenda, and invitees. On
+ * success shows the InvitePackage and notifies the session list.
+ */
 export default function CreateSessionForm() {
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    interviewees: "",
-    role: "",
-    level: "Entry",
-    interviewType: "Technical",
-    skills: "",
-    scheduledAt: "",
-    durationMinutes: 60,
-    agenda: defaultAgenda,
-  });
+  const [formData, setFormData] = useState(emptySessionForm);
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [createdSession, setCreatedSession] = useState(null);
-  const [copied, setCopied] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -60,27 +35,9 @@ export default function CreateSessionForm() {
     e.preventDefault();
     setMessage("");
     setIsError(false);
-    setCopied("");
 
     try {
-      const payload = {
-        title: formData.title,
-        description: formData.description,
-        role: formData.role,
-        level: formData.level,
-        interviewType: formData.interviewType,
-        skills: formData.skills
-          .split(",")
-          .map((skill) => skill.trim())
-          .filter(Boolean),
-        interviewees: formData.interviewees
-          .split(",")
-          .map((email) => email.trim())
-          .filter(Boolean),
-        scheduledAt: formData.scheduledAt,
-        durationMinutes: formData.durationMinutes,
-        agenda: formData.agenda,
-      };
+      const payload = buildSessionPayload(formData);
 
       const response = await postJson("/api/session", payload);
       setMessage(response.message);
@@ -88,30 +45,11 @@ export default function CreateSessionForm() {
       setCreatedSession(response.session);
       window.dispatchEvent(new CustomEvent("preptalk:sessions-updated"));
 
-      setFormData({
-        title: "",
-        description: "",
-        interviewees: "",
-        role: "",
-        level: "Entry",
-        interviewType: "Technical",
-        skills: "",
-        scheduledAt: "",
-        durationMinutes: 60,
-        agenda: defaultAgenda,
-      });
+      setFormData(emptySessionForm);
     } catch (error) {
       setMessage(error.message || "Session creation failed");
       setIsError(true);
     }
-  };
-
-  const inviteDetails = buildInviteDetails(createdSession);
-
-  const copyText = async (label, text) => {
-    if (!text) return;
-    await navigator.clipboard?.writeText(text);
-    setCopied(label);
   };
 
   return (
@@ -142,55 +80,7 @@ export default function CreateSessionForm() {
         </p>
       )}
 
-      {createdSession && (
-        <div className="mb-8 border-l-2 border-emerald-700 bg-emerald-50/60 px-5 py-5">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <p className="app-h3">Session ready</p>
-            {copied && <span className="app-eyebrow">Copied {copied}</span>}
-          </div>
-          <p className="mt-2 max-w-[58ch] text-sm leading-[1.7] text-ink-soft">
-            Send this link only to assigned interviewees — anyone else is blocked from
-            opening the room.
-          </p>
-
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <input
-              readOnly
-              value={inviteDetails.inviteUrl}
-              className="field-surface min-w-0 flex-1 rounded-[4px] px-3 py-2.5 text-sm"
-            />
-            <a href={inviteDetails.mailtoHref} className="btn-ink shrink-0">
-              Send email
-            </a>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]">
-            <button
-              type="button"
-              onClick={() => copyText("link", inviteDetails.inviteUrl)}
-              className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
-            >
-              Copy link
-            </button>
-            <button
-              type="button"
-              onClick={() => copyText("email", inviteDetails.emailBody)}
-              className="text-ink-soft underline decoration-rule decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-ink"
-            >
-              Copy email text
-            </button>
-          </div>
-
-          <details className="mt-4">
-            <summary className="app-eyebrow cursor-pointer">Preview email</summary>
-            <textarea
-              readOnly
-              value={inviteDetails.emailBody}
-              className="field-surface mt-3 min-h-44 w-full rounded-[4px] p-3 text-sm leading-6"
-            />
-          </details>
-        </div>
-      )}
+      {createdSession && <InvitePackage session={createdSession} />}
 
       <form onSubmit={handleSubmit} className="grid gap-5 lg:grid-cols-2">
         <label className="field-group lg:col-span-2">
@@ -331,33 +221,5 @@ export default function CreateSessionForm() {
         </div>
       </form>
     </motion.div>
-  );
-}
-
-function SegmentedControl({ name, value, options, onChange }) {
-  return (
-    <div className="inline-flex w-full overflow-hidden rounded-[4px] border border-rule">
-      {options.map((option, index) => {
-        const isActive = value === option;
-        return (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => onChange(option)}
-            className={`min-h-11 flex-1 px-3 text-sm transition-colors ${
-              index > 0 ? "border-l border-rule" : ""
-            } ${
-              isActive
-                ? "bg-ink font-medium text-canvas"
-                : "bg-transparent text-ink-soft hover:bg-black/[0.03] hover:text-ink"
-            }`}
-          >
-            {option}
-          </button>
-        );
-      })}
-      <input type="hidden" name={name} value={value} readOnly />
-    </div>
   );
 }

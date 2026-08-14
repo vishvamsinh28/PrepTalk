@@ -26,6 +26,10 @@ Notes: ${report.notes || "None"}
 `;
 }
 
+/**
+ * POST /api/reports/summary — generates an AI summary + action items
+ * for a saved report. Auth: report author.
+ */
 export async function POST(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

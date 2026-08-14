@@ -17,6 +17,9 @@ const display = Instrument_Serif({
   variable: "--font-display",
 });
 
+/**
+ * Site-wide metadata: title, description, and favicon set.
+ */
 export const metadata = {
   title: "PrepTalk",
   description: "We help you upskill",
@@ -29,6 +32,11 @@ export const metadata = {
   },
 };
 
+/**
+ * Root layout: loads fonts, gates the whole app to desktop widths,
+ * and mounts the shared Navbar.
+ * @param {{ children: React.ReactNode }} props
+ */
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${body.variable} ${display.variable}`}>

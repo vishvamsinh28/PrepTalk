@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+/**
+ * Landing closer: serif claim with sign-up and login actions.
+ */
 export default function ClosingCta() {
   return (
     <section className="px-10 py-32">

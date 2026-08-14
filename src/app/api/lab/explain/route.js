@@ -65,6 +65,10 @@ ${JSON.stringify(failedCases, null, 2)}
 `;
 }
 
+/**
+ * POST /api/lab/explain — asks Gemini to explain failing visible tests.
+ * Rate limited. Auth: assessment participant.
+ */
 export async function POST(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

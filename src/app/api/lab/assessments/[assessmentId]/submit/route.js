@@ -7,6 +7,10 @@ import { isValidObjectId } from "@/lib/sessionAccess";
 import LabAssessment from "@/models/LabAssessment";
 import { getClientIp, rateLimit, rateLimitResponse } from "@/lib/rateLimit";
 
+/**
+ * POST /api/lab/assessments/:id/submit — grades the candidate's
+ * solutions server-side and stores the submission. Auth: assigned candidate.
+ */
 export async function POST(req, props) {
   try {
     const user = await getAuthPayloadFromRequest(req);

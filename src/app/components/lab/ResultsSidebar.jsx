@@ -1,6 +1,11 @@
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { formatValue } from "./resultUtils";
 
+/**
+ * Collapsible visible-test results: per-case status, IO blocks, and
+ * debug hints.
+ * @param {object} props Runner results and toggle state.
+ */
 export default function ResultsSidebar({
   activeProblem,
   explanationError,

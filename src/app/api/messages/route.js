@@ -6,6 +6,10 @@ import { findSessionForUser } from "@/lib/sessionAccess";
 import { normalizeText } from "@/lib/validation";
 import { getAblyRestClient } from "@/lib/ably";
 
+/**
+ * GET /api/messages?sessionId= — lists persisted chat messages for a
+ * session. Auth: session participants.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -34,6 +38,10 @@ export async function GET(req) {
   }
 }
 
+/**
+ * POST /api/messages — persists a chat message and publishes it to the
+ * session channel. Auth: session participants.
+ */
 export async function POST(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

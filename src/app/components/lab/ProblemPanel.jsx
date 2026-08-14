@@ -1,3 +1,7 @@
+/**
+ * Problem statement panel in the assessment screen.
+ * @param {{ problem: object }} props
+ */
 export default function ProblemPanel({ problem }) {
   return (
     <section className="min-h-0 overflow-visible px-5 py-5 text-ink lg:overflow-y-auto lg:px-6">

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { getJson } from "@/lib/clientApi";
 import { useRouter } from "next/navigation";
 
+/**
+ * Hairline list of sessions assigned to the interviewee with
+ * join buttons.
+ */
 export default function IntervieweeSessionList() {
   const [sessions, setSessions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);

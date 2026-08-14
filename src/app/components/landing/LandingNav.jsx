@@ -1,6 +1,10 @@
 import Link from "next/link";
 import PrepTalkLogo from "../PrepTalkLogo";
 
+/**
+ * Landing header: wordmark, section anchors, and a login link.
+ * Deliberately no sign-up button — conversion lives in hero and closer.
+ */
 export default function LandingNav() {
   return (
     <header className="border-b border-rule px-10">

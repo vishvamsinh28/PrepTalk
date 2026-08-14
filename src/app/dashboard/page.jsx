@@ -2,6 +2,9 @@ import { getCurrentUser } from "@/lib/serverAuth";
 import DashboardClient from "../components/DashboardClient";
 import AuthState from "../components/AuthState";
 
+/**
+ * Server page: resolves the current user and renders DashboardClient.
+ */
 export default async function DashboardPage() {
   const userData = await getCurrentUser();
 

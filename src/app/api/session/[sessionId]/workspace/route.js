@@ -4,6 +4,9 @@ import { connectDB } from "@/lib/db";
 import { findSessionForUser } from "@/lib/sessionAccess";
 import { normalizeText } from "@/lib/validation";
 
+/**
+ * GET /api/session/:id/workspace — shared notes/code. Auth: participants.
+ */
 export async function GET(req, props) {
   try {
     const { sessionId } = await props.params;
@@ -21,6 +24,10 @@ export async function GET(req, props) {
   }
 }
 
+/**
+ * PATCH /api/session/:id/workspace — saves shared notes/code.
+ * Auth: participants.
+ */
 export async function PATCH(req, props) {
   try {
     const { sessionId } = await props.params;

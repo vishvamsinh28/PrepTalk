@@ -1,5 +1,10 @@
 import { FaExclamationTriangle } from "react-icons/fa";
 
+/**
+ * Full-screen notice for auth failures (invalid token, wrong role)
+ * with a link back to login.
+ * @param {{ title: string, message: string }} props
+ */
 export default function AuthState({ title, message }) {
   return (
     <div className="app-shell relative flex min-h-screen items-center justify-center overflow-hidden px-5">

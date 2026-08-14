@@ -8,8 +8,13 @@ import { Toast } from "./AdminShared";
 import AdminTestBuilder from "./AdminTestBuilder";
 import AdminTestList from "./AdminTestList";
 import { blankProblem, customTemplate, roleTemplates } from "./adminTemplates";
-import { cloneProblem, parseSkillList, templateToForm, toWholeNumber, validateAssessmentForm } from "./adminUtils";
+import { cloneProblem, templateToForm, toWholeNumber, validateAssessmentForm } from "./adminUtils";
 
+/**
+ * Interviewer lab state machine: list → create → builder → detail,
+ * owning assessments data and CRUD calls.
+ * @param {{ initialAssessmentId?: string }} props
+ */
 export default function LabAdminDashboard({ initialAssessmentId = "" }) {
   const [assessments, setAssessments] = useState([]);
   const [view, setView] = useState("list");
@@ -55,25 +60,7 @@ export default function LabAdminDashboard({ initialAssessmentId = "" }) {
     setView("detail");
   };
 
-  const exportAssessments = () => {
-    const rows = [
-      ["Title", "Candidates", "Sections", "Duration", "Submissions"],
-      ...visibleAssessments.map((assessment) => [
-        assessment.title,
-        (assessment.candidates || []).join("; "),
-        assessment.problems?.length || 0,
-        assessment.durationMinutes,
-        assessment.submissions?.length || 0,
-      ]),
-    ];
-    const csv = rows.map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\n");
-    const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "preptalk-lab-tests.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
+  const exportAssessments = () => exportAssessmentsCsv(visibleAssessments);
 
   const startCreate = () => {
     setView("create");
@@ -93,19 +80,7 @@ export default function LabAdminDashboard({ initialAssessmentId = "" }) {
       }
 
       setIsSubmitting(true);
-      const totalProblemMinutes = form.problems.reduce((total, problem) => total + toWholeNumber(problem.timeLimitMinutes, 30), 0);
-      const payload = {
-        ...form,
-        candidates: form.candidates.split(",").map((email) => email.trim()).filter(Boolean),
-        coreSkills: parseSkillList(form.coreSkills),
-        deadlineAt: form.deadlineAt,
-        durationMinutes: totalProblemMinutes,
-        problems: form.problems.map((problem) => ({
-          ...problem,
-          points: toWholeNumber(problem.points, 100),
-          timeLimitMinutes: toWholeNumber(problem.timeLimitMinutes, 30),
-        })),
-      };
+      const payload = buildAssessmentPayload(form);
       const data = await postJson("/api/lab/assessments", payload);
       setMessage(data.message || "Test created");
       await loadAssessments();

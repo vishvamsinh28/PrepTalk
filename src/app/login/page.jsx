@@ -6,6 +6,10 @@ import { postJson } from "@/lib/clientApi";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import AuthLayout from "../components/AuthLayout";
 
+/**
+ * Login screen inside the split AuthLayout. Sets the JWT cookie via
+ * /api/login, then replaces to /dashboard.
+ */
 export default function LoginPage() {
   const router = useRouter();
 

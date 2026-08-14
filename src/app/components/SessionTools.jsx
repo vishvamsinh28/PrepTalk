@@ -2,31 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { deleteJson, postJson } from "@/lib/clientApi";
+import { normalizeQuestionList } from "@/lib/questionBank";
 
-function normalizeQuestionList(value) {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .map((item) => {
-      if (typeof item === "string") {
-        return { category: "General", skill: "", question: item, followUps: [] };
-      }
-
-      return {
-        category: String(item?.category || "General").trim(),
-        skill: String(item?.skill || "").trim(),
-        question: String(item?.question || "").trim(),
-        followUps: Array.isArray(item?.followUps)
-          ? item.followUps.map((followUp) => String(followUp).trim()).filter(Boolean)
-          : String(item?.followUps || "")
-              .split(/\n|;/)
-              .map((followUp) => followUp.trim())
-              .filter(Boolean),
-      };
-    })
-    .filter((item) => item.question);
-}
-
+/**
+ * Session agenda plus the AI question bank and prep guide, with
+ * generate/clear controls for the interviewer.
+ * @param {{ sessionId: string, session: object, userRole: string }} props
+ */
 export default function SessionTools({ sessionId, session, userRole }) {
   const [questions, setQuestions] = useState(normalizeQuestionList(session.questionBank));
   const [prepGuide, setPrepGuide] = useState(session.prepGuide || "");

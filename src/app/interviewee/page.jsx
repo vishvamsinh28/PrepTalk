@@ -4,6 +4,10 @@ import ReportList from "../components/ReportList";
 import AuthState from "../components/AuthState";
 import PageHeader, { SignedInAs, SectionHeading } from "../components/ui/PageHeader";
 
+/**
+ * Interviewee workspace page: assigned sessions and received reports.
+ * Server-gated to the Interviewee role.
+ */
 export default async function IntervieweePage() {
   const userData = await getCurrentUser();
 

@@ -19,6 +19,10 @@ function normalizeScores(value) {
   return normalized;
 }
 
+/**
+ * GET /api/reports — reports the caller wrote (interviewer) or received
+ * (interviewee). Auth: signed in.
+ */
 export async function GET(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -38,6 +42,10 @@ export async function GET(req) {
   }
 }
 
+/**
+ * POST /api/reports — saves an interview scorecard. Auth: interviewer
+ * on their own session.
+ */
 export async function POST(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -91,6 +99,9 @@ export async function POST(req) {
   }
 }
 
+/**
+ * DELETE /api/reports — deletes a report by id. Auth: report author.
+ */
 export async function DELETE(req) {
   try {
     const user = await getAuthPayloadFromRequest(req);

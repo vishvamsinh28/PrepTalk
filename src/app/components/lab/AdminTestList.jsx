@@ -2,6 +2,11 @@
 
 import { formatDate, formatDateTime } from "./adminUtils";
 
+/**
+ * Assessments index: search, count, and hairline rows with pending/
+ * completed figures.
+ * @param {object} props List data and handlers.
+ */
 export default function AdminTestList({ assessments, query, setQuery, onCreate, onDelete, onExport, onOpen }) {
   return (
     <main className="relative z-10 mx-auto max-w-7xl">

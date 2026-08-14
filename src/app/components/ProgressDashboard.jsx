@@ -12,6 +12,9 @@ const labels = {
   roleFit: "Role fit",
 };
 
+/**
+ * Score averages across submitted reports as serif stat figures.
+ */
 export default function ProgressDashboard() {
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);

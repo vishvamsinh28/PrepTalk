@@ -1,3 +1,7 @@
+/**
+ * Mongoose model: an interview session — agenda, schedule, invitees,
+ * AI question bank, prep guide, and shared workspace.
+ */
 import mongoose from "mongoose";
 
 const AgendaItemSchema = new mongoose.Schema(

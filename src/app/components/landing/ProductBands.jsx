@@ -22,6 +22,10 @@ const labPoints = [
   "Plain-English explanations when a test fails",
 ];
 
+/**
+ * The two product sections: Interview (dark, with room recreation)
+ * and Lab (light, with editor recreation).
+ */
 export default function ProductBands() {
   return (
     <>

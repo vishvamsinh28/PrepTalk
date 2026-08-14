@@ -11,6 +11,10 @@ const scoreLabels = {
   roleFit: "Role fit",
 };
 
+/**
+ * Submitted interview reports as hairline rows: scores, strengths,
+ * improvements, and optional AI summary.
+ */
 export default function ReportList() {
   const [reports, setReports] = useState([]);
   const [canDeleteReports, setCanDeleteReports] = useState(false);

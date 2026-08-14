@@ -1,3 +1,6 @@
+/**
+ * Prebuilt role templates selectable in the create flow.
+ */
 export const roleTemplates = [
   {
     id: "backend",
@@ -138,6 +141,9 @@ export const roleTemplates = [
   },
 ];
 
+/**
+ * Factory for an empty builder problem.
+ */
 export const blankProblem = {
   title: "Custom Coding Question",
   difficulty: "Easy",
@@ -151,6 +157,9 @@ export const blankProblem = {
   ],
 };
 
+/**
+ * The start-from-blank template entry.
+ */
 export const customTemplate = {
   id: "custom",
   title: "Custom Assessment",

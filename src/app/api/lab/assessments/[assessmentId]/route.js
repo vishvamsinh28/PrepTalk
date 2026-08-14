@@ -9,6 +9,10 @@ import LabAssessment from "@/models/LabAssessment";
 
 const LAB_ROLES = new Set(["Interviewer", "Interviewee"]);
 
+/**
+ * GET /api/lab/assessments/:id — one assessment, sanitized for the
+ * caller's role. Auth: owner or assigned candidate.
+ */
 export async function GET(req, props) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -31,6 +35,9 @@ export async function GET(req, props) {
   }
 }
 
+/**
+ * DELETE /api/lab/assessments/:id — removes an assessment. Auth: owner.
+ */
 export async function DELETE(req, props) {
   try {
     const user = await getAuthPayloadFromRequest(req);
@@ -53,6 +60,9 @@ export async function DELETE(req, props) {
   }
 }
 
+/**
+ * PATCH /api/lab/assessments/:id — updates settings/problems. Auth: owner.
+ */
 export async function PATCH(req, props) {
   try {
     const user = await getAuthPayloadFromRequest(req);

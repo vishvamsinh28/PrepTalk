@@ -22,6 +22,10 @@ export default function PageHeader({ eyebrow, title, description, meta }) {
   );
 }
 
+/**
+ * Right-aligned signed-in email block for page headers.
+ * @param {{ email?: string }} props
+ */
 export function SignedInAs({ email }) {
   return (
     <div className="text-right">
@@ -31,6 +35,10 @@ export function SignedInAs({ email }) {
   );
 }
 
+/**
+ * Section heading: mono eyebrow, serif title, optional right action.
+ * @param {{ eyebrow?: string, title: string, action?: React.ReactNode }} props
+ */
 export function SectionHeading({ eyebrow, title, action }) {
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
